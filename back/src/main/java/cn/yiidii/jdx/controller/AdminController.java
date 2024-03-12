@@ -90,7 +90,7 @@ public class AdminController {
 
     @PostMapping("checkUpgrade")
     public R<?> checkUpgrade() {
-        githubVersionListener.checkUpgrade();
+//        githubVersionListener.checkUpgrade();
         return R.ok(githubVersionListener.getVersionInfo());
     }
 

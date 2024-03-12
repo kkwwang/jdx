@@ -2,11 +2,10 @@ package cn.yiidii.jdx.util;
 
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.ex.BizException;
-import com.sun.org.apache.regexp.internal.RE;
-import java.util.Arrays;
 import lombok.experimental.UtilityClass;
+
+import java.util.Arrays;
 
 /**
  * JDXUtil

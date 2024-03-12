@@ -1,0 +1,10 @@
+/.idea/
+/front/node_modules/
+/front/dist/
+/back/target/
+/config/
+/config/config.json
+/logs/
+/front/package-lock.json
+/front/yarn.lock
+/front/pnpm-lock.yaml

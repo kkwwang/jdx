@@ -15,17 +15,14 @@ import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.util.JDXUtil;
 import com.alibaba.fastjson.JSONObject;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * JdService
@@ -120,7 +117,7 @@ public class JdService {
         String cookie = StrUtil.format("pt_key={};pt_pin={};", ptKey, URLEncoder.DEFAULT.encode(ptPin, StandardCharsets.UTF_8));
         timedCache.remove(mobile);
         // 通知管理员
-        SpringUtil.publishEvent(new AdminNotifyEvent("系统通知", StrUtil.format("{} 获取了京东Cookie", DesensitizedUtil.mobilePhone(mobile))));
+        SpringUtil.publishEvent(new AdminNotifyEvent("系统通知：" + DesensitizedUtil.mobilePhone(mobile), StrUtil.format("{} 获取了京东Cookie", DesensitizedUtil.mobilePhone(mobile))));
         return new JdInfo().builder().cookie(cookie).ptPin(JDXUtil.getPtPinFromCK(cookie)).build();
     }
 

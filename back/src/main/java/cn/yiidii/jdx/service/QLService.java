@@ -231,7 +231,7 @@ public class QLService implements ITask {
         log.debug(StrUtil.format("[青龙 - {}] 更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
 
         // 如果第一次异常，第二次用id
-        if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR) {
+        if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR || response.getStatus() == HttpStatus.HTTP_BAD_REQUEST) {
             envJo.remove("_id");
             envJo.put("id", id);
             log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
@@ -241,7 +241,7 @@ public class QLService implements ITask {
                     .execute();
             log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
         }
-        if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR) {
+        if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR || response.getStatus() == HttpStatus.HTTP_BAD_REQUEST) {
             throw new BizException("更新失败，请联系系统管理员");
         }
     }

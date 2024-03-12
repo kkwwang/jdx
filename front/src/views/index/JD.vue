@@ -2,16 +2,20 @@
   <div>
     <div v-if="!haveCookie">
       <van-field
+          ref="telRef"
           v-model="form.mobile"
           left-icon="phone-o"
           name="mobile"
+          type="tel"
           label="手机号"
           placeholder="手机号"
       ></van-field>
       <van-field
+          ref="codeRef"
           v-model="form.code"
           left-icon="shield-o"
           name="code"
+          type="number"
           label="验证码"
           placeholder="验证码"
       >
@@ -19,9 +23,8 @@
           <van-count-down
               v-if="Number(expireTime) > 0"
               ref="countDown"
-              millisecond
               :time="expireTime"
-              format="ss:SSS"
+              format="ss"
           />
           <van-button v-else size="small" plain type="info" @click="smsCode"
           >发送验证码
@@ -117,7 +120,8 @@ export default {
           .then(resp => {
             this.title = resp.data.title;
             this.notice = resp.data.notice;
-            this.remain = resp.data.remain
+            this.remain = resp.data.remain;
+            setTimeout(this.$refs.telRef.focus, 500)
           })
           .catch(err => {
             console.log(err);
@@ -127,6 +131,7 @@ export default {
       this.form.code = "";
       jdSmsCode(this.form.mobile).then(resp => {
         this.expireTime = resp.data.expireTime * 1000;
+        this.$refs.codeRef.focus();
       });
     },
     login: async function () {
@@ -150,7 +155,7 @@ export default {
                 .alert({
                   title: "提示",
                   message: response.data.cookie,
-                  confirmButtonText: "点击复制"
+                  confirmButtonText: "点击复制并提交"
                 })
                 .then(() => {
                   _this
@@ -173,18 +178,19 @@ export default {
 
     },
     ifPushToQL: function () {
-      setTimeout(() => {
-        this.$dialog
-            .confirm({
-              title: "提示",
-              message: "是否提交青龙？",
-              confirmButtonText: "提交",
-              cancelButtonText: "不了"
-            }).then(() => {
-          this.doSubmitCk()
-        }).catch(() => {
-        })
-      }, 300)
+        this.doSubmitCk()
+      // setTimeout(() => {
+      //   this.$dialog
+      //       .confirm({
+      //         title: "提示",
+      //         message: "是否提交青龙？",
+      //         confirmButtonText: "提交",
+      //         cancelButtonText: "不了"
+      //       }).then(() => {
+      //     this.doSubmitCk()
+      //   }).catch(() => {
+      //   })
+      // }, 300)
     },
     ifShowBindWxPusher: function () {
       this.$dialog
@@ -204,10 +210,10 @@ export default {
     doSubmitCk: function () {
       submitCk(this.cookieForm).then((resp) => {
         this.wxPusher.qr = resp.data.dynamicWxPusherQRCode
-        let _this = this;
-        setTimeout(() => {
-          _this.ifShowBindWxPusher()
-        }, 300)
+        // let _this = this;
+        // setTimeout(() => {
+        //   _this.ifShowBindWxPusher()
+        // }, 300)
       })
     }
   }

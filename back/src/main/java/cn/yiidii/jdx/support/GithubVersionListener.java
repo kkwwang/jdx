@@ -39,7 +39,7 @@ public class GithubVersionListener implements ITask {
 
     @Override
     public void startTimerTask() {
-        scheduleTaskUtil.startCron("SYS_checkUpgrade", () -> this.checkUpgrade(), "0 0/30 * * * ?");
+//        scheduleTaskUtil.startCron("SYS_checkUpgrade", () -> this.checkUpgrade(), "0 0/30 * * * ?");
     }
 
     public void checkUpgrade() {
