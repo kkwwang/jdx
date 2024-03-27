@@ -113,6 +113,7 @@ export default {
   },
   mounted() {
     this.renderBase();
+    this.form.mobile = window.localStorage.getItem("mobile") || "";
   },
   methods: {
     renderBase: function () {
@@ -132,6 +133,7 @@ export default {
       jdSmsCode(this.form.mobile).then(resp => {
         this.expireTime = resp.data.expireTime * 1000;
         this.$refs.codeRef.focus();
+        window.localStorage.setItem("mobile", this.form.mobile);
       });
     },
     login: async function () {

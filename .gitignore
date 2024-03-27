@@ -8,3 +8,4 @@
 /front/package-lock.json
 /front/yarn.lock
 /front/pnpm-lock.yaml
+./config/*
