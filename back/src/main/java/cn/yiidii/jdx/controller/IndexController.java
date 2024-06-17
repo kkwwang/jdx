@@ -13,18 +13,14 @@ import cn.yiidii.jdx.service.QLService;
 import cn.yiidii.jdx.util.JDXUtil;
 import cn.yiidii.jdx.util.jd.JDTaskUtil;
 import com.alibaba.fastjson.JSONObject;
-import java.util.List;
-import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * JdController
@@ -81,11 +77,12 @@ public class IndexController {
     @PostMapping("/ql/submitCk")
     public R<JSONObject> submitCk(@RequestBody JSONObject paramJo) throws Exception {
         String cookie = paramJo.getString("cookie");
+        String mobile = paramJo.getString("mobile");
         Assert.isTrue(StrUtil.isNotBlank(cookie), () -> {
             throw new BizException("Cookie不能为空");
         });
 
-        JSONObject result = qlService.submitCk(cookie);
+        JSONObject result = qlService.submitCk(cookie, mobile);
         log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(cookie)));
         return R.ok(result, StrUtil.format("提交成功"));
     }

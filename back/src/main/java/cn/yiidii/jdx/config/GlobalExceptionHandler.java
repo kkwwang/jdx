@@ -137,7 +137,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public R<?> nullPointerException(NullPointerException ex) {
         log.debug("NullPointerException: {}", ex);
-        log.warn("NullPointerException: {}", ex.getMessage());
+        log.warn("NullPointerException: {}", ex);
         return R.failed(ExceptionCode.NULL_POINT_EX.getCode(), ExceptionCode.NULL_POINT_EX.getMsg(), ex.getMessage());
     }
 
@@ -224,7 +224,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public R<?> otherExceptionHandler(Throwable ex) {
         log.debug("Exception: {}", ex);
-        log.warn("Exception: {}", ex.getMessage());
+        log.warn("Exception: {}", ex);
         if (ex.getCause() instanceof BizException) {
             return this.bizException((BizException) ex.getCause());
         }

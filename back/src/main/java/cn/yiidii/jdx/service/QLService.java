@@ -9,25 +9,14 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
+import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.support.ITask;
 import cn.yiidii.jdx.util.JDXUtil;
 import cn.yiidii.jdx.util.ScheduleTaskUtil;
-import cn.yiidii.jdx.util.WXPushUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +24,13 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 /**
  * QLService
@@ -52,7 +48,7 @@ public class QLService implements ITask {
     private final SystemConfigProperties systemConfigProperties;
     private final ScheduleTaskUtil scheduleTaskUtil;
 
-    public JSONObject submitCk(String cookie) throws Exception {
+    public JSONObject submitCk(String cookie, String mobile) throws Exception {
         // 同步下数据
         this.refreshQLUsedCookieCount();
         List<QLConfig> availableQlConfigs = systemConfigProperties.getQls().stream().filter(ql -> ql.getDisabled() == 0 && ql.getUsed() < ql.getMax()).collect(Collectors.toList());
@@ -60,6 +56,8 @@ public class QLService implements ITask {
             throw new BizException("无可用节点");
         }
         String ptPin = JDXUtil.getPtPinFromCK(cookie);
+
+
         List<QLAllNodeSearchResult> qlAllNodeSearchResults = this.searchEnvFromAllNode(ptPin, "JD_COOKIE");
         log.debug("[提交cookie], 所有节点搜索{}, 结果: {}", ptPin, JSON.toJSONString(qlAllNodeSearchResults));
         if (CollUtil.isEmpty(qlAllNodeSearchResults)) {
@@ -67,12 +65,12 @@ public class QLService implements ITask {
             QLConfig qlConfig = availableQlConfigs.get(RandomUtil.randomInt(availableQlConfigs.size()));
             log.debug("[提交cookie], pt_pin: {}, 在节点{}新增", ptPin, qlConfig.getDisplayName());
             // 保存并启用
-            this.saveAndEnableEnv(qlConfig, "JD_COOKIE", cookie, "");
+            this.saveAndEnableEnv(qlConfig, "JD_COOKIE", cookie, "", mobile);
         } else {
             // 更新
             List<String> updateNodesNames = qlAllNodeSearchResults.stream().map(e -> e.getQlConfig().getDisplayName()).collect(Collectors.toList());
             log.debug("[提交cookie], pt_pin: {}, 在一下节点更新: {}", ptPin, JSON.toJSONString(updateNodesNames));
-            qlAllNodeSearchResults.forEach(r -> r.getEnvs().forEach(e -> this.saveAndEnableEnv(r.getQlConfig(), "JD_COOKIE", cookie, e.getString("remarks"))));
+            qlAllNodeSearchResults.forEach(r -> r.getEnvs().forEach(e -> this.saveAndEnableEnv(r.getQlConfig(), "JD_COOKIE", cookie, e.getString("remarks"), mobile)));
         }
 
         // 生成动态二维码
@@ -84,14 +82,47 @@ public class QLService implements ITask {
         return result;
     }
 
-    public void saveAndEnableEnv(QLConfig qlConfig, String name, String value, String remark) {
+    public void saveAndEnableEnv(QLConfig qlConfig, String name, String value, String remark, String mobile) {
         String displayName = qlConfig.getDisplayName();
         // 获取存在的env
         String ptPin = JDXUtil.getPtPinFromCK(value);
         JSONObject existEnv = this.getExistCK(qlConfig, ptPin);
 
-        // 查询用户信息，组装remark
+        // todo 查询用户信息，组装remark
 
+
+        HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
+                .cookie(value)
+                .execute();
+
+        RemarkInfo remarkInfo = new RemarkInfo();
+        if (StringUtils.hasText(remark)) {
+            if (JSONObject.isValidObject(remark)) {
+                remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+            } else {
+                String[] remarkArray = remark.split(" ");
+                remarkInfo.setWechat(remarkArray[0]);
+            }
+        }
+        // 新建string 数组
+        if (StringUtils.hasText(mobile)) {
+            remarkInfo.setMobile(mobile);
+        }
+        remarkInfo.setPtPin(ptPin);
+
+        if (userInfoResponse.getStatus() == HttpStatus.HTTP_OK) {
+            String body = userInfoResponse.body();
+            JSONObject jsonObject = JSON.parseObject(body);
+            if (jsonObject.getIntValue("retcode") == 0) {
+                JSONObject data = jsonObject.getJSONObject("data");
+                String nickname = data.getJSONObject("userInfo").getJSONObject("baseInfo").getString("nickname");
+                remarkInfo.setNickname(nickname);
+            }
+        }
+
+
+        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo));
+        remark = JSONObject.toJSONString(remarkInfo);
 
         // 推送青龙
         if (existEnv.isEmpty()) {
