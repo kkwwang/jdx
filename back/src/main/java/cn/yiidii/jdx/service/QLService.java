@@ -76,11 +76,11 @@ public class QLService implements ITask {
         }
 
         // 生成动态二维码
-        JSONObject param = new JSONObject();
-        param.put("ptPin", ptPin);
-        String dynamicQR = WXPushUtil.getDynamicQR(systemConfigProperties.getWxPusherAppToken(), param);
+//        JSONObject param = new JSONObject();
+//        param.put("ptPin", ptPin);
+//        String dynamicQR = WXPushUtil.getDynamicQR(systemConfigProperties.getWxPusherAppToken(), param);
         JSONObject result = new JSONObject();
-        result.put("dynamicWxPusherQRCode", dynamicQR);
+//        result.put("dynamicWxPusherQRCode", dynamicQR);
         return result;
     }
 
@@ -89,6 +89,9 @@ public class QLService implements ITask {
         // 获取存在的env
         String ptPin = JDXUtil.getPtPinFromCK(value);
         JSONObject existEnv = this.getExistCK(qlConfig, ptPin);
+
+        // 查询用户信息，组装remark
+
 
         // 推送青龙
         if (existEnv.isEmpty()) {

@@ -112,6 +112,8 @@ public class JdService {
         JSONObject responseJo = JSONObject.parseObject(response.body());
         this.checkErr(responseJo);
         JSONObject data = responseJo.getJSONObject("data");
+        log.info(StrUtil.format("[京东 - {}] 获取到数据 {}", mobile, data));
+
         String ptKey = data.getString("pt_key");
         String ptPin = data.getString("pt_pin");
         String cookie = StrUtil.format("pt_key={};pt_pin={};", ptKey, URLEncoder.DEFAULT.encode(ptPin, StandardCharsets.UTF_8));
