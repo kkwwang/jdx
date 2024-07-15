@@ -1,19 +1,41 @@
 package cn.yiidii.jdx.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import org.springframework.util.StringUtils;
 
-@Data
+import java.net.URLDecoder;
+
+@Getter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class RemarkInfo {
 
-    private String wechat;
+    private String wechat = "暂未设置";
     private String ptPin;
     private String mobile;
     private String nickname;
 
+    public RemarkInfo setMobile(String mobile) {
+        this.mobile = mobile;
+        return this;
+    }
+
+    @SneakyThrows
+    public RemarkInfo setPtPin(String ptPin) {
+        this.ptPin = !StringUtils.hasText(ptPin) ? ptPin : URLDecoder.decode(ptPin,"utf-8");
+        return this;
+    }
+
+    @SneakyThrows
+    public RemarkInfo setWechat(String wechat) {
+        this.wechat = !StringUtils.hasText(wechat) ? wechat :URLDecoder.decode(wechat,"utf-8");
+        return this;
+    }
+
+    @SneakyThrows
+    public RemarkInfo setNickname(String nickname) {
+        this.nickname = !StringUtils.hasText(nickname) ? nickname : URLDecoder.decode(nickname,"utf-8");
+        return this;
+    }
 }

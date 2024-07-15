@@ -119,7 +119,6 @@ public class JdService {
         String cookie = StrUtil.format("pt_key={};pt_pin={};", ptKey, URLEncoder.DEFAULT.encode(ptPin, StandardCharsets.UTF_8));
         timedCache.remove(mobile);
         // 通知管理员
-        SpringUtil.publishEvent(new AdminNotifyEvent("系统通知：" + DesensitizedUtil.mobilePhone(mobile), StrUtil.format("{} 获取了京东Cookie", DesensitizedUtil.mobilePhone(mobile))));
         return new JdInfo().builder().cookie(cookie).ptPin(JDXUtil.getPtPinFromCK(cookie)).build();
     }
 

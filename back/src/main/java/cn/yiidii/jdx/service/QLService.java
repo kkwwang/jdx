@@ -9,6 +9,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
+import cn.yiidii.jdx.model.dto.AdminNotifyEvent;
 import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.support.ITask;
@@ -17,6 +18,7 @@ import cn.yiidii.jdx.util.ScheduleTaskUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +98,8 @@ public class QLService implements ITask {
                 .execute();
 
         RemarkInfo remarkInfo = new RemarkInfo();
+
+
         if (StringUtils.hasText(remark)) {
             if (JSONObject.isValidObject(remark)) {
                 remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
@@ -104,11 +108,11 @@ public class QLService implements ITask {
                 remarkInfo.setWechat(remarkArray[0]);
             }
         }
-        // 新建string 数组
-        if (StringUtils.hasText(mobile)) {
-            remarkInfo.setMobile(mobile);
-        }
-        remarkInfo.setPtPin(ptPin);
+
+
+        remarkInfo.setMobile(mobile)
+                .setPtPin(ptPin);
+
 
         if (userInfoResponse.getStatus() == HttpStatus.HTTP_OK) {
             String body = userInfoResponse.body();
@@ -121,8 +125,8 @@ public class QLService implements ITask {
         }
 
 
-        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo));
-        remark = JSONObject.toJSONString(remarkInfo);
+        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.PrettyFormat));
+        remark = JSONObject.toJSONString(remarkInfo, SerializerFeature.PrettyFormat);
 
         // 推送青龙
         if (existEnv.isEmpty()) {
@@ -164,6 +168,11 @@ public class QLService implements ITask {
                 throw new BizException("连接青龙发生异常, 请联系系统管理员");
             }
         }
+
+        String text = StrUtil.format("{}-{} 提交了京东Cookie", StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(), remarkInfo.getMobile());
+
+        SpringUtil.publishEvent(new AdminNotifyEvent("系统通知：" + text, text));
+
 
     }
 
