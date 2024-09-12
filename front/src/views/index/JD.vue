@@ -3,6 +3,7 @@
         <div v-if="!haveCookie">
             <van-field
                 ref="telRef"
+                maxlength="11"
                 v-model="form.mobile"
                 left-icon="phone-o"
                 name="mobile"
@@ -11,6 +12,7 @@
                 placeholder="手机号"
             ></van-field>
             <van-field
+                maxlength="6"
                 ref="codeRef"
                 v-model="form.code"
                 left-icon="shield-o"
@@ -40,7 +42,7 @@
                     type="primary"
                     @click="login"
                 >
-                    获取CK
+                    登录
                 </van-button>
                 <van-button
                     style="margin-top: 8px"
