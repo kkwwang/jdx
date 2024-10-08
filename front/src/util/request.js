@@ -32,11 +32,11 @@ service.interceptors.response.use(
     // store.commit('SET_LOADING',false);
     let msg = resp.msg;
     if (resp.code != 0) {
-      Notify({ type: "danger", message: msg });
+        Toast.fail(msg);
       return Promise.reject(new Error(resp.msg || "Error"));
     } else {
       if (msg && msg.indexOf("处理成功") == -1) {
-        Notify({ type: "success", message: msg });
+          Toast.success(msg);
       }
     }
 
@@ -64,7 +64,8 @@ service.interceptors.response.use(
     const resp = error.response.data;
     let msg = resp.msg;
     if (msg) {
-      Notify({ type: "danger", message: msg });
+        Toast.fail(msg);
+      // Notify({ type: "danger", message: msg });
     }
     if (error.response.status == 401) {
       console.log("aa");
