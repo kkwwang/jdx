@@ -161,7 +161,7 @@ public class QLService implements ITask {
                 this.updateEnv(qlConfig, envJo);
                 // 启用
                 if (existEnv.getInteger("status") == 1) {
-                    this.enableEnv(qlConfig, Arrays.asList(existEnv.getString("id")));
+                    this.enableEnv(qlConfig, Collections.singletonList(existEnv.getString("id")));
                 }
             } catch (Exception e) {
                 log.error(StrUtil.format("[青龙 - {}] 更新并启用环境变量发生异常: {}", displayName, e));
@@ -169,9 +169,16 @@ public class QLService implements ITask {
             }
         }
 
-        String text = StrUtil.format("{}-{} 提交了京东Cookie", StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(), remarkInfo.getMobile());
+        String text = StrUtil.format("{} 登录成功", StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname());
 
-        SpringUtil.publishEvent(new AdminNotifyEvent("系统通知：" + text, text));
+        SpringUtil.publishEvent(
+                new AdminNotifyEvent(
+                        Collections.singletonList(mobile),
+                        "【通知】",
+                        text,
+                        false
+                )
+        );
 
 
     }

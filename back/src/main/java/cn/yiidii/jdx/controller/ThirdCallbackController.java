@@ -58,7 +58,17 @@ public class ThirdCallbackController {
                 // 通知用户
                 WXPushUtil.send(systemConfigProperties.getWxPusherAppToken(), Arrays.asList(uid), "关注成功", StrUtil.format("京东账户: {}关联成功，请关注后续通知", ptPin), "1");
                 // 通知管理员
-                SpringUtil.publishEvent(new AdminNotifyEvent("订阅通知", StrUtil.format("pt_pin: {} 订阅了{}", ptPin, appName)));
+                SpringUtil.publishEvent(
+                        new AdminNotifyEvent(
+                                null,
+                                "订阅通知",
+                                StrUtil.format("pt_pin: {} 订阅了{}",
+                                        ptPin,
+                                        appName
+                                ),
+                                true
+                        )
+                );
                 break;
             }
             default: {

@@ -104,6 +104,49 @@
 
     <!-- wxPusher end -->
 
+    <!-- qywxKey -->
+    <van-divider
+        :style="{
+        color: '#1989fa',
+        borderColor: '#1989fa',
+        padding: '0 16px',
+        marginTop: '32px'
+      }"
+    >企业微信机器人配置
+    </van-divider>
+    <van-swipe-cell>
+      <van-cell-group inset>
+        <van-cell title="key" :value="qywx.qywxKey"/>
+      </van-cell-group>
+
+      <template #right>
+        <van-button
+            square
+            type="info"
+            class="slide-button"
+            text="编辑"
+            @click="qywx.actionSheet.show = true"
+        />
+      </template>
+    </van-swipe-cell>
+
+    <van-action-sheet v-model="qywx.actionSheet.show" title="编辑企业微信配置">
+      <van-form>
+        <van-field
+            v-model="qywx.qywxKey"
+            label="key"
+            placeholder="key"
+        />
+        <div style="margin: 16px;">
+          <van-button round block type="info" @click="updateQywx()"
+          >提交
+          </van-button>
+        </div>
+      </van-form>
+    </van-action-sheet>
+
+    <!-- qywxKey end -->
+
     <!-- 定时任务配置 -->
     <van-divider
         :style="{
@@ -243,7 +286,7 @@ import {
   updateWebsiteConfig,
   checkCookie,
   updateCheckCookieCron,
-  updateAccount, updateWxPusher
+  updateAccount, updateWxPusher, updateQywx
 } from "@/api/admin";
 
 export default {
@@ -256,6 +299,12 @@ export default {
 
       websiteConfig: {
         show: false,
+      },
+      qywx: {
+        actionSheet: {
+          show: false
+        },
+        qywxKey: ''
       },
       wxPusher: {
         actionSheet: {
@@ -295,6 +344,7 @@ export default {
         this.checkCookie.cron = resp.data.checkCookieCron;
         this.accountConfig.username = resp.data.username
         this.accountConfig.password = resp.data.password
+        this.qywx.qywxKey = resp.data.qywxKey
         this.wxPusher.appToken = resp.data.appToken
         this.wxPusher.adminUid = resp.data.adminUid
       });
@@ -344,6 +394,14 @@ export default {
         localStorage.removeItem("token")
         this.$router.push("/login")
       }, 800)
+    },
+    updateQywx: function () {
+      let param = {
+        qywxKey: this.qywx.qywxKey
+      };
+      updateQywx(param).then(() => {
+        this.qywx.actionSheet.show = false;
+      });
     },
     updateWxPusher: function () {
       let param = {

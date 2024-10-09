@@ -13,20 +13,14 @@ import cn.yiidii.jdx.support.GithubVersionListener;
 import cn.yiidii.jdx.util.ScheduleTaskUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import java.util.List;
-import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author ed w
@@ -79,6 +73,7 @@ public class AdminController {
         result.put("password", systemConfigProperties.getPassword());
         result.put("checkCookieCron", systemConfigProperties.getCheckCookieCron());
         result.put("appToken", systemConfigProperties.getWxPusherAppToken());
+        result.put("qywxKey", systemConfigProperties.getQywxKey());
         result.put("adminUid", systemConfigProperties.getWxPusherAdminUid());
         return R.ok(result);
     }
@@ -104,6 +99,12 @@ public class AdminController {
     public R<?> updateWxPusher(@RequestBody JSONObject paramJo) {
         systemConfigProperties.setWxPusherAppToken(paramJo.getString("appToken"));
         systemConfigProperties.setWxPusherAdminUid(paramJo.getString("adminUid"));
+        return R.ok(paramJo, "修改成功");
+    }
+
+    @PutMapping("qywx")
+    public R<?> updateQywx(@RequestBody JSONObject paramJo) {
+        systemConfigProperties.setQywxKey(paramJo.getString("qywxKey"));
         return R.ok(paramJo, "修改成功");
     }
 
@@ -139,7 +140,17 @@ public class AdminController {
         }
         systemConfigProperties.setUsername(username);
         systemConfigProperties.setPassword(password);
-        SpringUtil.publishEvent(new AdminNotifyEvent("账号修改通知", StrUtil.format("后台账号已更新\r\n\r\n【账号】{}\r\n【密码】{}", username, password)));
+        SpringUtil.publishEvent(
+                new AdminNotifyEvent(
+                        null,
+                        "账号修改通知",
+                        StrUtil.format("后台账号已更新\r\n\r\n【账号】{}\r\n【密码】{}",
+                                username,
+                                password
+                        ),
+                        true
+                )
+        );
         return R.ok(null, "修改成功");
     }
 }

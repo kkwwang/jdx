@@ -139,7 +139,14 @@ public class JDTaskService implements ITask {
                             jo.getString("displayName"),
                             CollUtil.join(jo.getJSONArray("expiredPtPins"), "\r\n")))
                     .collect(Collectors.joining("\r\n\r\n"));
-            SpringUtil.publishEvent(new AdminNotifyEvent("Cookie失效通知", adminContent));
+            SpringUtil.publishEvent(
+                    new AdminNotifyEvent(
+                            null,
+                            "Cookie失效通知",
+                            adminContent,
+                            true
+                    )
+            );
         }
         return result;
     }

@@ -8,11 +8,6 @@ import cn.yiidii.jdx.support.ITask;
 import cn.yiidii.jdx.util.ScheduleTaskUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * 系统配置
@@ -51,6 +52,7 @@ public class SystemConfigProperties implements InitializingBean, ITask {
     private String wxPusherAppToken = "AT_xxxxx";
     private String wxPusherAdminUid = "UID_xxxxx";
 
+    private String qywxKey = null;
 
     @PostConstruct
     public void init() {

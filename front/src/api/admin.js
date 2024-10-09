@@ -67,6 +67,13 @@ export function updateWxPusher(data) {
     data: data
   });
 }
+export function updateQywx(data) {
+  return request({
+    url: "admin/qywx",
+    method: "put",
+    data: data
+  });
+}
 
 export function checkCookie() {
   return request({

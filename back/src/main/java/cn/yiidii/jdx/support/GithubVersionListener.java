@@ -65,7 +65,17 @@ public class GithubVersionListener implements ITask {
             needUpgrade = true;
             GithubVersionListener.latestVersion = latestVersionStr;
             scheduleTaskUtil.stopCron("SYS_checkUpgrade");
-            SpringUtil.publishEvent(new AdminNotifyEvent("JDX版本更新通知", StrUtil.format("检测到JDX最新版本号: v{}, 当前版本号: v{}", latestVersionStr, appVersionStr)));
+            SpringUtil.publishEvent(
+                    new AdminNotifyEvent(
+                            null,
+                            "JDX版本更新通知",
+                            StrUtil.format("检测到JDX最新版本号: v{}, 当前版本号: v{}",
+                                    latestVersionStr,
+                                    appVersionStr
+                            ),
+                            true
+                    )
+            );
         } else {
             log.info(StrUtil.format("当前系统为最新版本, 版本号: v{}", appVersionStr));
         }
