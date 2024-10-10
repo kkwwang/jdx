@@ -7,8 +7,10 @@ import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSONObject;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.buf.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @UtilityClass
@@ -30,11 +32,12 @@ public class QywxPushUtil {
         JSONObject reqParamJo = new JSONObject();
         reqParamJo.put("msgtype", "text");
         JSONObject text = new JSONObject();
-        text.put("content", title + "\n\n" + content);
         if (null != mobileList && !mobileList.isEmpty()) {
             text.put("mentioned_mobile_list", mobileList);
+            content += "\n\n手机号：" + StringUtils.join(mobileList.stream().map(item -> item.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2")).collect(Collectors.toList()), '、');
         }
 
+        text.put("content", title + "\n\n" + content);
         reqParamJo.put("text", text);
 
 

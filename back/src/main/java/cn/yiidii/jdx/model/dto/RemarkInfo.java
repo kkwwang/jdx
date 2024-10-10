@@ -11,7 +11,7 @@ import java.net.URLDecoder;
 @AllArgsConstructor
 public class RemarkInfo {
 
-    private String wechat = "暂未设置";
+    private String wechat = "新账号";
     private String ptPin;
     private String mobile;
     private String nickname;
