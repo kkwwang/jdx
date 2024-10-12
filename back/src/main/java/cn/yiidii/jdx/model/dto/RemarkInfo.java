@@ -14,10 +14,16 @@ public class RemarkInfo {
     private String wechat = "新账号";
     private String ptPin;
     private String mobile;
+    private String notifyMobile;
     private String nickname;
 
     public RemarkInfo setMobile(String mobile) {
         this.mobile = mobile;
+        return this;
+    }
+
+    public RemarkInfo setNotifyMobile(String notifyMobile) {
+        this.notifyMobile = notifyMobile;
         return this;
     }
 

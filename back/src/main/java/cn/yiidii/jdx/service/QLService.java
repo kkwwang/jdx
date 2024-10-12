@@ -100,17 +100,16 @@ public class QLService implements ITask {
         RemarkInfo remarkInfo = new RemarkInfo();
 
 
-        if (StringUtils.hasText(remark)) {
-            if (JSONObject.isValidObject(remark)) {
-                remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-            } else {
-                String[] remarkArray = remark.split(" ");
-                remarkInfo.setWechat(remarkArray[0]);
+        if (StringUtils.hasText(remark) && JSONObject.isValidObject(remark)) {
+            remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+            if (!StringUtils.hasText(remarkInfo.getNotifyMobile())) {
+                remarkInfo.setNotifyMobile(mobile);
             }
         }
 
 
-        remarkInfo.setMobile(mobile)
+        remarkInfo
+                .setMobile(mobile)
                 .setPtPin(ptPin);
 
 
