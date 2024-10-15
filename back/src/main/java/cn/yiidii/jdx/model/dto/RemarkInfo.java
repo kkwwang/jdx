@@ -16,6 +16,16 @@ public class RemarkInfo {
     private String mobile;
     private String notifyMobile;
     private String nickname;
+    private String qywxUserId;
+
+    public String getQywxUserId() {
+        return qywxUserId;
+    }
+
+    public RemarkInfo setQywxUserId(String qywxUserId) {
+        this.qywxUserId = qywxUserId;
+        return this;
+    }
 
     public RemarkInfo setMobile(String mobile) {
         this.mobile = mobile;

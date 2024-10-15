@@ -90,13 +90,6 @@ public class QLService implements ITask {
         String ptPin = JDXUtil.getPtPinFromCK(value);
         JSONObject existEnv = this.getExistCK(qlConfig, ptPin);
 
-        // todo 查询用户信息，组装remark
-
-
-        HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
-                .cookie(value)
-                .execute();
-
         RemarkInfo remarkInfo = new RemarkInfo();
 
 
@@ -111,6 +104,13 @@ public class QLService implements ITask {
         remarkInfo
                 .setMobile(mobile)
                 .setPtPin(ptPin);
+        // todo 查询用户信息，组装remark
+
+
+        HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
+                .cookie(value)
+                .execute();
+
 
 
         if (userInfoResponse.getStatus() == HttpStatus.HTTP_OK) {

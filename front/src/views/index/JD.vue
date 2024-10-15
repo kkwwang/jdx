@@ -44,15 +44,15 @@
                 >
                     登录
                 </van-button>
-                <van-button
-                    style="margin-top: 8px"
-                    round
-                    block plain
-                    type="info"
-                    @click="haveCookie = true"
-                >
-                    已有Cookie？
-                </van-button>
+<!--                <van-button-->
+<!--                    style="margin-top: 8px"-->
+<!--                    round-->
+<!--                    block plain-->
+<!--                    type="info"-->
+<!--                    @click="haveCookie = true"-->
+<!--                >-->
+<!--                    已有Cookie？-->
+<!--                </van-button>-->
             </div>
         </div>
         <div v-else>

@@ -8,9 +8,9 @@
         <van-tab title="系统设置">
           <SystemConfig />
         </van-tab>
-        <van-tab title="关于">
-          <About />
-        </van-tab>
+<!--        <van-tab title="关于">-->
+<!--          <About />-->
+<!--        </van-tab>-->
       </van-tabs>
     </div>
   </div>
