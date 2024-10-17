@@ -95,9 +95,6 @@ public class QLService implements ITask {
 
         if (StringUtils.hasText(remark) && JSONObject.isValidObject(remark)) {
             remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-            if (!StringUtils.hasText(remarkInfo.getNotifyMobile())) {
-                remarkInfo.setNotifyMobile(mobile);
-            }
         }
 
 
@@ -105,7 +102,9 @@ public class QLService implements ITask {
                 .setMobile(mobile)
                 .setPtPin(ptPin);
         // todo 查询用户信息，组装remark
-
+        if (!StringUtils.hasText(remarkInfo.getNotifyMobile())) {
+            remarkInfo.setNotifyMobile(mobile);
+        }
 
         HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
                 .cookie(value)
@@ -124,8 +123,8 @@ public class QLService implements ITask {
         }
 
 
-        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.PrettyFormat));
-        remark = JSONObject.toJSONString(remarkInfo, SerializerFeature.PrettyFormat);
+        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+        remark = JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty);
 
         // 推送青龙
         if (existEnv.isEmpty()) {

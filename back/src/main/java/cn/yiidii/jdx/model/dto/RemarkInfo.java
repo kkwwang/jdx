@@ -16,7 +16,7 @@ public class RemarkInfo {
     private String mobile;
     private String notifyMobile;
     private String nickname;
-    private String qywxUserId;
+    private String qywxUserId="";
 
     public String getQywxUserId() {
         return qywxUserId;
