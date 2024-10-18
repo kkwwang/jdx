@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "../router";
-import { Toast } from "vant";
+import { Toast, Dialog } from "vant";
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
@@ -31,11 +31,17 @@ service.interceptors.response.use(
     const resp = response.data;
     let msg = resp.msg;
     if (resp.code !== 0) {
-      Toast.fail(msg);
+      Dialog({
+        title: "提示",
+        message: msg
+      });
       return Promise.reject(new Error(resp.msg || "Error"));
     } else {
       if (msg && msg.indexOf("处理成功") === -1) {
-        Toast.success(msg);
+        Dialog({
+          title: "提示",
+          message: msg
+        });
       }
     }
     return resp;
@@ -45,7 +51,10 @@ service.interceptors.response.use(
     const resp = error.response.data;
     let msg = resp.msg;
     if (msg) {
-      Toast.fail(msg);
+      Dialog({
+        title: "提示",
+        message: msg
+      });
     }
     if (error.response.status === 401) {
       console.log("aa");

@@ -20,6 +20,7 @@
         type="number"
         label="验证码"
         placeholder="验证码"
+        @change="codeChange"
       >
         <template #button>
           <van-count-down
@@ -65,6 +66,11 @@ export default {
     this.form.mobile = window.localStorage.getItem("mobile") || "";
   },
   methods: {
+    codeChange: function() {
+      if(this.form.code.length === 6){
+        this.login();
+      }
+    },
     smsCode: function() {
       this.form.code = "";
       jdSmsCode(this.form.mobile).then(resp => {
