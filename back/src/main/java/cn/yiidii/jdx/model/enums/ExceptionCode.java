@@ -1,8 +1,6 @@
 package cn.yiidii.jdx.model.enums;
 
 
-import cn.yiidii.jdx.model.BaseExceptionCode;
-
 /**
  * @author YiiDii Wang
  * @date 2021/2/11 14:48:24

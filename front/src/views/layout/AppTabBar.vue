@@ -40,7 +40,7 @@ export default {
   methods: {
     changeTab(path) {
       let adminPaths = ["login", "admin", "oauth"];
-      let admin = adminPaths.filter(e => path.indexOf(e) != -1).length > 0;
+      let admin = adminPaths.filter(e => path.indexOf(e) !== -1).length > 0;
       if (admin) {
         this.active = "admin";
       }

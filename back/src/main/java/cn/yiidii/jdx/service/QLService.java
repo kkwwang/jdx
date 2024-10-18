@@ -50,7 +50,7 @@ public class QLService implements ITask {
     private final SystemConfigProperties systemConfigProperties;
     private final ScheduleTaskUtil scheduleTaskUtil;
 
-    public JSONObject submitCk(String cookie, String mobile) throws Exception {
+    public JSONObject submitCk(String cookie, String mobile) {
         // 同步下数据
         this.refreshQLUsedCookieCount();
         List<QLConfig> availableQlConfigs = systemConfigProperties.getQls().stream().filter(ql -> ql.getDisabled() == 0 && ql.getUsed() < ql.getMax()).collect(Collectors.toList());
@@ -109,7 +109,6 @@ public class QLService implements ITask {
         HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
                 .cookie(value)
                 .execute();
-
 
 
         if (userInfoResponse.getStatus() == HttpStatus.HTTP_OK) {
@@ -173,33 +172,26 @@ public class QLService implements ITask {
                 new AdminNotifyEvent(
                         Collections.singletonList(mobile),
                         "【通知】",
-                        text,
-                        false
+                        text
                 )
         );
 
 
     }
 
-    public void bindWxPushUidToRemark(String ptPin, String uid) {
-        List<QLConfig> qlConfigs = systemConfigProperties.getQls();
-        qlConfigs.forEach(qlConfig -> {
-            List<JSONObject> envs = this.searchEnv(qlConfig, ptPin);
-            if (CollUtil.isEmpty(envs)) {
-                return;
-            }
-            envs.forEach(env -> {
-                String remark = env.getString("remarks");
-                Set<String> newRemarkSplit = StrUtil.split(remark, "@@").stream().filter(e -> !StrUtil.startWith(e, "UID_") && StrUtil.isNotBlank(e)).collect(Collectors.toSet());
-                newRemarkSplit.add(uid);
-                if (newRemarkSplit.size() <= 1) {
-                    newRemarkSplit.add(ptPin);
-                }
-                String newRemark = CollUtil.join(newRemarkSplit, "@@");
-                env.put("remarks", newRemark);
-                this.updateEnv(qlConfig, env);
-            });
-        });
+    public List<JSONObject> searchEnv(String searchValue) {
+        // 同步下数据
+        this.refreshQLUsedCookieCount();
+        List<QLConfig> availableQlConfigs = systemConfigProperties.getQls().stream().filter(ql -> ql.getDisabled() == 0 && ql.getUsed() < ql.getMax()).collect(Collectors.toList());
+        if (CollUtil.isEmpty(availableQlConfigs)) {
+            throw new BizException("无可用节点");
+        }
+
+        List<JSONObject> envs = new ArrayList<>();
+        for (QLConfig qlConfig : availableQlConfigs) {
+            envs.addAll(this.searchEnv(qlConfig, searchValue));
+        }
+        return envs;
     }
 
     /**
@@ -421,7 +413,7 @@ public class QLService implements ITask {
     @Data
     @Accessors(chain = true)
     @AllArgsConstructor
-    public class QLAllNodeSearchResult {
+    public static class QLAllNodeSearchResult {
 
         /**
          * 青龙配置

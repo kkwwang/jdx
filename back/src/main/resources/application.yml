@@ -7,3 +7,9 @@ spring:
 
 logging:
   config: classpath:logback-jdx.xml
+
+qywx:
+  getToken: https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET
+  # 文档：https://work.weixin.qq.com/api/doc#10167
+  getuserid: https://qyapi.weixin.qq.com/cgi-bin/user/getuserid?access_token=ACCESS_TOKEN
+  getuserinfo: https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&userid=USERID

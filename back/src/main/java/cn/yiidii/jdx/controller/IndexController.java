@@ -4,14 +4,13 @@ import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
-import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.R;
 import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.JdService;
 import cn.yiidii.jdx.service.QLService;
+import cn.yiidii.jdx.util.CheckHasQywx;
 import cn.yiidii.jdx.util.JDXUtil;
-import cn.yiidii.jdx.util.jd.JDTaskUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * JdController
@@ -37,6 +35,7 @@ public class IndexController {
 
     private final JdService jdService;
     private final QLService qlService;
+    private final CheckHasQywx checkHasQywx;
     private final SystemConfigProperties systemConfigProperties;
 
     @GetMapping("/jd/smsCode")
@@ -44,13 +43,18 @@ public class IndexController {
         Assert.isTrue(PhoneUtil.isMobile(mobile), () -> {
             throw new BizException("手机号格式不正确");
         });
+
+        if (!checkHasQywx.checkHasQywx(mobile)) {
+            return R.failed("该手机号未绑定企业微信，请先扫码关注下方插件，若加入失败，请尝试下载企业微信绑定手机号或联系管理员!!!");
+        }
+
         JdInfo jdInfo = jdService.sendSmsCode(mobile);
         log.info(StrUtil.format("{}发送了验证码", DesensitizedUtil.mobilePhone(mobile)));
         return R.ok(jdInfo, "发送验证码成功");
     }
 
     @PostMapping("/jd/login")
-    public R<JdInfo> login(@RequestBody JSONObject paramJo) throws Exception {
+    public R<JSONObject> login(@RequestBody JSONObject paramJo) throws Exception {
         String mobile = paramJo.getString("mobile");
         String code = paramJo.getString("code");
         Assert.isTrue(StrUtil.isNotBlank(mobile), () -> {
@@ -66,26 +70,13 @@ public class IndexController {
         JdInfo jdInfo = jdService.login(mobile, code);
         log.info(StrUtil.format("{}获取了京东Cookie", DesensitizedUtil.mobilePhone(mobile)));
 
-//        // 测试用
-//        String testCookie = "pt_key=xxx7;pt_pin=jd_xxx01;";
-//        String ptPin = JDXUtil.getPtPinFromCK(testCookie);
-//        JdInfo jdInfo = JdInfo.builder().cookie(testCookie).ptPin(ptPin).build();
 
-        return R.ok(jdInfo, "获取cookie成功");
+        JSONObject result = qlService.submitCk(jdInfo.getCookie(), mobile);
+        log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(jdInfo.getCookie())));
+
+        return R.ok(result, "获取cookie成功");
     }
 
-    @PostMapping("/ql/submitCk")
-    public R<JSONObject> submitCk(@RequestBody JSONObject paramJo) throws Exception {
-        String cookie = paramJo.getString("cookie");
-        String mobile = paramJo.getString("mobile");
-        Assert.isTrue(StrUtil.isNotBlank(cookie), () -> {
-            throw new BizException("Cookie不能为空");
-        });
-
-        JSONObject result = qlService.submitCk(cookie, mobile);
-        log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(cookie)));
-        return R.ok(result, StrUtil.format("提交成功"));
-    }
 
     @GetMapping("info")
     public R<?> getBaseInfo() {
@@ -100,22 +91,4 @@ public class IndexController {
         return R.ok(jo);
     }
 
-    @GetMapping("cfd")
-    public Object getCfdUrl(@RequestParam(required = false) String type) {
-        List<QLConfig> qls = systemConfigProperties.getQls();
-        for (QLConfig qlConfig : qls) {
-            List<JSONObject> envs = qlService.searchEnv(qlConfig, "JD_COOKIE", 0);
-            for (JSONObject env : envs) {
-                String cookie = env.getString("value");
-                String cfdUrl = JDTaskUtil.getCfdUrl(cookie);
-                if (StrUtil.isNotBlank(cfdUrl)) {
-                    if (StrUtil.equals(type, "json")) {
-                        return R.ok(cfdUrl);
-                    }
-                    return cfdUrl;
-                }
-            }
-        }
-        throw new BizException("暂时无法获取");
-    }
 }

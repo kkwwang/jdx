@@ -28,9 +28,5 @@ public class JDXUtil {
         }
     }
 
-    public String getUidFromRemark(String remark) {
-        return StrUtil.split(remark, "@@").stream().filter(e -> StrUtil.startWith(e, "UID_")).findFirst().orElse("");
-    }
-
 
 }

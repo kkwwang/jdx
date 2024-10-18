@@ -79,7 +79,6 @@ Vue.use(Dialog);
 
 Vue.use(VueClipboard);
 
-Vue.prototype.$axios = axios;
 Vue.prototype.$toast = Toast;
 Vue.prototype.$dialog = Dialog;
 

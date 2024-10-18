@@ -46,13 +46,14 @@ public class SystemConfigProperties implements InitializingBean, ITask {
     private String title;
     private String notice = "这是一条测试公告，只支持顶部";
     private String indexBottomNotice = "这是底部说明，只支持html";
-    private String checkCookieCron = "0 0 12 * * ?";
+    //    private String checkCookieCron = "0 0 12 * * ?";
     private List<QLConfig> qls;
 
-    private String wxPusherAppToken = "AT_xxxxx";
-    private String wxPusherAdminUid = "UID_xxxxx";
-
     private String qywxKey = null;
+
+    private String corpid = "";
+    private String corpsecret = "";
+    private String agentid = "";
 
     @PostConstruct
     public void init() {

@@ -8,9 +8,6 @@
         <van-tab title="系统设置">
           <SystemConfig />
         </van-tab>
-<!--        <van-tab title="关于">-->
-<!--          <About />-->
-<!--        </van-tab>-->
       </van-tabs>
     </div>
   </div>
@@ -19,11 +16,10 @@
 <script>
 import QLManage from "@/views/admin/tab/QLManage";
 import SystemConfig from "@/views/admin/tab/SystemConfig";
-import About from "@/views/admin/tab/About";
 
 export default {
   name: "Home",
-  components: { QLManage, SystemConfig, About },
+  components: { QLManage, SystemConfig },
   data() {
     return {
       active: 0

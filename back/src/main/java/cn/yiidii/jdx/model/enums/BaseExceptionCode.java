@@ -1,8 +1,8 @@
-package cn.yiidii.jdx.model;
+package cn.yiidii.jdx.model.enums;
 
 /**
- *  异常编码
- * 
+ * 异常编码
+ *
  * @author YiiDii Wang
  * @date 2021/2/11 14:48:10
  */

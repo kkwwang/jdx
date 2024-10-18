@@ -16,7 +16,7 @@ public class RemarkInfo {
     private String mobile;
     private String notifyMobile;
     private String nickname;
-    private String qywxUserId="";
+    private String qywxUserId = "";
 
     public String getQywxUserId() {
         return qywxUserId;
@@ -39,19 +39,19 @@ public class RemarkInfo {
 
     @SneakyThrows
     public RemarkInfo setPtPin(String ptPin) {
-        this.ptPin = !StringUtils.hasText(ptPin) ? ptPin : URLDecoder.decode(ptPin,"utf-8");
+        this.ptPin = !StringUtils.hasText(ptPin) ? ptPin : URLDecoder.decode(ptPin, "utf-8");
         return this;
     }
 
     @SneakyThrows
     public RemarkInfo setWechat(String wechat) {
-        this.wechat = !StringUtils.hasText(wechat) ? wechat :URLDecoder.decode(wechat,"utf-8");
+        this.wechat = !StringUtils.hasText(wechat) ? wechat : URLDecoder.decode(wechat, "utf-8");
         return this;
     }
 
     @SneakyThrows
     public RemarkInfo setNickname(String nickname) {
-        this.nickname = !StringUtils.hasText(nickname) ? nickname : URLDecoder.decode(nickname,"utf-8");
+        this.nickname = !StringUtils.hasText(nickname) ? nickname : URLDecoder.decode(nickname, "utf-8");
         return this;
     }
 }

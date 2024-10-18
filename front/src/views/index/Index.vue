@@ -1,37 +1,39 @@
 <template>
   <div>
     <van-notice-bar
-        v-if="notice"
-        left-icon="volume-o"
-        :text="notice"
-        mode="closeable"
+      v-if="notice"
+      left-icon="volume-o"
+      :text="notice"
+      mode="closeable"
     />
 
     <!-- title -->
     <div>
-      <div v-if="title" style="text-align: center; margin: 40px 0 20px 0; font-size: 32px">
+      <div
+        v-if="title"
+        style="text-align: center; margin: 40px 0 20px 0; font-size: 32px"
+      >
         {{ title }}
       </div>
     </div>
 
-    <JD/>
+    <JD />
 
     <div style="text-align: center">
-      <van-tag size="medium" type="primary">剩余车位：{{remain}}</van-tag>
+      <van-tag size="medium" type="primary">剩余车位：{{ remain }}</van-tag>
     </div>
 
-    <div style="padding: 16px 8px " v-html="bottomNotice">
-    </div>
+    <div style="padding: 16px 8px " v-html="bottomNotice"></div>
   </div>
 </template>
 
 <script>
 import JD from "./JD";
-import {baseInfo} from "@/api";
+import { baseInfo } from "@/api";
 
 export default {
   name: "Index",
-  components: {JD},
+  components: { JD },
   data() {
     return {
       title: "",
@@ -42,27 +44,27 @@ export default {
   },
   created() {
     this.renderBase();
-    let tab = this.$route.query.tab
+    let tab = this.$route.query.tab;
     if (tab) {
-      this.active = tab
+      this.active = tab;
     } else {
-      this.active = "jd"
+      this.active = "jd";
     }
   },
   watch: {},
   methods: {
-    renderBase: function () {
+    renderBase: function() {
       baseInfo()
-          .then(resp => {
-            this.title = resp.data.title;
-            this.notice = resp.data.notice;
-            this.remain = resp.data.remain
-            this.bottomNotice = resp.data.bottomNotice
-          })
-          .catch(err => {
-            console.log(err);
-          });
-    },
+        .then(resp => {
+          this.title = resp.data.title;
+          this.notice = resp.data.notice;
+          this.remain = resp.data.remain;
+          this.bottomNotice = resp.data.bottomNotice;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
   }
 };
 </script>

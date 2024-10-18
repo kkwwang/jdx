@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "../router";
-import { Toast, Notify } from "vant";
+import { Toast } from "vant";
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
@@ -29,34 +29,15 @@ service.interceptors.response.use(
   response => {
     Toast.clear();
     const resp = response.data;
-    // store.commit('SET_LOADING',false);
     let msg = resp.msg;
-    if (resp.code != 0) {
-        Toast.fail(msg);
+    if (resp.code !== 0) {
+      Toast.fail(msg);
       return Promise.reject(new Error(resp.msg || "Error"));
     } else {
-      if (msg && msg.indexOf("处理成功") == -1) {
-          Toast.success(msg);
+      if (msg && msg.indexOf("处理成功") === -1) {
+        Toast.success(msg);
       }
     }
-
-    // if (res.code == 401) {
-    //     /* 普通401拦截直接返回到登录页面 */
-    //     removeAllCookie();
-    //     router.push("/login");
-    //     // return;
-    // } else if (res.code !== 0) {
-    //     console.log("有报错");
-    //
-    //     Notification({
-    //         type: "error",
-    //         title: "错误",
-    //         message: res.msg
-    //     });
-    //     return Promise.reject(new Error(res.msg || "Error"));
-    // } else {
-    //     return res;
-    // }
     return resp;
   },
   error => {
@@ -64,10 +45,9 @@ service.interceptors.response.use(
     const resp = error.response.data;
     let msg = resp.msg;
     if (msg) {
-        Toast.fail(msg);
-      // Notify({ type: "danger", message: msg });
+      Toast.fail(msg);
     }
-    if (error.response.status == 401) {
+    if (error.response.status === 401) {
       console.log("aa");
       setTimeout(() => {
         localStorage.removeItem("token");

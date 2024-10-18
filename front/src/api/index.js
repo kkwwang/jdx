@@ -24,12 +24,3 @@ export function jdLogin(data) {
     data: data
   });
 }
-
-// submitCk
-export function submitCk(data) {
-  return request({
-    url: "ql/submitCk",
-    method: "post",
-    data: data
-  });
-}

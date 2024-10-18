@@ -1,16 +1,12 @@
-
 package cn.yiidii.jdx.model;
 
-import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 /**
- *  R
+ * R
  *
  * @author ed w
  * @since 1.0
@@ -56,19 +52,19 @@ public class R<T> implements Serializable {
     }
 
     public static <T> R<T> failed() {
-        return restResult(null,-1,  "处理失败", null);
+        return restResult(null, -1, "处理失败", null);
     }
 
     public static <T> R<T> failed(String msg) {
-        return restResult(null,-1, msg, null);
+        return restResult(null, -1, msg, null);
     }
 
     public static <T> R<T> failed(T data) {
-        return restResult(data,-1,  "处理失败", null);
+        return restResult(data, -1, "处理失败", null);
     }
 
     public static <T> R<T> failed(T data, String msg) {
-        return restResult(data,-1, msg, null);
+        return restResult(data, -1, msg, null);
     }
 
     public static <T> R<T> failed(int code, String msg) {

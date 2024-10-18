@@ -2,8 +2,9 @@ package cn.yiidii.jdx.util;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.StrUtil;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
+
+import java.util.Objects;
 
 /**
  * IdUtil

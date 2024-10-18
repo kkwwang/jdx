@@ -59,14 +59,6 @@ export function updateWebsiteConfig(data) {
     data: data
   });
 }
-
-export function updateWxPusher(data) {
-  return request({
-    url: "admin/wxPusher",
-    method: "put",
-    data: data
-  });
-}
 export function updateQywx(data) {
   return request({
     url: "admin/qywx",
@@ -74,22 +66,6 @@ export function updateQywx(data) {
     data: data
   });
 }
-
-export function checkCookie() {
-  return request({
-    url: "admin/checkCookie",
-    method: "post"
-  });
-}
-
-export function updateCheckCookieCron(data) {
-  return request({
-    url: "admin/updateCheckCookieCron",
-    method: "put",
-    data: data
-  });
-}
-
 export function updateAccount(data) {
   return request({
     url: "admin/updateAccount",
@@ -99,16 +75,3 @@ export function updateAccount(data) {
 }
 
 // 版本信息
-export function getVersion() {
-  return request({
-    url: "admin/version",
-    method: "get"
-  });
-}
-export function checkUpgrade() {
-  return request({
-    url: "admin/checkUpgrade",
-    method: "post"
-  });
-}
-
