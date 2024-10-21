@@ -37,7 +37,7 @@ service.interceptors.response.use(
       });
       return Promise.reject(new Error(resp.msg || "Error"));
     } else {
-      if (msg && msg.indexOf("处理成功") === -1) {
+      if (msg && msg.indexOf("登录成功") !== -1) {
         Dialog({
           title: "提示",
           message: msg

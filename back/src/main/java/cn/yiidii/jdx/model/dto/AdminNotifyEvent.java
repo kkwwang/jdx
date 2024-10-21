@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.context.ApplicationEvent;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 管理员通知事件
@@ -21,12 +21,14 @@ public class AdminNotifyEvent extends ApplicationEvent {
     private static final Object NULL_OBJECT = new Object();
 
     private String title;
-    private List<String> mobileList;
+    private Set<String> mobileList;
+    private Set<String> qywxUserIdList;
     private String content;
 
-    public AdminNotifyEvent(List<String> mobileList, String title, String content) {
+    public AdminNotifyEvent(Set<String> mobileList, Set<String> qywxUserIdList, String title, String content) {
         super(NULL_OBJECT);
         this.mobileList = mobileList;
+        this.qywxUserIdList = qywxUserIdList;
         this.title = title;
         this.content = content;
     }

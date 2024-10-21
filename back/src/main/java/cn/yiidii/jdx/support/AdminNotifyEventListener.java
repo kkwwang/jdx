@@ -35,7 +35,8 @@ public class AdminNotifyEventListener implements ApplicationListener<AdminNotify
                 systemConfigProperties.getQywxKey(),
                 event.getTitle(),
                 event.getContent(),
-                event.getMobileList()
+                event.getMobileList(),
+                event.getQywxUserIdList()
         );
 
         log.debug(StrUtil.format("[admin通知], title: {}, content: {}", event.getTitle(), event.getContent()));

@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.AllArgsConstructor;
+import lombok.Cleanup;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -75,13 +76,7 @@ public class QLService implements ITask {
             qlAllNodeSearchResults.forEach(r -> r.getEnvs().forEach(e -> this.saveAndEnableEnv(r.getQlConfig(), "JD_COOKIE", cookie, e.getString("remarks"), mobile)));
         }
 
-        // 生成动态二维码
-//        JSONObject param = new JSONObject();
-//        param.put("ptPin", ptPin);
-//        String dynamicQR = WXPushUtil.getDynamicQR(systemConfigProperties.getWxPusherAppToken(), param);
-        JSONObject result = new JSONObject();
-//        result.put("dynamicWxPusherQRCode", dynamicQR);
-        return result;
+        return new JSONObject();
     }
 
     public void saveAndEnableEnv(QLConfig qlConfig, String name, String value, String remark, String mobile) {
@@ -106,20 +101,7 @@ public class QLService implements ITask {
             remarkInfo.setNotifyMobile(mobile);
         }
 
-        HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
-                .cookie(value)
-                .execute();
-
-
-        if (userInfoResponse.getStatus() == HttpStatus.HTTP_OK) {
-            String body = userInfoResponse.body();
-            JSONObject jsonObject = JSON.parseObject(body);
-            if (jsonObject.getIntValue("retcode") == 0) {
-                JSONObject data = jsonObject.getJSONObject("data");
-                String nickname = data.getJSONObject("userInfo").getJSONObject("baseInfo").getString("nickname");
-                remarkInfo.setNickname(nickname);
-            }
-        }
+        remarkInfo.setNickname(JDXUtil.getNiceName(value));
 
 
         log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
@@ -136,7 +118,7 @@ public class QLService implements ITask {
             paramJa.add(envJo);
             try {
                 log.debug(StrUtil.format("[青龙 - {}] 添加环境变量, 参数: {}", displayName, envJo.toJSONString()));
-                HttpResponse response = HttpRequest.post(qlConfig.getUrl().concat("open/envs"))
+                @Cleanup HttpResponse response = HttpRequest.post(qlConfig.getUrl().concat("open/envs"))
                         .bearerAuth(this.getQLToken(displayName))
                         .body(paramJa.toJSONString())
                         .execute();
@@ -166,12 +148,13 @@ public class QLService implements ITask {
             }
         }
 
-        String text = StrUtil.format("{} 登录成功", StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname());
+        String text = StrUtil.format("账号：{}\n手机号：{}", StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(), mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"));
 
         SpringUtil.publishEvent(
                 new AdminNotifyEvent(
-                        Collections.singletonList(mobile),
-                        "【通知】",
+                        new HashSet<>(Arrays.asList(mobile, remarkInfo.getNotifyMobile())),
+                        StringUtils.hasText(remarkInfo.getQywxUserId()) ? new HashSet<>(Collections.singletonList(remarkInfo.getQywxUserId())) : null,
+                        "【登录成功】",
                         text
                 )
         );
@@ -210,7 +193,7 @@ public class QLService implements ITask {
     public List<JSONObject> searchEnv(QLConfig qlConfig, String searchValue) {
         String displayName = qlConfig.getDisplayName();
         try {
-            HttpResponse response = HttpRequest.get(StrUtil.format("{}open/envs?searchValue={}", qlConfig.getUrl(), searchValue))
+            @Cleanup HttpResponse response = HttpRequest.get(StrUtil.format("{}open/envs?searchValue={}", qlConfig.getUrl(), searchValue))
                     .bearerAuth(this.getQLToken(displayName))
                     .execute();
             log.debug(StrUtil.format("[青龙 - {}] 搜索环境变量, 参数: {}, 响应: {}", displayName, searchValue, response.body()));
@@ -250,7 +233,7 @@ public class QLService implements ITask {
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
         CompletableFuture<List<QLAllNodeSearchResult>> finalResults = allFutures.thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()));
         try {
-            return finalResults.get().stream().filter(r -> r.getEnvs().size() > 0).collect(Collectors.toList());
+            return finalResults.get().stream().filter(r -> !r.getEnvs().isEmpty()).collect(Collectors.toList());
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -264,7 +247,7 @@ public class QLService implements ITask {
         envJo.remove("id");
         envJo.put("_id", id);
         log.debug(StrUtil.format("[青龙 - {}] 第一次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
-        HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
+        @Cleanup HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
                 .bearerAuth(this.getQLToken(displayName))
                 .body(envJo.toJSONString())
                 .execute();
@@ -293,7 +276,7 @@ public class QLService implements ITask {
         String displayName = qlConfig.getDisplayName();
         try {
             log.debug(StrUtil.format("[青龙 - {}] 启用环境变量, 参数: {}", displayName, JSON.toJSONString(ids)));
-            HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs/enable"))
+            @Cleanup HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs/enable"))
                     .bearerAuth(this.getQLToken(displayName))
                     .body(JSON.toJSONString(ids))
                     .execute();
@@ -311,7 +294,7 @@ public class QLService implements ITask {
         String displayName = qlConfig.getDisplayName();
         try {
             log.debug(StrUtil.format("[青龙 - {}] 禁用环境变量, 参数: {}", displayName, JSON.toJSONString(ids)));
-            HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs/disable"))
+            @Cleanup HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs/disable"))
                     .bearerAuth(this.getQLToken(displayName))
                     .body(JSON.toJSONString(ids))
                     .execute();
@@ -359,7 +342,7 @@ public class QLService implements ITask {
     }
 
     public String refreshToken(QLConfig ql) {
-        HttpResponse response = HttpRequest.get(StrUtil.format("{}open/auth/token?client_id={}&client_secret={}", ql.getUrl(), ql.getClientId(), ql.getClientSecret())).execute();
+        @Cleanup HttpResponse response = HttpRequest.get(StrUtil.format("{}open/auth/token?client_id={}&client_secret={}", ql.getUrl(), ql.getClientId(), ql.getClientSecret())).execute();
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             JSONObject respJo = JSONObject.parseObject(response.body());
             Integer code = respJo.getInteger("code");
@@ -374,7 +357,7 @@ public class QLService implements ITask {
 
     @Override
     public void startTimerTask() {
-        scheduleTaskUtil.startCron("QL_timerRefreshToken", () -> this.timerRefreshToken(), "0 0 0/1 * * ?");
+        scheduleTaskUtil.startCron("QL_timerRefreshToken", this::timerRefreshToken, "0 0 0/1 * * ?");
     }
 
     private void timerRefreshToken() {
@@ -391,16 +374,16 @@ public class QLService implements ITask {
         log.debug(StrUtil.format("[青龙 - {}], 获取存在的Cookie: {}", qlConfig.getDisplayName(), ptPin));
         JSONObject result;
         List<JSONObject> envs = this.searchEnv(qlConfig, ptPin);
-        if (envs.size() == 0) {
+        if (envs.isEmpty()) {
             result = new JSONObject();
         } else if (envs.size() == 1) {
             result = envs.get(0);
         } else {
             // 通过【pt_pin=xxx;】搜索出来有多个的话, 返回正常状态(status=0)的第一个， 如果没有正常的, 就返回禁用状态(status=1)的第一个
             Map<Integer, List<JSONObject>> statusMap = envs.stream().collect(Collectors.groupingBy(e -> e.getInteger("status")));
-            if (statusMap.get(0).size() >= 1) {
+            if (!statusMap.get(0).isEmpty()) {
                 result = statusMap.get(0).get(0);
-            } else if (statusMap.get(1).size() >= 1) {
+            } else if (!statusMap.get(1).isEmpty()) {
                 result = statusMap.get(1).get(0);
             } else {
                 result = new JSONObject();

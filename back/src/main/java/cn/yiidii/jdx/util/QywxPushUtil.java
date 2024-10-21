@@ -5,11 +5,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Cleanup;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.buf.StringUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,13 +29,16 @@ public class QywxPushUtil {
      * }
      */
 
-    public void send(String qywxKey, String title, String content, List<String> mobileList) {
+    public void send(String qywxKey, String title, String content, Set<String> mobileList, Set<String> qywxUserIdList) {
         JSONObject reqParamJo = new JSONObject();
         reqParamJo.put("msgtype", "text");
         JSONObject text = new JSONObject();
         if (null != mobileList && !mobileList.isEmpty()) {
-            text.put("mentioned_mobile_list", mobileList);
-            content += "\n\n手机号：" + StringUtils.join(mobileList.stream().map(item -> item.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2")).collect(Collectors.toList()), '、');
+            text.put("mentioned_mobile_list", mobileList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+        }
+
+        if (null != qywxUserIdList && !qywxUserIdList.isEmpty()) {
+            text.put("mentioned_list", qywxUserIdList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
         }
 
         text.put("content", title + "\n\n" + content);
@@ -42,7 +46,7 @@ public class QywxPushUtil {
 
 
         log.debug(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
-        HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
+        @Cleanup HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
                 .body(reqParamJo.toJSONString())
                 .execute();
         log.debug(StrUtil.format("企业微信发送消息, 响应: {}", resp.body()));

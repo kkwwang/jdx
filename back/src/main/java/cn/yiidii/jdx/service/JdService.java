@@ -12,6 +12,7 @@ import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.util.JDXUtil;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("all")
 public class JdService {
 
     TimedCache<String, JdInfo> timedCache = CacheUtil.newTimedCache(2 * 60 * 1000);
@@ -46,7 +46,7 @@ public class JdService {
         // 第一步，获取一堆什么参数
         String sign = DigestUtil.md5Hex(StrUtil.format("{}{}{}36{}sb2cwlYyaCSN1KUv5RHG3tmqxfEb8NKN", APP_ID, Q_VERSION, timestamp, subCmd));
         String param = StrUtil.format("client_ver=1.0.0&gsign={}&appid={}&return_page=https%3A%2F%2Fcrpl.jd.com%2Fn%2Fmine%3FpartnerId%3DWBTF0KYY%26ADTAG%3Dkyy_mrqd%26token%3D&cmd=36&sdk_ver=1.0.0&sub_cmd=1&qversion={}&ts={}", sign, APP_ID, Q_VERSION, timestamp);
-        HttpResponse response = HttpRequest.post("https://qapplogin.m.jd.com/cgi-bin/qapp/quick")
+        @Cleanup HttpResponse response = HttpRequest.post("https://qapplogin.m.jd.com/cgi-bin/qapp/quick")
                 .body(param, ContentType.FORM_URLENCODED.toString())
                 .execute();
         JSONObject responseJo = JSONObject.parseObject(response.body());
@@ -77,11 +77,11 @@ public class JdService {
         sign = DigestUtil.md5Hex(StrUtil.format("{}{}{}{}4dtyyzKF3w6o54fJZnmeW3bVHl0$PbXj", APP_ID, Q_VERSION, COUNTRY_CODE, mobile));
         param = StrUtil.format("country_code={}&client_ver=1.0.0&gsign={}&appid={}&mobile={}&sign={}&cmd=36&sub_cmd={}&qversion={}&ts={}", COUNTRY_CODE, gsign, APP_ID, mobile, sign, subCmd, Q_VERSION, timestamp);
 
-        response = HttpRequest.post("https://qapplogin.m.jd.com/cgi-bin/qapp/quick")
+        @Cleanup HttpResponse quickResponse = HttpRequest.post("https://qapplogin.m.jd.com/cgi-bin/qapp/quick")
                 .body(param, ContentType.FORM_URLENCODED.toString())
                 .cookie(ck)
                 .execute();
-        responseJo = JSONObject.parseObject(response.body());
+        responseJo = JSONObject.parseObject(quickResponse.body());
         if (Objects.isNull(responseJo)) {
             throw new BizException("京东服务器抽风中, 再试一次吧~");
         }
@@ -102,7 +102,7 @@ public class JdService {
         long timestamp = System.currentTimeMillis();
         String gsign = StrUtil.format("{}{}{}36{}{}", APP_ID, Q_VERSION, timestamp, subCmd, jdInfo.getGsalt());
         String param = StrUtil.format("country_code={}&client_ver=1.0.0&gsign={}&smscode={}&appid={}&mobile={}&cmd=36&sub_cmd={}&qversion={}&ts={}", COUNTRY_CODE, gsign, code, APP_ID, mobile, subCmd, Q_VERSION, timestamp);
-        HttpResponse response = HttpRequest.post("https://qapplogin.m.jd.com/cgi-bin/qapp/quick")
+        @Cleanup HttpResponse response = HttpRequest.post("https://qapplogin.m.jd.com/cgi-bin/qapp/quick")
                 .body(param, ContentType.FORM_URLENCODED.toString())
                 .cookie(jdInfo.getPreCookie())
                 .execute();
@@ -116,7 +116,7 @@ public class JdService {
         String cookie = StrUtil.format("pt_key={};pt_pin={};", ptKey, URLEncoder.DEFAULT.encode(ptPin, StandardCharsets.UTF_8));
         timedCache.remove(mobile);
         // 通知管理员
-        return new JdInfo().builder().cookie(cookie).ptPin(JDXUtil.getPtPinFromCK(cookie)).build();
+        return JdInfo.builder().cookie(cookie).ptPin(JDXUtil.getPtPinFromCK(cookie)).build();
     }
 
 

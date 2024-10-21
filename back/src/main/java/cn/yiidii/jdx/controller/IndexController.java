@@ -9,7 +9,7 @@ import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.JdService;
 import cn.yiidii.jdx.service.QLService;
-import cn.yiidii.jdx.util.CheckHasQywx;
+import cn.yiidii.jdx.util.CheckUtil;
 import cn.yiidii.jdx.util.JDXUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class IndexController {
 
     private final JdService jdService;
     private final QLService qlService;
-    private final CheckHasQywx checkHasQywx;
+    private final CheckUtil checkUtil;
     private final SystemConfigProperties systemConfigProperties;
 
     @GetMapping("/jd/smsCode")
@@ -44,8 +44,12 @@ public class IndexController {
             throw new BizException("手机号格式不正确");
         });
 
-        if (!checkHasQywx.checkHasQywx(mobile)) {
+        if (!checkUtil.checkBindQywx(mobile)) {
             return R.failed("该手机号未绑定企业微信，请先扫码关注下方插件，若加入失败，请尝试下载企业微信绑定手机号或联系管理员!!!");
+        }
+
+        if(checkUtil.envIsEnable(mobile)){
+            return R.failed("cookie还在有效期，请勿重复登录");
         }
 
         JdInfo jdInfo = jdService.sendSmsCode(mobile);
@@ -74,7 +78,7 @@ public class IndexController {
         JSONObject result = qlService.submitCk(jdInfo.getCookie(), mobile);
         log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(jdInfo.getCookie())));
 
-        return R.ok(result, "获取cookie成功");
+        return R.ok(result, "登录成功");
     }
 
 
