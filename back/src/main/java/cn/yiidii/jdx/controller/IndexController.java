@@ -7,6 +7,7 @@ import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.model.R;
 import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.ex.BizException;
+import cn.yiidii.jdx.service.AdminService;
 import cn.yiidii.jdx.service.JdService;
 import cn.yiidii.jdx.service.QLService;
 import cn.yiidii.jdx.util.JDXUtil;
@@ -40,6 +41,7 @@ public class IndexController {
     private final QLService qlService;
     private final QywxUtil qywxUtil;
     private final SystemConfigProperties systemConfigProperties;
+    private final AdminService adminService;
 
     @GetMapping("/jd/smsCode")
     public R<JdInfo> smsCode(@RequestParam @NotNull(message = "请填写手机号") String mobile) throws Exception {
@@ -85,7 +87,8 @@ public class IndexController {
 
         JSONObject result = qlService.submitCk(jdInfo.getCookie(), mobile);
         log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(jdInfo.getCookie())));
-
+        // 异步联动修正数据
+        adminService.updateEnv(mobile);
         return R.ok(result, "登录成功");
     }
 

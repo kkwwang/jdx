@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -111,7 +112,12 @@ public class AdminService {
         return result;
     }
 
+    @Async
     public JSONObject updateEnv(String mobile) {
+        log.info("envs 修正开始");
+
+        long start = System.currentTimeMillis();
+
         Map<String, Set<String>> qywxUserIdMap = new HashMap<>();
 
         List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode(mobile, "JD_COOKIE");
@@ -125,15 +131,16 @@ public class AdminService {
                     log.error("解析remark异常: {}", remark);
                     // todo 临时代码
 
-//                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-//                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-//                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
                 } finally {
                     RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                    remarkInfo.setNotifyMobile(remarkInfo.getMobile());
                     Set<String> bindQywx = qywxUtil.checkBindQywx(remarkInfo.getMobile());
                     remarkInfo.setQywxUserId(bindQywx);
                     env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-//                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
 
 
                     for (String qywxId : bindQywx) {
@@ -149,7 +156,7 @@ public class AdminService {
 
         qywxUserIdMap.forEach(qywxUtil::updateQywxUserPosition);
 
-        log.info("envs 修正更新成功");
+        log.info("envs 修正更新成功，耗时：" + (System.currentTimeMillis() - start) / 1000);
         return new JSONObject();
     }
 

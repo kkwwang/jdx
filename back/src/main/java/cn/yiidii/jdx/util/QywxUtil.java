@@ -151,7 +151,7 @@ public class QywxUtil {
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
             JSONObject jsonObject = JSON.parseObject(body);
-            if (jsonObject.getInteger("errcode") == 0 && jsonObject.getInteger("status") == 1) {
+            if (jsonObject.getInteger("errcode") == 0) {
                 return jsonObject.getString("userid");
             }
         }
