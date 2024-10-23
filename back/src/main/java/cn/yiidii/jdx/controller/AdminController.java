@@ -98,4 +98,9 @@ public class AdminController {
         systemConfigProperties.setPassword(password);
         return R.ok(null, "修改成功");
     }
+
+    @GetMapping(value = "updateEnv")
+    public R<?> updateEnv(String mobile) {
+        return R.ok(adminService.updateEnv(mobile));
+    }
 }

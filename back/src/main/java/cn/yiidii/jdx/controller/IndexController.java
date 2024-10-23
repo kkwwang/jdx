@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * JdController
@@ -44,15 +45,17 @@ public class IndexController {
             throw new BizException("手机号格式不正确");
         });
 
-        if (!checkUtil.checkBindQywx(mobile)) {
+        Set<String> bindQywx = checkUtil.checkBindQywx(mobile);
+        if (bindQywx.isEmpty()) {
             return R.failed("该手机号未绑定企业微信，请先扫码关注下方插件，若加入失败，请尝试下载企业微信绑定手机号或联系管理员!!!");
         }
 
-        if(checkUtil.envIsEnable(mobile)){
+        if (checkUtil.envIsEnable(mobile)) {
             return R.failed("cookie还在有效期，请勿重复登录");
         }
 
         JdInfo jdInfo = jdService.sendSmsCode(mobile);
+        jdInfo.setQywxUserId(bindQywx);
         log.info(StrUtil.format("{}发送了验证码", DesensitizedUtil.mobilePhone(mobile)));
         return R.ok(jdInfo, "发送验证码成功");
     }

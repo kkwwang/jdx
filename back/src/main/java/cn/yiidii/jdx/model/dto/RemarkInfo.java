@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.util.StringUtils;
 
 import java.net.URLDecoder;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -14,16 +16,17 @@ public class RemarkInfo {
     private String wechat = "新账号";
     private String ptPin;
     private String mobile;
-    private String notifyMobile;
+    private Set<String> notifyMobile = new HashSet<>();
     private String nickname;
-    private String qywxUserId = "";
+    private Set<String> qywxUserId = new HashSet<>();
 
-    public String getQywxUserId() {
-        return qywxUserId;
+
+    public RemarkInfo setQywxUserId(Set<String> qywxUserId) {
+        this.qywxUserId.addAll(qywxUserId.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+        return this;
     }
-
-    public RemarkInfo setQywxUserId(String qywxUserId) {
-        this.qywxUserId = qywxUserId;
+    public RemarkInfo setQywxUserId(String... qywxUserId) {
+        this.qywxUserId.addAll(Arrays.stream(qywxUserId).filter(StringUtils::hasText).collect(Collectors.toList()));
         return this;
     }
 
@@ -32,8 +35,8 @@ public class RemarkInfo {
         return this;
     }
 
-    public RemarkInfo setNotifyMobile(String notifyMobile) {
-        this.notifyMobile = notifyMobile;
+    public RemarkInfo setNotifyMobile(String... notifyMobile) {
+        this.notifyMobile.addAll(Arrays.stream(notifyMobile).filter(StringUtils::hasText).collect(Collectors.toList()));
         return this;
     }
 

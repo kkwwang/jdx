@@ -15,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,33 +27,48 @@ public class CheckUtil {
 
     private final SystemConfigProperties systemConfigProperties;
 
-    public boolean checkBindQywx(String mobile) {
+    public Set<String> checkBindQywx(String mobile) {
+        Set<String> result = new HashSet<>();
         // 获取token
         String token = getToken();
         if (null == token) {
-            return false;
-        }
-
-        // 手机号获取userid
-        String userid = getUserid(mobile, token);
-        if (null != userid && getUserinfo(userid, token)) {
-            return true;
+            return result;
         }
 
         JSONObject env = getEnv(mobile);
-        RemarkInfo remarkInfo = JSONObject.parseObject(env.getString("remarks"), RemarkInfo.class);
+        String remark = env.getString("remarks");
 
-        String qywxUserId = remarkInfo.getQywxUserId();
-        if (StringUtils.hasText(qywxUserId) && getUserinfo(qywxUserId, token)) {
-            return true;
-        }
-        // 手机号获取userid
-        String notifyUserid = getUserid(remarkInfo.getNotifyMobile(), token);
-        if (null != notifyUserid && getUserinfo(notifyUserid, token)) {
-            return true;
+        RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+
+        Set<String> notifyMobileSet = remarkInfo.getNotifyMobile();
+        notifyMobileSet.add(mobile);
+
+        Set<String> qywxUserIdSet = remarkInfo.getQywxUserId();
+
+        // 获取用户id
+        for (String notifMobile : notifyMobileSet) {
+            // 手机号获取userid
+            String notifyUserid = getUserid(notifMobile, token);
+            if (StringUtils.hasText(notifyUserid)) {
+                notifyUserid = getUserinfo(notifyUserid, token);
+                if (StringUtils.hasText(notifyUserid)) {
+                    qywxUserIdSet.add(notifyUserid);
+                }
+            }
         }
 
-        return false;
+        // 验证有效性
+        for (String qywxUserId : qywxUserIdSet) {
+            if (StringUtils.hasText(qywxUserId)) {
+                qywxUserId = getUserinfo(qywxUserId, token);
+                if (StringUtils.hasText(qywxUserId)) {
+                    result.add(qywxUserId);
+                }
+            }
+        }
+
+
+        return result;
     }
 
     public boolean envIsEnable(String mobile) {
@@ -66,6 +83,9 @@ public class CheckUtil {
         List<JSONObject> envs = service.searchEnv(mobile).stream().filter(item -> StringUtils.pathEquals("JD_COOKIE", item.getString("name"))).collect(Collectors.toList());
         for (JSONObject env : envs) {
             String remark = env.getString("remarks");
+
+
+
             RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
             if (StringUtils.pathEquals(mobile, remarkInfo.getMobile())) {
                 return env;
@@ -110,7 +130,7 @@ public class CheckUtil {
         return null;
     }
 
-    private boolean getUserinfo(String userid, String token) {
+    private String getUserinfo(String userid, String token) {
         String getuserinfo = SpringUtil.getProperty("qywx.getuserinfo");
         // 获取token
         @Cleanup HttpResponse response = HttpRequest.get(getuserinfo.replace("ACCESS_TOKEN", token).replace("USERID", userid))
@@ -119,8 +139,10 @@ public class CheckUtil {
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
             JSONObject jsonObject = JSON.parseObject(body);
-            return jsonObject.getInteger("status") == 1;
+            if (jsonObject.getInteger("errcode") == 0 && jsonObject.getInteger("status") == 1) {
+                return jsonObject.getString("userid");
+            }
         }
-        return false;
+        return null;
     }
 }

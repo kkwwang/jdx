@@ -45,11 +45,11 @@ public class QywxPushUtil {
         reqParamJo.put("text", text);
 
 
-        log.debug(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
+        log.info(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
         @Cleanup HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
                 .body(reqParamJo.toJSONString())
                 .execute();
-        log.debug(StrUtil.format("企业微信发送消息, 响应: {}", resp.body()));
+        log.info(StrUtil.format("企业微信发送消息, 响应: {}", resp.body()));
     }
 
 

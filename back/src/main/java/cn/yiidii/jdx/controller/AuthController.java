@@ -62,7 +62,7 @@ public class AuthController {
 
         info.remove("exp");
 
-        log.debug(StrUtil.format("登录结果: {}", info.toJSONString()));
+        log.info(StrUtil.format("登录结果: {}", info.toJSONString()));
         return R.ok(info, "登陆成功");
     }
 

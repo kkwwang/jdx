@@ -53,7 +53,7 @@ public class JdService {
         if (Objects.isNull(responseJo)) {
             throw new BizException("京东服务器抽风中, 再试一次吧~");
         }
-        log.debug(StrUtil.format("京东发送验证码, 获取一堆什么参数, 京东响应: {}", responseJo.toJSONString()));
+        log.info(StrUtil.format("京东发送验证码, 获取一堆什么参数, 京东响应: {}", responseJo.toJSONString()));
         this.checkErr(responseJo);
         JSONObject data = responseJo.getJSONObject("data");
         String gsalt = data.getString("gsalt");
@@ -85,7 +85,7 @@ public class JdService {
         if (Objects.isNull(responseJo)) {
             throw new BizException("京东服务器抽风中, 再试一次吧~");
         }
-        log.debug(StrUtil.format("京东发送验证码, 第二步, 京东响应: {}", responseJo.toJSONString()));
+        log.info(StrUtil.format("京东发送验证码, 第二步, 京东响应: {}", responseJo.toJSONString()));
         this.checkErr(responseJo);
         timedCache.put(mobile, jdInfo);
         jdInfo.setExpireTime(responseJo.getJSONObject("data").getLong("expire_time"));
@@ -114,7 +114,7 @@ public class JdService {
         String ptKey = data.getString("pt_key");
         String ptPin = data.getString("pt_pin");
         String cookie = StrUtil.format("pt_key={};pt_pin={};", ptKey, URLEncoder.DEFAULT.encode(ptPin, StandardCharsets.UTF_8));
-        timedCache.remove(mobile);
+//        timedCache.remove(mobile);
         // 通知管理员
         return JdInfo.builder().cookie(cookie).ptPin(JDXUtil.getPtPinFromCK(cookie)).build();
     }

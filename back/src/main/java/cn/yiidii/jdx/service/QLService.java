@@ -10,6 +10,7 @@ import cn.hutool.http.HttpStatus;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.dto.AdminNotifyEvent;
+import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.support.ITask;
@@ -50,6 +51,7 @@ public class QLService implements ITask {
 
     private final SystemConfigProperties systemConfigProperties;
     private final ScheduleTaskUtil scheduleTaskUtil;
+    private final JdService jdService;
 
     public JSONObject submitCk(String cookie, String mobile) {
         // 同步下数据
@@ -62,17 +64,17 @@ public class QLService implements ITask {
 
 
         List<QLAllNodeSearchResult> qlAllNodeSearchResults = this.searchEnvFromAllNode(ptPin, "JD_COOKIE");
-        log.debug("[提交cookie], 所有节点搜索{}, 结果: {}", ptPin, JSON.toJSONString(qlAllNodeSearchResults));
+        log.info("[提交cookie], 所有节点搜索{}, 结果: {}", ptPin, JSON.toJSONString(qlAllNodeSearchResults));
         if (CollUtil.isEmpty(qlAllNodeSearchResults)) {
             // 随机一个节点
             QLConfig qlConfig = availableQlConfigs.get(RandomUtil.randomInt(availableQlConfigs.size()));
-            log.debug("[提交cookie], pt_pin: {}, 在节点{}新增", ptPin, qlConfig.getDisplayName());
+            log.info("[提交cookie], pt_pin: {}, 在节点{}新增", ptPin, qlConfig.getDisplayName());
             // 保存并启用
             this.saveAndEnableEnv(qlConfig, "JD_COOKIE", cookie, "", mobile);
         } else {
             // 更新
             List<String> updateNodesNames = qlAllNodeSearchResults.stream().map(e -> e.getQlConfig().getDisplayName()).collect(Collectors.toList());
-            log.debug("[提交cookie], pt_pin: {}, 在一下节点更新: {}", ptPin, JSON.toJSONString(updateNodesNames));
+            log.info("[提交cookie], pt_pin: {}, 在一下节点更新: {}", ptPin, JSON.toJSONString(updateNodesNames));
             qlAllNodeSearchResults.forEach(r -> r.getEnvs().forEach(e -> this.saveAndEnableEnv(r.getQlConfig(), "JD_COOKIE", cookie, e.getString("remarks"), mobile)));
         }
 
@@ -96,10 +98,10 @@ public class QLService implements ITask {
         remarkInfo
                 .setMobile(mobile)
                 .setPtPin(ptPin);
+        JdInfo jdInfo = jdService.timedCache.get(mobile);
+        remarkInfo.setQywxUserId(jdInfo.getQywxUserId());
         // todo 查询用户信息，组装remark
-        if (!StringUtils.hasText(remarkInfo.getNotifyMobile())) {
-            remarkInfo.setNotifyMobile(mobile);
-        }
+        remarkInfo.setNotifyMobile(mobile);
 
         remarkInfo.setNickname(JDXUtil.getNiceName(value));
 
@@ -117,12 +119,12 @@ public class QLService implements ITask {
             JSONArray paramJa = new JSONArray();
             paramJa.add(envJo);
             try {
-                log.debug(StrUtil.format("[青龙 - {}] 添加环境变量, 参数: {}", displayName, envJo.toJSONString()));
+                log.info(StrUtil.format("[青龙 - {}] 添加环境变量, 参数: {}", displayName, envJo.toJSONString()));
                 @Cleanup HttpResponse response = HttpRequest.post(qlConfig.getUrl().concat("open/envs"))
                         .bearerAuth(this.getQLToken(displayName))
                         .body(paramJa.toJSONString())
                         .execute();
-                log.debug(StrUtil.format("[青龙 - {}] 添加环境变量, 响应: {}", displayName, response.body()));
+                log.info(StrUtil.format("[青龙 - {}] 添加环境变量, 响应: {}", displayName, response.body()));
             } catch (Exception e) {
                 log.error(StrUtil.format("[青龙 - {}] 添加环境变量发生异常: {}", displayName, e));
                 throw new BizException("连接青龙发生异常, 请联系系统管理员");
@@ -152,8 +154,8 @@ public class QLService implements ITask {
 
         SpringUtil.publishEvent(
                 new AdminNotifyEvent(
-                        new HashSet<>(Arrays.asList(mobile, remarkInfo.getNotifyMobile())),
-                        StringUtils.hasText(remarkInfo.getQywxUserId()) ? new HashSet<>(Collections.singletonList(remarkInfo.getQywxUserId())) : null,
+                        new HashSet<>(),
+                        remarkInfo.getQywxUserId(),
                         "【登录成功】",
                         text
                 )
@@ -214,7 +216,7 @@ public class QLService implements ITask {
                 return jo;
             }).collect(Collectors.toList());
         } catch (Exception e) {
-            log.debug(StrUtil.format("连接青龙发生异常, e: {}", e));
+            log.info(StrUtil.format("连接青龙发生异常, e: {}", e));
             throw new BizException("连接青龙发生异常, 请联系系统管理员" + displayName);
         }
     }
@@ -244,25 +246,26 @@ public class QLService implements ITask {
         String id = envJo.getString("id");
         String displayName = qlConfig.getDisplayName();
         // 第一次，用_id
-        envJo.remove("id");
-        envJo.put("_id", id);
-        log.debug(StrUtil.format("[青龙 - {}] 第一次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
+        envJo.remove("_id");
+        envJo.put("id", id);
+        log.info(StrUtil.format("[青龙 - {}] 第一次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
         @Cleanup HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
                 .bearerAuth(this.getQLToken(displayName))
                 .body(envJo.toJSONString())
                 .execute();
-        log.debug(StrUtil.format("[青龙 - {}] 更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
+        log.info(StrUtil.format("[青龙 - {}] 更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
 
         // 如果第一次异常，第二次用id
         if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR || response.getStatus() == HttpStatus.HTTP_BAD_REQUEST) {
-            envJo.remove("_id");
-            envJo.put("id", id);
-            log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
+
+            envJo.remove("id");
+            envJo.put("_id", id);
+            log.info(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 参数: {}", displayName, envJo.toJSONString()));
             response = HttpRequest.put(qlConfig.getUrl().concat("open/envs"))
                     .bearerAuth(this.getQLToken(displayName))
                     .body(envJo.toJSONString())
                     .execute();
-            log.debug(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
+            log.info(StrUtil.format("[青龙 - {}] 第二次尝试更新环境变量, 状态码: {}, 响应: {}", displayName, response.getStatus(), response.body()));
         }
         if (response.getStatus() == HttpStatus.HTTP_INTERNAL_ERROR || response.getStatus() == HttpStatus.HTTP_BAD_REQUEST) {
             throw new BizException("更新失败，请联系系统管理员");
@@ -275,14 +278,14 @@ public class QLService implements ITask {
         }
         String displayName = qlConfig.getDisplayName();
         try {
-            log.debug(StrUtil.format("[青龙 - {}] 启用环境变量, 参数: {}", displayName, JSON.toJSONString(ids)));
+            log.info(StrUtil.format("[青龙 - {}] 启用环境变量, 参数: {}", displayName, JSON.toJSONString(ids)));
             @Cleanup HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs/enable"))
                     .bearerAuth(this.getQLToken(displayName))
                     .body(JSON.toJSONString(ids))
                     .execute();
-            log.debug(StrUtil.format("[青龙 - {}] 启用环境变量, 响应: {}", displayName, response.body()));
+            log.info(StrUtil.format("[青龙 - {}] 启用环境变量, 响应: {}", displayName, response.body()));
         } catch (Exception e) {
-            log.debug(StrUtil.format("连接青龙发生异常, e: {}", e));
+            log.info(StrUtil.format("连接青龙发生异常, e: {}", e));
             throw new BizException("连接青龙发生异常, 请联系系统管理员");
         }
     }
@@ -293,14 +296,14 @@ public class QLService implements ITask {
         }
         String displayName = qlConfig.getDisplayName();
         try {
-            log.debug(StrUtil.format("[青龙 - {}] 禁用环境变量, 参数: {}", displayName, JSON.toJSONString(ids)));
+            log.info(StrUtil.format("[青龙 - {}] 禁用环境变量, 参数: {}", displayName, JSON.toJSONString(ids)));
             @Cleanup HttpResponse response = HttpRequest.put(qlConfig.getUrl().concat("open/envs/disable"))
                     .bearerAuth(this.getQLToken(displayName))
                     .body(JSON.toJSONString(ids))
                     .execute();
-            log.debug(StrUtil.format("[青龙 - {}] 禁用环境变量, 响应: {}", displayName, response.body()));
+            log.info(StrUtil.format("[青龙 - {}] 禁用环境变量, 响应: {}", displayName, response.body()));
         } catch (Exception e) {
-            log.debug(StrUtil.format("连接青龙发生异常, e: {}", e));
+            log.info(StrUtil.format("连接青龙发生异常, e: {}", e));
             throw new BizException("连接青龙发生异常, 请联系系统管理员");
         }
     }
@@ -371,7 +374,7 @@ public class QLService implements ITask {
      * @return JSONObject
      */
     private JSONObject getExistCK(QLConfig qlConfig, String ptPin) {
-        log.debug(StrUtil.format("[青龙 - {}], 获取存在的Cookie: {}", qlConfig.getDisplayName(), ptPin));
+        log.info(StrUtil.format("[青龙 - {}], 获取存在的Cookie: {}", qlConfig.getDisplayName(), ptPin));
         JSONObject result;
         List<JSONObject> envs = this.searchEnv(qlConfig, ptPin);
         if (envs.isEmpty()) {
@@ -389,7 +392,7 @@ public class QLService implements ITask {
                 result = new JSONObject();
             }
         }
-        log.debug(StrUtil.format("[青龙 - {}], 获取存在的Cookie: {}, 最终返回结果: {}", qlConfig.getDisplayName(), ptPin, result.toJSONString()));
+        log.info(StrUtil.format("[青龙 - {}], 获取存在的Cookie: {}, 最终返回结果: {}", qlConfig.getDisplayName(), ptPin, result.toJSONString()));
         return result;
     }
 

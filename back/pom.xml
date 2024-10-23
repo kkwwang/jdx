@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.yiidii</groupId>
     <artifactId>jdx</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>${project.artifactId}</name>
 
     <properties>
@@ -67,11 +67,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
             <version>RELEASE</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.zhyd.oauth</groupId>
-            <artifactId>JustAuth</artifactId>
-            <version>${justAuth.version}</version>
         </dependency>
 
     </dependencies>

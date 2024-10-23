@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
+
 /**
  * JdInfo
  *
@@ -27,5 +29,7 @@ public class JdInfo {
     private String preCookie;
     private String cookie;
     private String ptPin;
+
+    private Set<String> qywxUserId;
 
 }

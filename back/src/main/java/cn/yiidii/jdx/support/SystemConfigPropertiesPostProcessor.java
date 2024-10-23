@@ -35,7 +35,7 @@ public class SystemConfigPropertiesPostProcessor implements BeanPostProcessor {
                 .entrySet().stream().filter(e -> e.getValue().size() > 1).map(e -> e.getKey()).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(duplicateDisplayName)) {
             String msg = StrUtil.format("青龙配置异常, 以下名称出现重复: {}", CollUtil.join(duplicateDisplayName, ","));
-            log.debug(msg);
+            log.info(msg);
             throw new RuntimeException(msg);
         }
     }

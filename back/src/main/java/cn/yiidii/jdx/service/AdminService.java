@@ -3,10 +3,13 @@ package cn.yiidii.jdx.service;
 import cn.hutool.core.util.StrUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
+import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
+import cn.yiidii.jdx.util.CheckUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +31,7 @@ public class AdminService {
 
     private final SystemConfigProperties systemConfigProperties;
     private final QLService qlService;
+    private final CheckUtil checkUtil;
 
     public JSONArray getQLConfig() {
         List<QLConfig> qls = systemConfigProperties.getQls();
@@ -45,7 +50,7 @@ public class AdminService {
         }
         List<QLConfig> qls = systemConfigProperties.getQls();
         qls.add(qlConfig);
-        log.debug(StrUtil.format("[admin] 添加ql: {}", JSON.toJSONString(qls)));
+        log.info(StrUtil.format("[admin] 添加ql: {}", JSON.toJSONString(qls)));
         // 刷新下次数
         qlService.refreshQLUsedCookieCount();
         return qls;
@@ -68,7 +73,7 @@ public class AdminService {
         systemConfigProperties.setQls(qlConfigMap.values().stream().collect(Collectors.toList()));
         // 刷新下次数
         qlService.refreshQLUsedCookieCount();
-        log.debug(StrUtil.format("[admin] 更新ql: {}", JSON.toJSONString(qls)));
+        log.info(StrUtil.format("[admin] 更新ql: {}", JSON.toJSONString(qls)));
         return qls;
     }
 
@@ -80,7 +85,7 @@ public class AdminService {
         List<QLConfig> qls = systemConfigProperties.getQls();
         qls = qls.stream().filter(ql -> !StrUtil.equalsIgnoreCase(displayName, ql.getDisplayName())).collect(Collectors.toList());
         systemConfigProperties.setQls(qls);
-        log.debug(StrUtil.format("[admin] 删除ql: {}", displayName));
+        log.info(StrUtil.format("[admin] 删除ql: {}", displayName));
         return qls;
     }
 
@@ -105,8 +110,36 @@ public class AdminService {
             systemConfigProperties.setIndexBottomNotice(bottomNotice);
             result.put("bottomNotice", bottomNotice);
         }
-        log.debug(StrUtil.format("[admin] 更新网站配置: {}", result.toJSONString()));
+        log.info(StrUtil.format("[admin] 更新网站配置: {}", result.toJSONString()));
         return result;
+    }
+
+    public JSONObject updateEnv(String mobile) {
+        List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode(mobile, "JD_COOKIE");
+        for (QLService.QLAllNodeSearchResult nodeSearchResult : jdCookie) {
+            for (JSONObject env : nodeSearchResult.getEnvs()) {
+                String remark = env.getString("remarks");
+
+                try {
+                    JSONObject.parseObject(remark, RemarkInfo.class);
+                } catch (Exception e) {
+                    log.error("解析remark异常: {}", remark);
+                    // todo 临时代码
+
+                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+                } finally {
+                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                    Set<String> bindQywx = checkUtil.checkBindQywx(remarkInfo.getMobile());
+                    remarkInfo.setQywxUserId(bindQywx);
+                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+                }
+            }
+        }
+        log.info("envs 修正更新成功");
+        return new JSONObject();
     }
 
 }
