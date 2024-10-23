@@ -13,3 +13,5 @@ qywx:
   # 文档：https://work.weixin.qq.com/api/doc#10167
   getuserid: https://qyapi.weixin.qq.com/cgi-bin/user/getuserid?access_token=ACCESS_TOKEN
   getuserinfo: https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&userid=USERID
+  update: https://qyapi.weixin.qq.com/cgi-bin/user/update?access_token=ACCESS_TOKEN
+  create: https://qyapi.weixin.qq.com/cgi-bin/user/create?access_token=ACCESS_TOKEN

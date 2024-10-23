@@ -9,8 +9,8 @@ import cn.yiidii.jdx.model.dto.JdInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.JdService;
 import cn.yiidii.jdx.service.QLService;
-import cn.yiidii.jdx.util.CheckUtil;
 import cn.yiidii.jdx.util.JDXUtil;
+import cn.yiidii.jdx.util.QywxUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -36,26 +38,22 @@ public class IndexController {
 
     private final JdService jdService;
     private final QLService qlService;
-    private final CheckUtil checkUtil;
+    private final QywxUtil qywxUtil;
     private final SystemConfigProperties systemConfigProperties;
 
     @GetMapping("/jd/smsCode")
-    public R<JdInfo> qrCode(@RequestParam @NotNull(message = "请填写手机号") String mobile) throws Exception {
+    public R<JdInfo> smsCode(@RequestParam @NotNull(message = "请填写手机号") String mobile) throws Exception {
         Assert.isTrue(PhoneUtil.isMobile(mobile), () -> {
             throw new BizException("手机号格式不正确");
         });
 
-        Set<String> bindQywx = checkUtil.checkBindQywx(mobile);
-        if (bindQywx.isEmpty()) {
-            return R.failed("该手机号未绑定企业微信，请先扫码关注下方插件，若加入失败，请尝试下载企业微信绑定手机号或联系管理员!!!");
-        }
 
-        if (checkUtil.envIsEnable(mobile)) {
+        if (qywxUtil.envIsEnable(mobile)) {
             return R.failed("cookie还在有效期，请勿重复登录");
         }
 
         JdInfo jdInfo = jdService.sendSmsCode(mobile);
-        jdInfo.setQywxUserId(bindQywx);
+
         log.info(StrUtil.format("{}发送了验证码", DesensitizedUtil.mobilePhone(mobile)));
         return R.ok(jdInfo, "发送验证码成功");
     }
@@ -77,6 +75,13 @@ public class IndexController {
         JdInfo jdInfo = jdService.login(mobile, code);
         log.info(StrUtil.format("{}获取了京东Cookie", DesensitizedUtil.mobilePhone(mobile)));
 
+        Set<String> bindQywx = qywxUtil.checkBindQywx(mobile);
+        if (bindQywx.isEmpty()) {
+            jdInfo.setQywxUserId(new HashSet<>(Collections.singletonList(mobile)));
+            qywxUtil.createUser(mobile, new HashSet<>(Collections.singletonList(jdInfo.getPtPin())));
+        } else {
+            jdInfo.setQywxUserId(bindQywx);
+        }
 
         JSONObject result = qlService.submitCk(jdInfo.getCookie(), mobile);
         log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(jdInfo.getCookie())));

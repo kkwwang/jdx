@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -15,6 +17,7 @@ import java.util.Set;
  */
 @Data
 @Builder
+@Accessors(chain = true)
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class JdInfo {
@@ -30,6 +33,6 @@ public class JdInfo {
     private String cookie;
     private String ptPin;
 
-    private Set<String> qywxUserId;
+    private Set<String> qywxUserId = new HashSet<>();
 
 }

@@ -5,7 +5,7 @@ import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
-import cn.yiidii.jdx.util.CheckUtil;
+import cn.yiidii.jdx.util.QywxUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +28,7 @@ public class AdminService {
 
     private final SystemConfigProperties systemConfigProperties;
     private final QLService qlService;
-    private final CheckUtil checkUtil;
+    private final QywxUtil qywxUtil;
 
     public JSONArray getQLConfig() {
         List<QLConfig> qls = systemConfigProperties.getQls();
@@ -115,6 +112,8 @@ public class AdminService {
     }
 
     public JSONObject updateEnv(String mobile) {
+        Map<String, Set<String>> qywxUserIdMap = new HashMap<>();
+
         List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode(mobile, "JD_COOKIE");
         for (QLService.QLAllNodeSearchResult nodeSearchResult : jdCookie) {
             for (JSONObject env : nodeSearchResult.getEnvs()) {
@@ -126,18 +125,30 @@ public class AdminService {
                     log.error("解析remark异常: {}", remark);
                     // todo 临时代码
 
-                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+//                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+//                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+//                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
                 } finally {
                     RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-                    Set<String> bindQywx = checkUtil.checkBindQywx(remarkInfo.getMobile());
+                    Set<String> bindQywx = qywxUtil.checkBindQywx(remarkInfo.getMobile());
                     remarkInfo.setQywxUserId(bindQywx);
                     env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+//                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+
+
+                    for (String qywxId : bindQywx) {
+                        Set<String> ptPinSet = qywxUserIdMap.computeIfAbsent(qywxId, k -> new HashSet<>());
+                        ptPinSet.add(remarkInfo.getPtPin());
+                    }
                 }
             }
         }
+
+
+        // 更新企业微信信息
+
+        qywxUserIdMap.forEach(qywxUtil::updateQywxUserPosition);
+
         log.info("envs 修正更新成功");
         return new JSONObject();
     }

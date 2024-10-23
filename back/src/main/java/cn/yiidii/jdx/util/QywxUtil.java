@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CheckUtil {
+public class QywxUtil {
 
     private final SystemConfigProperties systemConfigProperties;
 
@@ -36,6 +36,9 @@ public class CheckUtil {
         }
 
         JSONObject env = getEnv(mobile);
+        if(null == env){
+            return result;
+        }
         String remark = env.getString("remarks");
 
         RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
@@ -95,8 +98,17 @@ public class CheckUtil {
     }
 
     private String getToken() {
+        return getToken(null);
+    }
+
+    private String getContactsToken(){
+        String contactsSecret = systemConfigProperties.getContactsSecret();
+        return getToken(contactsSecret);
+
+    }
+    private String getToken(String contactsSecret) {
         String corpid = systemConfigProperties.getCorpid();
-        String corpsecret = systemConfigProperties.getCorpsecret();
+        String corpsecret = contactsSecret != null ? contactsSecret : systemConfigProperties.getCorpsecret();
 
         String getToken = SpringUtil.getProperty("qywx.getToken");
 
@@ -145,4 +157,43 @@ public class CheckUtil {
         }
         return null;
     }
+
+    public void updateQywxUserPosition(String userid, Set<String> ptPinSet) {
+        String token = getContactsToken();
+        if (token != null) {
+            String updateUrl = SpringUtil.getProperty("qywx.update");
+
+            JSONObject reqParamJo = new JSONObject();
+            reqParamJo.put("userid", userid);
+            reqParamJo.put("position", String.join(",", ptPinSet));
+
+            @Cleanup HttpResponse response = HttpRequest.post(updateUrl.replace("ACCESS_TOKEN", token))
+                    .body(reqParamJo.toJSONString())
+                    .execute();
+            log.info(response.body());
+        }
+
+    }
+    public void createUser(String mobile, Set<String> ptPinSet) {
+        String token = getContactsToken();
+        if (token != null) {
+            String create = SpringUtil.getProperty("qywx.create");
+
+            JSONObject reqParamJo = new JSONObject();
+            reqParamJo.put("name", "请登录企业微信或关注微信插件修改—" + mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"));
+            reqParamJo.put("mobile", mobile);
+            reqParamJo.put("userid", mobile);
+            reqParamJo.put("biz_mail", mobile + "@" + systemConfigProperties.getDomain());
+//            reqParamJo.put("email", mobile + "@" + systemConfigProperties.getDomain());
+            reqParamJo.put("position", String.join(",", ptPinSet));
+
+            @Cleanup HttpResponse response = HttpRequest.post(create.replace("ACCESS_TOKEN", token))
+                    .body(reqParamJo.toJSONString())
+                    .execute();
+            log.info(response.body());
+        }
+
+    }
+
+
 }

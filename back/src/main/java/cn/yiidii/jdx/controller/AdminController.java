@@ -61,8 +61,9 @@ public class AdminController {
         result.put("notice", systemConfigProperties.getNotice());
         result.put("bottomNotice", systemConfigProperties.getIndexBottomNotice());
         result.put("username", systemConfigProperties.getUsername());
-        result.put("password", systemConfigProperties.getPassword());
         result.put("corpid", systemConfigProperties.getCorpid());
+        result.put("domain", systemConfigProperties.getDomain());
+        result.put("contactsSecret", systemConfigProperties.getContactsSecret());
         result.put("corpsecret", systemConfigProperties.getCorpsecret());
         result.put("agentid", systemConfigProperties.getAgentid());
         result.put("qywxKey", systemConfigProperties.getQywxKey());
@@ -79,6 +80,11 @@ public class AdminController {
 
     @PutMapping("qywx")
     public R<?> updateQywx(@RequestBody JSONObject paramJo) {
+        systemConfigProperties.setAgentid(paramJo.getString("agentid"));
+        systemConfigProperties.setContactsSecret(paramJo.getString("contactsSecret"));
+        systemConfigProperties.setCorpid(paramJo.getString("corpid"));
+        systemConfigProperties.setCorpsecret(paramJo.getString("corpsecret"));
+        systemConfigProperties.setDomain(paramJo.getString("domain"));
         systemConfigProperties.setQywxKey(paramJo.getString("qywxKey"));
         return R.ok(paramJo, "修改成功");
     }
@@ -91,11 +97,10 @@ public class AdminController {
         if (StrUtil.isBlank(username)) {
             throw new BizException("用户名不能为空");
         }
-        if (StrUtil.isBlank(password)) {
-            throw new BizException("密码不能为空");
+        if (StrUtil.isNotBlank(password)) {
+            systemConfigProperties.setPassword(password);
         }
         systemConfigProperties.setUsername(username);
-        systemConfigProperties.setPassword(password);
         return R.ok(null, "修改成功");
     }
 

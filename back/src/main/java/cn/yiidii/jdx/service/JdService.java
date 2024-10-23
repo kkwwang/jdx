@@ -16,11 +16,9 @@ import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * JdService
@@ -114,31 +112,14 @@ public class JdService {
         String ptKey = data.getString("pt_key");
         String ptPin = data.getString("pt_pin");
         String cookie = StrUtil.format("pt_key={};pt_pin={};", ptKey, URLEncoder.DEFAULT.encode(ptPin, StandardCharsets.UTF_8));
-//        timedCache.remove(mobile);
-        // 通知管理员
-        return JdInfo.builder().cookie(cookie).ptPin(JDXUtil.getPtPinFromCK(cookie)).build();
+
+        jdInfo.setCookie(cookie)
+                .setPtPin(JDXUtil.getPtPinFromCK(cookie))
+        ;
+
+        return jdInfo;
     }
 
-
-    private Map<String, String> transSetCookie2Map(List<String> setCookiesList) {
-        if (CollectionUtils.isEmpty(setCookiesList)) {
-            return new HashMap<>();
-        }
-        return setCookiesList.stream()
-                .map(item -> item.split(";"))
-                .flatMap(Arrays::stream)
-                .map(String::trim)
-                .filter(s -> {
-                    final String[] split = s.split("=");
-                    return split.length > 1 && StrUtil.isNotBlank(split[1]);
-                })
-                .distinct()
-                .collect(Collectors.toMap(
-                        s -> s.split("=")[0],
-                        s -> s.split("=")[1],
-                        (s1, s2) -> s2
-                ));
-    }
 
     private void checkErr(JSONObject responseJo) {
         Integer errCode = responseJo.getInteger("err_code");
