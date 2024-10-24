@@ -76,6 +76,9 @@ public class QywxUtil {
 
     public boolean envIsEnable(String mobile) {
         JSONObject env = getEnv(mobile);
+        if (env == null) {
+            return false;
+        }
         String niceName = JDXUtil.getNiceName(env.getString("value"));
         return StringUtils.hasText(niceName);
     }

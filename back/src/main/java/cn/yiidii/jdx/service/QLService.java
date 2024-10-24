@@ -30,6 +30,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -104,6 +106,8 @@ public class QLService implements ITask {
         remarkInfo.setNotifyMobile(mobile);
 
         remarkInfo.setNickname(JDXUtil.getNiceName(value));
+        String preLoginTime = remarkInfo.getLoginTime();
+        remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
 
         log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
@@ -150,7 +154,12 @@ public class QLService implements ITask {
             }
         }
 
-        String text = StrUtil.format("账号：{}\n手机号：{}", StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(), mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"));
+        String text = StrUtil.format(
+                "账号：{}\n手机号：{}\n上次登录时间：{}",
+                StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(),
+                mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"),
+                preLoginTime
+        );
 
         SpringUtil.publishEvent(
                 new AdminNotifyEvent(

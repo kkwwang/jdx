@@ -1,4 +1,5 @@
 const Timestamp = new Date().getTime();
+
 module.exports = {
   publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
   outputDir: "dist",
@@ -37,5 +38,13 @@ module.exports = {
       filename: `css/[name].${Timestamp}.css`,
       chunkFilename: `css/[name].${Timestamp}.css`
     }
+  },
+  chainWebpack(config){
+    // 版本号在页面显示
+    config.plugin('define').tap(args => {
+      args[0]['process.env'].npm_package_version = JSON.stringify(process.env.npm_package_version);
+
+      return args;
+    });
   }
 };

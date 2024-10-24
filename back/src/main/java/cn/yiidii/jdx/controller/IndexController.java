@@ -3,6 +3,7 @@ package cn.yiidii.jdx.controller;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.model.R;
 import cn.yiidii.jdx.model.dto.JdInfo;
@@ -98,6 +99,7 @@ public class IndexController {
         JSONObject jo = new JSONObject();
         jo.put("title", systemConfigProperties.getTitle());
         jo.put("notice", systemConfigProperties.getNotice());
+        jo.put("version", SpringUtil.getProperty("spring.application.version"));
         jo.put("bottomNotice", systemConfigProperties.getIndexBottomNotice());
         jo.put("remain", systemConfigProperties.getQls().stream()
                 .filter(ql -> ql.getDisabled() == 0 && ql.getUsed() < ql.getMax())
