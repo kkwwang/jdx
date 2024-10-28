@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -141,7 +142,7 @@ public class AdminService {
                     remarkInfo.setNotifyMobile(remarkInfo.getMobile());
                     Set<String> bindQywx = qywxUtil.checkBindQywx(remarkInfo.getMobile());
                     remarkInfo.setQywxUserId(bindQywx);
-                    if (null == remarkInfo.getLoginTime()) {
+                    if (!StringUtils.hasText(remarkInfo.getLoginTime())) {
                         remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                     }
 

@@ -32,8 +32,8 @@
         style="position: fixed; bottom: 10px; right: 10px;"
     >
 
-      <van-tag mark type="primary">页面版本号：{{ npm_package_version }}</van-tag>
-      <van-tag mark type="primary">服务版本号：{{ version }}</van-tag>
+      <van-tag mark type="primary">页面：v{{ npm_package_version }}</van-tag>
+      <van-tag mark type="primary">服务：v{{ version }}</van-tag>
     </div>
   </div>
 </template>
