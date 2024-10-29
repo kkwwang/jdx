@@ -104,7 +104,7 @@ public class QywxUtil {
         return getToken(null);
     }
 
-    private String getContactsToken(){
+    public String getContactsToken(){
         String contactsSecret = systemConfigProperties.getContactsSecret();
         return getToken(contactsSecret);
 

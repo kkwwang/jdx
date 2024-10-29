@@ -21,13 +21,11 @@ public class AdminNotifyEvent extends ApplicationEvent {
     private static final Object NULL_OBJECT = new Object();
 
     private String title;
-    private Set<String> mobileList;
     private Set<String> qywxUserIdList;
     private String content;
 
-    public AdminNotifyEvent(Set<String> mobileList, Set<String> qywxUserIdList, String title, String content) {
+    public AdminNotifyEvent(Set<String> qywxUserIdList, String title, String content) {
         super(NULL_OBJECT);
-        this.mobileList = mobileList;
         this.qywxUserIdList = qywxUserIdList;
         this.title = title;
         this.content = content;

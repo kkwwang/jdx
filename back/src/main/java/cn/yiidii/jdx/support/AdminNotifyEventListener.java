@@ -1,7 +1,6 @@
 package cn.yiidii.jdx.support;
 
 import cn.hutool.core.util.StrUtil;
-import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.model.dto.AdminNotifyEvent;
 import cn.yiidii.jdx.util.IdUtil;
 import cn.yiidii.jdx.util.QywxPushUtil;
@@ -24,7 +23,6 @@ public class AdminNotifyEventListener implements ApplicationListener<AdminNotify
 
     private static final String PREFIX = "adminNotify";
 
-    private final SystemConfigProperties systemConfigProperties;
 
     @Override
     @Async("asyncExecutor")
@@ -32,10 +30,8 @@ public class AdminNotifyEventListener implements ApplicationListener<AdminNotify
         Thread.currentThread().setName(String.format(Thread.currentThread().getName(), IdUtil.randomSnowflakeId(PREFIX) + "_"));
 
         QywxPushUtil.send(
-                systemConfigProperties.getQywxKey(),
                 event.getTitle(),
                 event.getContent(),
-                event.getMobileList(),
                 event.getQywxUserIdList()
         );
 

@@ -163,7 +163,6 @@ public class QLService implements ITask {
 
         SpringUtil.publishEvent(
                 new AdminNotifyEvent(
-                        new HashSet<>(),
                         remarkInfo.getQywxUserId(),
                         "【登录成功】",
                         text
