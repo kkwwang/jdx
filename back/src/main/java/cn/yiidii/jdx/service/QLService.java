@@ -110,8 +110,8 @@ public class QLService implements ITask {
         remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
 
-        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-        remark = JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty);
+        log.info("用户信息：{}", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty, SerializerFeature.PrettyFormat));
+        remark = JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty, SerializerFeature.PrettyFormat);
 
         // 推送青龙
         if (existEnv.isEmpty()) {

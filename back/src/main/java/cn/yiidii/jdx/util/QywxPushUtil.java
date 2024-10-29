@@ -35,7 +35,7 @@ public class QywxPushUtil {
         try {
             if (null != qywxUserIdList && !qywxUserIdList.isEmpty()) {
                 QywxUtil qywxUtil = SpringUtil.getBean(QywxUtil.class);
-                String contactsToken = qywxUtil.getContactsToken();
+                String contactsToken = qywxUtil.getToken();
                 SystemConfigProperties systemConfigProperties = SpringUtil.getBean(SystemConfigProperties.class);
                 reqParamJo.put("agentid", systemConfigProperties.getAgentid());
                 reqParamJo.put("touser", String.join("|", qywxUserIdList));

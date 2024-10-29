@@ -87,6 +87,7 @@ public class AdminController {
         systemConfigProperties.setCorpsecret(paramJo.getString("corpsecret"));
         systemConfigProperties.setDomain(paramJo.getString("domain"));
         systemConfigProperties.setQywxKey(paramJo.getString("qywxKey"));
+        systemConfigProperties.setAdminQywxId(paramJo.getString("adminQywxId"));
         return R.ok(paramJo, "修改成功");
     }
 

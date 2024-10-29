@@ -103,7 +103,7 @@ public class QywxUtil {
         return null;
     }
 
-    private String getToken() {
+    public String getToken() {
         return getToken(null);
     }
 
@@ -113,7 +113,7 @@ public class QywxUtil {
 
     }
 
-    private String getToken(String contactsSecret) {
+    public String getToken(String contactsSecret) {
 
         if (timedCache.containsKey(contactsSecret)) {
             return timedCache.get(contactsSecret);
