@@ -5,14 +5,15 @@ import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
+import cn.yiidii.jdx.support.ITask;
 import cn.yiidii.jdx.util.QywxUtil;
+import cn.yiidii.jdx.util.ScheduleTaskUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -28,11 +29,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminService implements ITask {
 
     private final SystemConfigProperties systemConfigProperties;
     private final QLService qlService;
     private final QywxUtil qywxUtil;
+    private final ScheduleTaskUtil scheduleTaskUtil;
 
     public JSONArray getQLConfig() {
         List<QLConfig> qls = systemConfigProperties.getQls();
@@ -115,7 +117,10 @@ public class AdminService {
         return result;
     }
 
-    @Async
+    public JSONObject updateEnv() {
+        return this.updateEnv("");
+    }
+
     public JSONObject updateEnv(String mobile) {
         log.info("envs 修正开始");
 
@@ -163,8 +168,12 @@ public class AdminService {
 
         qywxUserIdMap.forEach(qywxUtil::updateQywxUserPosition);
 
-        log.info("envs 修正更新成功，耗时：" + (System.currentTimeMillis() - start) / 1000);
+        log.info("envs 修正更新成功，耗时：{}", (System.currentTimeMillis() - start) / 1000);
         return new JSONObject();
     }
 
+    @Override
+    public void startTimerTask() {
+        scheduleTaskUtil.startCron("QL_timerUpdateEnv", this::updateEnv, "0 0 */1 * * ?");
+    }
 }

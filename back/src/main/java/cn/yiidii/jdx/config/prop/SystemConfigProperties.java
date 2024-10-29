@@ -53,7 +53,7 @@ public class SystemConfigProperties implements InitializingBean, ITask {
 
     private String corpid = "";
     private String corpsecret = "";
-    private String domain  = "";
+    private String domain = "";
     private String contactsSecret = "";
     private String agentid = "";
 

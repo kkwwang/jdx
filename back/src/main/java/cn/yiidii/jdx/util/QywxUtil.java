@@ -1,5 +1,7 @@
 package cn.yiidii.jdx.util;
 
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 public class QywxUtil {
 
     private final SystemConfigProperties systemConfigProperties;
+    // 微信access_token有效期7200秒，提前200秒刷新
+    TimedCache<String, String> timedCache = CacheUtil.newTimedCache(7000 * 1000);
 
     public Set<String> checkBindQywx(String mobile) {
         Set<String> result = new HashSet<>();
@@ -36,7 +40,7 @@ public class QywxUtil {
         }
 
         JSONObject env = getEnv(mobile);
-        if(null == env){
+        if (null == env) {
             return result;
         }
         String remark = env.getString("remarks");
@@ -91,7 +95,6 @@ public class QywxUtil {
             String remark = env.getString("remarks");
 
 
-
             RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
             if (StringUtils.pathEquals(mobile, remarkInfo.getMobile())) {
                 return env;
@@ -104,12 +107,19 @@ public class QywxUtil {
         return getToken(null);
     }
 
-    public String getContactsToken(){
+    public String getContactsToken() {
         String contactsSecret = systemConfigProperties.getContactsSecret();
         return getToken(contactsSecret);
 
     }
+
     private String getToken(String contactsSecret) {
+
+        if (timedCache.containsKey(contactsSecret)) {
+            return timedCache.get(contactsSecret);
+        }
+
+
         String corpid = systemConfigProperties.getCorpid();
         String corpsecret = contactsSecret != null ? contactsSecret : systemConfigProperties.getCorpsecret();
 
@@ -122,7 +132,9 @@ public class QywxUtil {
             String body = response.body();
             JSONObject jsonObject = JSON.parseObject(body);
             if (jsonObject.getInteger("errcode") == 0) {
-                return jsonObject.getString("access_token");
+                String accessToken = jsonObject.getString("access_token");
+                timedCache.put(contactsSecret, accessToken);
+                return accessToken;
             }
         }
         return null;
@@ -173,10 +185,11 @@ public class QywxUtil {
             @Cleanup HttpResponse response = HttpRequest.post(updateUrl.replace("ACCESS_TOKEN", token))
                     .body(reqParamJo.toJSONString())
                     .execute();
-            log.info(response.body());
+            log.info("更新企业微信岗位信息为京东pt_pin完成，参数：{}，结果：{}", reqParamJo.toJSONString(), response.body());
         }
 
     }
+
     public void createUser(String mobile, Set<String> ptPinSet) {
         String token = getContactsToken();
         if (token != null) {

@@ -35,7 +35,7 @@ public class JDXUtil {
         }
     }
 
-    public String getNiceName(String cookie){
+    public String getNiceName(String cookie) {
         @Cleanup HttpResponse userInfoResponse = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
                 .cookie(cookie)
                 .execute();
