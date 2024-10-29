@@ -50,6 +50,7 @@ public class SystemConfigProperties implements InitializingBean, ITask {
     private List<QLConfig> qls;
 
     private String qywxKey = null;
+    private String adminQywxId = null;
 
     private String corpid = "";
     private String corpsecret = "";

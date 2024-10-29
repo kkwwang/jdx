@@ -67,6 +67,7 @@ public class AdminController {
         result.put("corpsecret", systemConfigProperties.getCorpsecret());
         result.put("agentid", systemConfigProperties.getAgentid());
         result.put("qywxKey", systemConfigProperties.getQywxKey());
+        result.put("adminQywxId", systemConfigProperties.getAdminQywxId());
         return R.ok(result);
     }
 

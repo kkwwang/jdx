@@ -181,6 +181,10 @@ export default {
           {
             key: "contactsSecret",
             label: "通讯录Secret"
+          },
+          {
+            key: "adminQywxId",
+            label: "管理员id"
           }
         ]
       },
@@ -200,6 +204,7 @@ export default {
         corpsecret: "",
         contactsSecret: "",
         domain: "",
+        adminQywxId: "",
         agentid: "",
         qywxKey: ""
       },
@@ -229,6 +234,7 @@ export default {
         this.qywx.agentid = resp.data.agentid;
         this.qywx.contactsSecret = resp.data.contactsSecret;
         this.qywx.domain = resp.data.domain;
+        this.qywx.adminQywxId = resp.data.adminQywxId;
       });
     },
     updateWebsiteConfig: function () {
@@ -262,6 +268,7 @@ export default {
         corpid: this.qywx.corpid,
         corpsecret: this.qywx.corpsecret,
         domain: this.qywx.domain,
+        adminQywxId: this.qywx.adminQywxId,
         contactsSecret: this.qywx.contactsSecret,
         agentid: this.qywx.agentid
       };

@@ -174,7 +174,7 @@ public class AdminService implements ITask {
                     SpringUtil.publishEvent(
                             new AdminNotifyEvent(
                                     new HashSet<>(),
-                                    new HashSet<>(),
+                                    new HashSet<>(Collections.singletonList(systemConfigProperties.getAdminQywxId())),
                                     "【参数配置错误】",
                                     e.getMessage()
                             )
