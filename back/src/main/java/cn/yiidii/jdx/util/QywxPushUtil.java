@@ -24,40 +24,49 @@ public class QywxPushUtil {
 
 
     public static void send(String qywxKey, String title, String content, Set<String> mobileList, Set<String> qywxUserIdList) {
-
-        QywxUtil qywxUtil = SpringUtil.getBean(QywxUtil.class);
-        SystemConfigProperties systemConfigProperties = SpringUtil.getBean(SystemConfigProperties.class);
-        String contactsToken = qywxUtil.getContactsToken();
-
-
         JSONObject reqParamJo = new JSONObject();
         reqParamJo.put("msgtype", "text");
-        reqParamJo.put("agentid", systemConfigProperties.getAgentid());
-        reqParamJo.put("touser", String.join("|", qywxUserIdList));
-
 
         JSONObject text = new JSONObject();
-        if (null != mobileList && !mobileList.isEmpty()) {
-            text.put("mentioned_mobile_list", mobileList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
-        }
-
-        if (null != qywxUserIdList && !qywxUserIdList.isEmpty()) {
-            text.put("mentioned_list", qywxUserIdList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
-        }
-
         text.put("content", title + "\n\n" + content);
         reqParamJo.put("text", text);
 
 
-        log.info(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
-        @Cleanup HttpResponse respYY = HttpRequest.post(YY_PUSH_URL.replace("ACCESS_TOKEN", contactsToken))
-                .body(reqParamJo.toJSONString())
-                .execute();
-        @Cleanup HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
-                .body(reqParamJo.toJSONString())
-                .execute();
-        log.info(StrUtil.format("企业微信应用发送消息, 响应: {}", respYY.body()));
-        log.info(StrUtil.format("企业微信群发送消息, 响应: {}", resp.body()));
+        try {
+            QywxUtil qywxUtil = SpringUtil.getBean(QywxUtil.class);
+            String contactsToken = qywxUtil.getContactsToken();
+            SystemConfigProperties systemConfigProperties = SpringUtil.getBean(SystemConfigProperties.class);
+            reqParamJo.put("agentid", systemConfigProperties.getAgentid());
+            reqParamJo.put("touser", String.join("|", qywxUserIdList));
+            log.info(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
+            @Cleanup HttpResponse respYY = HttpRequest.post(YY_PUSH_URL.replace("ACCESS_TOKEN", contactsToken))
+                    .body(reqParamJo.toJSONString())
+                    .execute();
+            log.info(StrUtil.format("企业微信应用发送消息, 响应: {}", respYY.body()));
+        } catch (Exception e) {
+            log.warn("企业微信应用推送异常, 异常信息: {}", e.getMessage());
+        }
+
+        try {
+            // 删除 agentid，touser
+            reqParamJo.remove("agentid");
+            reqParamJo.remove("touser");
+
+            if (null != mobileList && !mobileList.isEmpty()) {
+                text.put("mentioned_mobile_list", mobileList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+            }
+            if (null != qywxUserIdList && !qywxUserIdList.isEmpty()) {
+                text.put("mentioned_list", qywxUserIdList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+            }
+
+            @Cleanup HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
+                    .body(reqParamJo.toJSONString())
+                    .execute();
+            log.info(StrUtil.format("企业微信群发送消息, 响应: {}", resp.body()));
+        } catch (Exception e) {
+            log.warn("企业微信群推送异常, 异常信息: {}", e.getMessage());
+        }
+
     }
 
 
