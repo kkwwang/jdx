@@ -1,8 +1,10 @@
 package cn.yiidii.jdx.service;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
+import cn.yiidii.jdx.model.dto.AdminNotifyEvent;
 import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.support.ITask;
@@ -131,34 +133,52 @@ public class AdminService implements ITask {
         List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode(mobile, "JD_COOKIE");
         for (QLService.QLAllNodeSearchResult nodeSearchResult : jdCookie) {
             for (JSONObject env : nodeSearchResult.getEnvs()) {
-                String remark = env.getString("remarks");
-
                 try {
-                    JSONObject.parseObject(remark, RemarkInfo.class);
+                    String remark = env.getString("remarks");
+
+                    try {
+                        JSONObject.parseObject(remark, RemarkInfo.class);
+                    } catch (Exception e) {
+                        try {
+                            log.error("解析remark异常: {}", remark);
+                            // todo 临时代码
+                            RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                            env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+                            qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+                        } catch (Exception ignored) {
+                            throw new RuntimeException("参数配置错误，请检查: " + remark);
+                        }
+                    } finally {
+                        try {
+                            RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                            remarkInfo.setNotifyMobile(remarkInfo.getMobile());
+                            Set<String> bindQywx = qywxUtil.checkBindQywx(remarkInfo.getMobile());
+                            remarkInfo.setQywxUserId(bindQywx);
+                            if (!StringUtils.hasText(remarkInfo.getLoginTime())) {
+                                remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                            }
+
+                            env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+                            qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+
+
+                            for (String qywxId : bindQywx) {
+                                Set<String> ptPinSet = qywxUserIdMap.computeIfAbsent(qywxId, k -> new HashSet<>());
+                                ptPinSet.add(remarkInfo.getPtPin());
+                            }
+                        } catch (Exception ignored) {
+                            throw new RuntimeException("参数配置错误，请检查: " + remark);
+                        }
+                    }
                 } catch (Exception e) {
-                    log.error("解析remark异常: {}", remark);
-                    // todo 临时代码
-
-                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
-                } finally {
-                    RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-                    remarkInfo.setNotifyMobile(remarkInfo.getMobile());
-                    Set<String> bindQywx = qywxUtil.checkBindQywx(remarkInfo.getMobile());
-                    remarkInfo.setQywxUserId(bindQywx);
-                    if (!StringUtils.hasText(remarkInfo.getLoginTime())) {
-                        remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                    }
-
-                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
-                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
-
-
-                    for (String qywxId : bindQywx) {
-                        Set<String> ptPinSet = qywxUserIdMap.computeIfAbsent(qywxId, k -> new HashSet<>());
-                        ptPinSet.add(remarkInfo.getPtPin());
-                    }
+                    SpringUtil.publishEvent(
+                            new AdminNotifyEvent(
+                                    new HashSet<>(),
+                                    new HashSet<>(),
+                                    "【参数配置错误】",
+                                    e.getMessage()
+                            )
+                    );
                 }
             }
         }
@@ -168,7 +188,7 @@ public class AdminService implements ITask {
 
         qywxUserIdMap.forEach(qywxUtil::updateQywxUserPosition);
 
-        log.info("envs 修正更新成功，耗时：{}", (System.currentTimeMillis() - start) / 1000);
+        log.info("envs 修正更新成功，耗时：{} s", (System.currentTimeMillis() - start) / 1000);
         return new JSONObject();
     }
 
