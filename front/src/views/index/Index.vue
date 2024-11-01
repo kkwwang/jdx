@@ -4,6 +4,7 @@
       <van-nav-bar :title="title">
         <template #right>
           <van-icon
+              color="#ee0a24"
             name="balance-pay"
             size="18"
             @click="$router.push('/bean')"

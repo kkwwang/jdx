@@ -1,6 +1,14 @@
 <template>
   <div>
-    <van-nav-bar title="收益统计" left-arrow @click-left="$router.push('/')">
+    <van-nav-bar title="收益统计">
+      <template #left>
+        <van-icon
+            color="#ee0a24"
+            name="arrow-left"
+            size="18"
+            @click="$router.push('/')"
+        />
+      </template>
     </van-nav-bar>
     <van-notice-bar
       left-icon="volume-o"
@@ -239,13 +247,16 @@ export default {
   height: calc(100vh - 225px - 44px - 16px);
   overflow-y: auto;
 }
+.van-cell{
+  align-items: center;
+}
 
 .echarts-main .van-cell {
   height: calc(100% - 44px);
   //padding: 0!important;
 }
 
-.van-cell-group .van-cell:nth-child(odd) {
+.van-cell-group .van-cell:nth-child(even) {
   background-color: #f5f5f5; /* 奇数行的背景色 */
 }
 
