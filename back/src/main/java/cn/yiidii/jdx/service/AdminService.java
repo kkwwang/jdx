@@ -194,6 +194,6 @@ public class AdminService implements ITask {
 
     @Override
     public void startTimerTask() {
-        scheduleTaskUtil.startCron("QL_timerUpdateEnv", this::updateEnv, "0 0 */1 * * ?");
+//        scheduleTaskUtil.startCron("QL_timerUpdateEnv", this::updateEnv, "0 0 */1 * * ?");
     }
 }

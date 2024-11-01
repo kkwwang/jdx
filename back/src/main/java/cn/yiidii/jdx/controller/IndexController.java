@@ -13,6 +13,8 @@ import cn.yiidii.jdx.service.JdService;
 import cn.yiidii.jdx.service.QLService;
 import cn.yiidii.jdx.util.JDXUtil;
 import cn.yiidii.jdx.util.QywxUtil;
+import cn.yiidii.jdx.util.SQLiteUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,8 +106,13 @@ public class IndexController {
         jo.put("remain", systemConfigProperties.getQls().stream()
                 .filter(ql -> ql.getDisabled() == 0 && ql.getUsed() < ql.getMax())
                 .map(ql -> ql.getMax() - ql.getUsed())
-                .reduce(0, (a, b) -> a + b));
+                .reduce(0, Integer::sum));
         return R.ok(jo);
+    }
+
+    @GetMapping("/jd/getBean")
+    public R<JSONArray> getBean(String mobile) {
+        return R.ok(SQLiteUtils.getBeanByMobile(mobile));
     }
 
 }

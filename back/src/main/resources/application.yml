@@ -4,6 +4,8 @@ server:
 spring:
   application:
     version: @project.version@
+  datasource:
+    url: jdbc:sqlite:/bean-log.db
 
 logging:
   config: classpath:logback-jdx.xml
@@ -15,3 +17,4 @@ qywx:
   getuserinfo: https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&userid=USERID
   update: https://qyapi.weixin.qq.com/cgi-bin/user/update?access_token=ACCESS_TOKEN
   create: https://qyapi.weixin.qq.com/cgi-bin/user/create?access_token=ACCESS_TOKEN
+

@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Index from "./views/index/Index";
 import AdminLogin from "./views/admin/Login";
 import AdminHome from "./views/admin/Home";
+import Bean from "./views/index/Bean";
 
 Vue.use(Router);
 
@@ -17,6 +18,14 @@ export default new Router({
       component: Index,
       meta: {
         title: "JDX"
+      }
+    },
+    {
+      path: "/bean",
+      name: "Bean",
+      component: Bean,
+      meta: {
+        title: "收益"
       }
     },
     {

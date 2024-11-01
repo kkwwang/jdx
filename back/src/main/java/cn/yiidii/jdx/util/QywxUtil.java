@@ -130,6 +130,7 @@ public class QywxUtil {
                 .execute();
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
+            log.info("获取token结果: {}", body);
             JSONObject jsonObject = JSON.parseObject(body);
             if (jsonObject.getInteger("errcode") == 0) {
                 String accessToken = jsonObject.getString("access_token");
@@ -151,6 +152,7 @@ public class QywxUtil {
 
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
+            log.info("获取用户id结果: {}", body);
             JSONObject jsonObject = JSON.parseObject(body);
             return jsonObject.getString("userid");
         }
@@ -165,6 +167,7 @@ public class QywxUtil {
 
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
+            log.info("获取用户信息结果: {}", body);
             JSONObject jsonObject = JSON.parseObject(body);
             if (jsonObject.getInteger("errcode") == 0) {
                 return jsonObject.getString("userid");

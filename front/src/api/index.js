@@ -24,3 +24,11 @@ export function jdLogin(data) {
     data: data
   });
 }
+
+// jd登录
+export function jdBean(mobile) {
+  return request({
+    url: "jd/getBean?mobile=" + mobile,
+    method: "get"
+  });
+}
