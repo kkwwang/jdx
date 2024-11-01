@@ -61,7 +61,7 @@
           <van-cell
             v-for="item in legend"
             :title="item.title"
-            :label="getLatestTop(item)"
+            :label="getLatestTip(item)"
             >{{ latest[item.title] || "-" }}
           </van-cell>
         </van-cell-group>
@@ -188,9 +188,9 @@ export default {
         });
       }
     },
-    getLatestTop(item) {
+    getLatestTip(item) {
       if (this.latest[item.title] - item.difference > 0) {
-        return item.top;
+        return item.tip;
       }
     },
 
@@ -261,7 +261,7 @@ export default {
 }
 
 .van-cell__label {
-  color: rgba(255, 0, 0, 0.8);
+  color: #ee0a24;
   float: left;
   width: 180%;
 }
