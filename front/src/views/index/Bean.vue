@@ -11,70 +11,71 @@
       </template>
     </van-nav-bar>
     <van-notice-bar
-      left-icon="volume-o"
-      text="统计信息仅供参考，以实际到账为准"
-      mode="closeable"
+        left-icon="volume-o"
+        text="统计信息仅供参考，以实际到账为准"
+        mode="closeable"
     />
-    <!--    <div style="text-align: center; margin: 40px 0 20px 0; font-size: 32px">-->
-    <!--      收益统计-->
-    <!--    </div>-->
     <van-cell-group inset>
       <van-field
-        ref="telRef"
-        maxlength="11"
-        v-model="mobile"
-        left-icon="phone-o"
-        name="mobile"
-        type="tel"
-        label="手机号"
-        placeholder="手机号"
+          ref="telRef"
+          maxlength="11"
+          v-model="mobile"
+          left-icon="phone-o"
+          name="mobile"
+          type="tel"
+          label="手机号"
+          placeholder="手机号"
       >
         <template #button>
           <van-button size="small" plain type="info" @click="getBean"
-            >查 询
+          >查 询
           </van-button>
         </template>
       </van-field>
     </van-cell-group>
     <van-divider contentPosition="center"
-      >{{ this.account.join() }}
+    >{{ this.account.join() }}
     </van-divider>
     <van-cell-group inset>
       <van-tabs v-model="activeTab" @change="tabChange">
-        <van-tab title="最新数据" name="最新数据" />
-        <van-tab title="趋势图" name="趋势图" />
+        <van-tab title="最新" name="最新"/>
+        <van-tab title="趋势图" name="趋势图"/>
       </van-tabs>
-      <template v-if="activeTab === '趋势图'">
-        <van-cell-group class="echarts-main">
-          <van-tabs @change="legendTabChange" swipeable>
-            <van-tab
-              v-for="item in legend"
-              :title="item.title"
-              :name="item.title"
-            />
-          </van-tabs>
-          <van-cell ref="main"></van-cell>
-        </van-cell-group>
-      </template>
-      <template v-if="activeTab === '最新数据'">
-        <van-cell-group class="latest-cell">
-          <van-cell
-            v-for="item in legend"
-            :title="item.title"
-            :label="getLatestTip(item)"
+      <van-empty v-if="!latest.mobile" description="暂无数据"/>
+      <template v-else>
+        <template v-if="activeTab === '趋势图'">
+          <van-cell-group class="echarts-main">
+            <van-tabs @change="legendTabChange" swipeable>
+              <van-tab
+                  :key="item.title"
+                  v-for="item in legend"
+                  :title="item.title"
+                  :name="item.title"
+              />
+            </van-tabs>
+            <van-cell ref="main"></van-cell>
+          </van-cell-group>
+        </template>
+        <template v-if="activeTab === '最新'">
+          <van-cell-group class="latest-cell">
+            <van-cell
+                :key="item.title"
+                v-for="item in legend"
+                :title="item.title"
+                :label="getLatestTip(item)"
             >{{ latest[item.title] || "-" }}
-          </van-cell>
-        </van-cell-group>
+            </van-cell>
+          </van-cell-group>
+        </template>
       </template>
     </van-cell-group>
   </div>
 </template>
 
 <script>
-import { jdBean } from "@/api";
+import {jdBean} from "@/api";
 import * as echarts from "echarts";
 import "echarts/i18n/langZH";
-import dayjs from "dayjs";
 import legend from "./legend.json";
 
 let chart = null;
@@ -83,7 +84,7 @@ export default {
   data() {
     return {
       latest: {},
-      activeTab: "最新数据",
+      activeTab: "最新",
       mobile: "",
       accountName: "账号",
       account: [],
@@ -108,10 +109,10 @@ export default {
             inside: true
           },
           boundaryGap: ["20%", "20%"],
-          min: function(value) {
+          min: function (value) {
             return Math.floor(value.min * 0.9);
           },
-          max: function(value) {
+          max: function (value) {
             return Math.ceil(value.max * 1.1);
           },
           minInterval: 1,
@@ -154,10 +155,13 @@ export default {
     }
   },
   mounted() {
-    dayjs().format("YYYY-MM-DD 00:00:00 A");
-    // this.init();
+    if (this.$route.query.mobile) {
+      this.mobile = this.$route.query.mobile.split(",")[0];
+    } else {
+      this.mobile = window.localStorage.getItem("mobile") || "";
+    }
+
     this.activeLegend = this.legend[0].title;
-    this.mobile = window.localStorage.getItem("mobile") || "";
     if (this.mobile) {
       this.getBean();
     }
@@ -168,7 +172,10 @@ export default {
   methods: {
     init() {
       const chartDom = this.$refs.main;
-      chart = echarts.init(chartDom, null, { locale: "ZH" });
+      if (chartDom == null) {
+        return;
+      }
+      chart = echarts.init(chartDom, null, {locale: "ZH"});
       this.option && chart.setOption(this.option);
       chart.on("legendselectchanged", params => {
         this.activeLegend = params.name;
@@ -180,9 +187,8 @@ export default {
       }
       if (this.activeTab === "趋势图") {
         this.$nextTick(() => {
-          this.init();
-
           if (this.mobile) {
+            this.init();
             this.getBean();
           }
         });
@@ -232,9 +238,9 @@ export default {
         this.account = Array.from(account);
 
         chart &&
-          chart.setOption({
-            series: Object.values(seriesObj)
-          });
+        chart.setOption({
+          series: Object.values(seriesObj)
+        });
       });
     }
   }
@@ -247,7 +253,8 @@ export default {
   height: calc(100vh - 225px - 44px - 16px);
   overflow-y: auto;
 }
-.van-cell{
+
+.van-cell {
   align-items: center;
 }
 
