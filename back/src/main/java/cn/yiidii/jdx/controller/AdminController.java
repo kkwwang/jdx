@@ -6,6 +6,8 @@ import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.R;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.AdminService;
+import cn.yiidii.jdx.service.QLService;
+import cn.yiidii.jdx.util.SQLiteUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author ed w
@@ -29,6 +33,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final SystemConfigProperties systemConfigProperties;
+    private final QLService qlService;
 
     @GetMapping("ql")
     public R<?> qlConfig() {
@@ -109,5 +114,27 @@ public class AdminController {
     @GetMapping(value = "updateEnv")
     public R<?> updateEnv(String mobile) {
         return R.ok(adminService.updateEnv(mobile));
+    }
+
+    @GetMapping(value = "getLatestBean")
+    public R<?> getLatestBean() {
+        return R.ok(SQLiteUtils.getLatestBean());
+    }
+
+    @GetMapping(value = "getAllEnv")
+    public R<?> getAllEnv() {
+        List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode("", "JD_COOKIE");
+        List<List<JSONObject>> collect = jdCookie.stream().map(QLService.QLAllNodeSearchResult::getEnvs).collect(Collectors.toList());
+        List<JSONObject> temp = new ArrayList<>();
+        for (List<JSONObject> jsonObjects : collect) {
+            temp.addAll(jsonObjects.stream().map(item -> {
+                JSONObject remarks = JSONObject.parseObject(item.getString("remarks"));
+                remarks.put("status", item.getInteger("status"));
+                return remarks;
+            }).collect(Collectors.toList()));
+        }
+
+
+        return R.ok(temp);
     }
 }

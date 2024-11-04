@@ -26,7 +26,7 @@ public class RemarkInfo {
 
 
     public RemarkInfo setQywxUserId(Set<String> qywxUserId) {
-        this.qywxUserId.clear();
+//        this.qywxUserId.clear();
         this.qywxUserId.addAll(qywxUserId.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
         return this;
     }
@@ -42,7 +42,7 @@ public class RemarkInfo {
     }
 
     public RemarkInfo setNotifyMobile(Set<String> notifyMobile) {
-        this.notifyMobile.clear();
+//        this.notifyMobile.clear();
         this.notifyMobile.addAll(notifyMobile.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
         return this;
     }

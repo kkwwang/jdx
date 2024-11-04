@@ -133,7 +133,7 @@ public class AdminService implements ITask {
         List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode(mobile, "JD_COOKIE");
         for (QLService.QLAllNodeSearchResult nodeSearchResult : jdCookie) {
             for (JSONObject env : nodeSearchResult.getEnvs()) {
-                    String remark = env.getString("remarks");
+                String remark = env.getString("remarks");
                 try {
 
                     try {
@@ -143,7 +143,9 @@ public class AdminService implements ITask {
                             log.error("解析remark异常: {}", remark);
                             // todo 临时代码
                             RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
-                            env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty, SerializerFeature.PrettyFormat));
+                            env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty
+//                                    , SerializerFeature.PrettyFormat
+                            ));
                             qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
                         } catch (Exception ignored) {
                             throw new RuntimeException("参数配置错误，请检查: \n" + remark);
@@ -158,7 +160,9 @@ public class AdminService implements ITask {
                                 remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                             }
 
-                            env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty, SerializerFeature.PrettyFormat));
+                            env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty
+//                                    , SerializerFeature.PrettyFormat
+                            ));
                             qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
 
 

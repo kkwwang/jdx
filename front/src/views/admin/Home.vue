@@ -8,6 +8,9 @@
         <van-tab title="系统设置">
           <SystemConfig />
         </van-tab>
+        <van-tab title="资产统计">
+          <BeanMange/>
+        </van-tab>
       </van-tabs>
 
       <!-- 其他操作 -->
@@ -41,13 +44,14 @@
 <script>
 import QLManage from "@/views/admin/tab/QLManage";
 import SystemConfig from "@/views/admin/tab/SystemConfig";
+import BeanMange from "@/views/admin/tab/BeanManage.vue";
 
 export default {
   name: "Home",
-  components: { QLManage, SystemConfig },
+  components: {BeanMange, QLManage, SystemConfig },
   data() {
     return {
-      active: 0
+      active: 2
     };
   },
   methods: {

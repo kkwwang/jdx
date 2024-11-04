@@ -75,3 +75,16 @@ export function updateAccount(data) {
 }
 
 // 版本信息
+
+export function getLatestBean() {
+  return request({
+    url: "admin/getLatestBean",
+    method: "get"
+  });
+}
+export function getAllEnv() {
+  return request({
+    url: "admin/getAllEnv",
+    method: "get"
+  });
+}

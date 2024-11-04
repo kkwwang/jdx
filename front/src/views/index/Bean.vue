@@ -58,6 +58,9 @@
         </template>
         <template v-if="activeTab === '最新'">
           <van-cell-group class="latest-cell">
+            <van-cell title="统计时间" :label="new Date() - new Date(latest.时间) > 12 * 60 * 60 * 1000 ?'若展示为非最新数据，请过十分钟后再试' : ''">
+              {{ latest.时间 ? dayjs(latest.时间).format("MM-DD A").replace("AM", "早上").replace("PM", "晚上") : "-" }}
+            </van-cell>
             <van-cell
                 :key="item.title"
                 v-for="item in legend"
@@ -76,7 +79,8 @@
 import {jdBean} from "@/api";
 import * as echarts from "echarts";
 import "echarts/i18n/langZH";
-import legend from "./legend.json";
+import legend from "../legend.json";
+import dayjs from "dayjs";
 
 let chart = null;
 export default {
@@ -169,7 +173,11 @@ export default {
       chart && chart.resize();
     });
   },
+  beforeDestroy() {
+    chart.dispose()
+  },
   methods: {
+    dayjs,
     init() {
       const chartDom = this.$refs.main;
       if (chartDom == null) {
@@ -177,9 +185,6 @@ export default {
       }
       chart = echarts.init(chartDom, null, {locale: "ZH"});
       this.option && chart.setOption(this.option);
-      chart.on("legendselectchanged", params => {
-        this.activeLegend = params.name;
-      });
     },
     tabChange() {
       if (chart != null && chart.dispose) {
@@ -210,28 +215,33 @@ export default {
       if (!this.mobile) {
         return;
       }
-      window.localStorage.setItem("mobile", this.mobile);
 
       jdBean(this.mobile).then(res => {
         let account = new Set();
         const seriesObj = {};
         res.data.forEach(item => {
           account.add(item[this.accountName]);
-          for (let key of Object.keys(item)) {
-            if (this.legend.map(item => item.title).includes(key)) {
-              if (!seriesObj[key]) {
-                seriesObj[key] = {
-                  name: key,
-                  type: "line",
-                  data: []
-                };
+          this.legend.forEach(legendItem => {
+            for (let key of Object.keys(item)) {
+              if (legendItem.title === key) {
+                if (!seriesObj[key]) {
+                  seriesObj[key] = {
+                    name: key,
+                    type: "line",
+                    markLine: {
+                      data: [{yAxis: legendItem.difference, name: "提示线"}]
+                    },
+                    data: []
+                  };
+                }
+                seriesObj[key].data.push([
+                  new Date(item[this.dataTime]),
+                  item[key]
+                ]);
               }
-              seriesObj[key].data.push([
-                new Date(item[this.dataTime]),
-                item[key]
-              ]);
             }
-          }
+          })
+
           this.latest = item;
         });
 

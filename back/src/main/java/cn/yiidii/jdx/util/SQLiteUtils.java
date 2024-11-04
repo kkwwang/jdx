@@ -10,6 +10,11 @@ import java.sql.*;
 
 public class SQLiteUtils {
 
+    public static  JSONArray getLatestBean(){
+        String sql = "SELECT  * FROM  bean WHERE  时间= ( SELECT MAX( 时间 ) FROM bean ) group by mobile, 时间 order by 时间, 序号;";
+        return select(sql);
+    }
+
 
     public static JSONArray getBeanByMobile(String mobile) {
         if (!StringUtils.hasText(mobile)) {
