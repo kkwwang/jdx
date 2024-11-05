@@ -1,13 +1,13 @@
 <template>
   <div>
     <van-tabs @change="legendTabChange" swipeable>
-      <van-tab title="登录统计" name="登录统计"/>
+      <van-tab title="登录统计" name="登录统计" />
       <van-tab
-          :disabled="!isBean"
-          :key="item.title"
-          v-for="item in legend"
-          :title="item.title"
-          :name="item.title"
+        :disabled="!isBean"
+        :key="item.title"
+        v-for="item in legend"
+        :title="item.title"
+        :name="item.title"
       />
     </van-tabs>
     <van-cell-group inset>
@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-import {getAllEnv, getLatestBean} from "@/api/admin";
+import { getAllEnv, getLatestBean } from "@/api/admin";
 import legend from "../../legend.json";
 import * as echarts from "echarts";
 
@@ -35,6 +35,7 @@ export default {
       legend: legend,
       yAxis: {
         type: "category",
+        // inverse: true,
         axisLabel: {
           interval: 0
         },
@@ -43,6 +44,17 @@ export default {
       lastLoginTime: {
         name: "最后登录时间",
         type: "bar",
+        markLine: {
+          symbol: ["none", "none"],
+          label: {
+            position: "middle",
+            formatter: "{b}"
+          },
+          data: [
+            //{xAxis: item.difference, name: "提示线"},
+            { type: "average", name: "平均值", lineStyle: { color: "#ee0a24" } }
+          ]
+        },
         data: []
       }
     };
@@ -55,7 +67,10 @@ export default {
         },
         yAxis: this.yAxis,
         xAxis: {
-          type: "time"
+          type: "time",
+          min: function(value) {
+            return Math.ceil(value.min - 6 * 60 * 60 * 1000);
+          }
         },
         grid: {
           top: "0",
@@ -76,10 +91,8 @@ export default {
             inside: false
           },
           boundaryGap: ["20%", "20%"],
-          min: function (value) {
-            return Math.floor(value.min * 0.9);
-          },
-          max: function (value) {
+          min: 0,
+          max: function(value) {
             return Math.ceil(value.max * 1.1);
           },
           minInterval: 1,
@@ -126,7 +139,7 @@ export default {
       if (chart) {
         chart.dispose();
       }
-      chart = echarts.init(this.$refs.main, null, {locale: "ZH"});
+      chart = echarts.init(this.$refs.main, null, { locale: "ZH" });
       if (option) {
         chart.setOption(option);
       }
@@ -135,9 +148,19 @@ export default {
       getAllEnv().then(res => {
         this.envs = res.data;
         this.yAxis.data = res.data.map(
-            item => item.wechat + (item.status === 1 ? " ❌" : " ✅")
+          item => item.wechat + (item.status === 1 ? " ❌" : " ✅")
         );
-        this.lastLoginTime.data = res.data.map(item => item.loginTime);
+        this.lastLoginTime.data = res.data.map(item => {
+          return item.status === 1
+            ? {
+                value: item.loginTime,
+                itemStyle: {
+                  color: "#ee0a24"
+                }
+              }
+            : item.loginTime;
+        });
+        console.log(this.lastLoginTime.data);
         this.reInit(this.lasLoginOption);
 
         this.getLatestBean();
@@ -165,12 +188,30 @@ export default {
             name: item.title,
             type: "bar",
             markLine: {
-              data: [{xAxis: item.difference, name: "提示线"}]
+              symbol: ["none", "none"],
+              label: {
+                position: "middle",
+                formatter: "{b}:{c}"
+              },
+              data: [
+                { xAxis: item.difference, name: "提示线" },
+                {
+                  type: "average",
+                  name: "平均值",
+                  lineStyle: { color: "#ff0000" }
+                }
+              ]
+            },
+            markPoint: {
+              data: [
+                { type: "max", name: "Max" },
+                { type: "min", name: "Min" }
+              ]
             },
             data: temp.map(env => env[item.title])
           };
         });
-        this.isBean = true
+        this.isBean = true;
       });
     },
     legendTabChange(name) {

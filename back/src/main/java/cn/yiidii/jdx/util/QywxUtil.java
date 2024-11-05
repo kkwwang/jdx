@@ -152,7 +152,7 @@ public class QywxUtil {
 
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
-            log.info("获取用户id结果: {}", body);
+            log.info("获取用户id，参数：{}，结果: {}", reqParamJo.toJSONString(), body);
             JSONObject jsonObject = JSON.parseObject(body);
             return jsonObject.getString("userid");
         }
