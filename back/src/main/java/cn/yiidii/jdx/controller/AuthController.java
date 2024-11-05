@@ -9,6 +9,7 @@ import cn.yiidii.jdx.model.ex.BizException;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,9 @@ public class AuthController {
 
     private final SystemConfigProperties systemConfigProperties;
 
+    @Value("${key:username}")
+    private String key;
+
     /**
      * 社交登录81726148
      *
@@ -57,8 +61,8 @@ public class AuthController {
         }
         JSONObject info = new JSONObject();
         info.put("username", username);
-        info.put("exp", DateUtil.offsetHour(new Date(), 24));
-        info.put("token", JWTUtil.createToken(info, "jdx".getBytes(StandardCharsets.UTF_8)));
+        info.put("exp", DateUtil.offsetMinute(new Date(), 30));
+        info.put("token", JWTUtil.createToken(info, key.replace("username", username).replace("password", password).getBytes(StandardCharsets.UTF_8)));
 
         info.remove("exp");
 
