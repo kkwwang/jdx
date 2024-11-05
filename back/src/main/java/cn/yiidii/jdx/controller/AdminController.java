@@ -129,8 +129,14 @@ public class AdminController {
         for (List<JSONObject> jsonObjects : collect) {
             temp.addAll(jsonObjects.stream().map(item -> {
                 JSONObject remarks = JSONObject.parseObject(item.getString("remarks"));
-                remarks.put("status", item.getInteger("status"));
-                return remarks;
+
+                JSONObject jp = new JSONObject();
+
+                jp.put("status", item.getInteger("status"));
+                jp.put("ptPin", remarks.getString("ptPin"));
+                jp.put("loginTime", remarks.getString("loginTime"));
+                jp.put("wechat", remarks.getString("wechat"));
+                return jp;
             }).collect(Collectors.toList()));
         }
 
