@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import static cn.hutool.jwt.RegisteredPayload.*;
+
 /**
  * auth
  *
@@ -60,14 +62,15 @@ public class AuthController {
             throw new BizException("用户名或密码不正确");
         }
         JSONObject info = new JSONObject();
-        info.put("username", username);
-        info.put("exp", DateUtil.offsetMinute(new Date(), 30));
+        Date now = new Date();
+        info.put(SUBJECT, username);
+        info.put(EXPIRES_AT, DateUtil.offsetMinute(now, 30));
+        info.put(ISSUED_AT, now);
+        info.put(NOT_BEFORE, now);
         info.put("token", JWTUtil.createToken(info, key.replace("username", username).replace("password", password).getBytes(StandardCharsets.UTF_8)));
 
-        info.remove("exp");
-
         log.info(StrUtil.format("登录结果: {}", info.toJSONString()));
-        return R.ok(info, "登陆成功");
+        return R.ok(info.getString("token"), "登陆成功");
     }
 
 }

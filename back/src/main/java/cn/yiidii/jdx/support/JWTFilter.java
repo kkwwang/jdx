@@ -2,10 +2,11 @@ package cn.yiidii.jdx.support;
 
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpStatus;
+import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
+import cn.hutool.jwt.JWTValidator;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.model.R;
-import cn.yiidii.jdx.model.ex.BizException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,10 +68,9 @@ public class JWTFilter extends OncePerRequestFilter {
         if (!ignore) {
             String token = request.getHeader("token");
             try {
-                boolean verify = JWTUtil.verify(token, key.replace("username", systemConfigProperties.getUsername()).replace("password", systemConfigProperties.getPassword()).getBytes(StandardCharsets.UTF_8));
-                if (!verify) {
-                    throw new BizException("登录身份已失效，请重新登录");
-                }
+                String replaceKey = key.replace("username", systemConfigProperties.getUsername()).replace("password", systemConfigProperties.getPassword());
+                JWT jwt = JWTUtil.parseToken(token).setKey(replaceKey.getBytes(StandardCharsets.UTF_8));
+                JWTValidator.of(jwt).validateDate();
             } catch (Throwable e) {
                 R<?> fail = R.failed(1, "登录身份已失效，请重新登录");
                 response.setStatus(HttpStatus.HTTP_UNAUTHORIZED);

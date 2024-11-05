@@ -57,7 +57,6 @@ service.interceptors.response.use(
       });
     }
     if (error.response.status === 401) {
-      console.log("aa");
       setTimeout(() => {
         localStorage.removeItem("token");
         localStorage.removeItem("thirdToken");

@@ -18,4 +18,4 @@ qywx:
   update: https://qyapi.weixin.qq.com/cgi-bin/user/update?access_token=ACCESS_TOKEN
   create: https://qyapi.weixin.qq.com/cgi-bin/user/create?access_token=ACCESS_TOKEN
 
-key: username@password:jdx-v@project.version@
+key: username@password:jdx-v${spring.application.version}

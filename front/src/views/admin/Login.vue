@@ -58,7 +58,7 @@ export default {
         password: CryptoJS.MD5(this.password).toString()
       };
       login(form).then(resp => {
-        localStorage.setItem("token", resp.data.token);
+        localStorage.setItem("token", resp.data);
         this.$router.push("/admin");
         localStorage.setItem("username", this.username);
         localStorage.setItem("password", this.password);

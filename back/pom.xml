@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.yiidii</groupId>
     <artifactId>jdx</artifactId>
-    <version>1.1.1-1</version>
+    <version>1.1.2-1</version>
     <name>${project.artifactId}</name>
 
     <properties>

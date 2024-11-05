@@ -1,7 +1,6 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
-import store from "./store";
 
 Vue.config.productionTip = false;
 import {
@@ -40,7 +39,6 @@ import {
   Toast,
   Dialog
 } from "vant";
-import axios from "axios";
 import VueClipboard from "vue-clipboard2";
 
 Vue.use(Icon);
@@ -84,6 +82,5 @@ Vue.prototype.$dialog = Dialog;
 
 new Vue({
   router,
-  store,
   render: h => h(App)
 }).$mount("#app");
