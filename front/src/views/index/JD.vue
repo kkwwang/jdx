@@ -63,7 +63,11 @@ export default {
     };
   },
   mounted() {
-    this.form.mobile = window.localStorage.getItem("mobile") || "";
+    if (this.$route.query.mobile) {
+      this.form.mobile = this.$route.query.mobile.split(",")[0];
+    } else {
+      this.form.mobile = window.localStorage.getItem("mobile") || "";
+    }
   },
   methods: {
     codeChange: function() {

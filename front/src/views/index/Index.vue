@@ -2,6 +2,15 @@
   <div>
     <div style="margin-bottom: 2em;">
       <van-nav-bar :title="title">
+        <template #left>
+          <van-icon
+              color="#ee0a24"
+              name="setting-o"
+              size="18"
+              @click="$router.push('/admin')"
+          />
+
+        </template>
         <template #right>
           <van-icon
               color="#ee0a24"

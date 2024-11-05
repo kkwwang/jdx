@@ -51,7 +51,7 @@ export default {
   components: {BeanMange, QLManage, SystemConfig },
   data() {
     return {
-      active: 2
+      active: 0
     };
   },
   methods: {
