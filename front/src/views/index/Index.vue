@@ -7,7 +7,7 @@
               color="#ee0a24"
               name="setting-o"
               size="18"
-              @click="$router.push('/admin')"
+              @click="$router.push('/login')"
           />
 
         </template>

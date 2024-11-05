@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import { baseInfo } from "@/api";
 import { login } from "@/api/admin";
 import CryptoJS from "crypto-js";
 
@@ -43,29 +42,16 @@ export default {
   name: "Login",
   data() {
     return {
-      title: "",
-      username: "",
-      password: ""
+      username: localStorage.getItem("username"),
+      password: localStorage.getItem("password")
     };
   },
   mounted() {
-    this.renderBase();
     if (localStorage.getItem("token")) {
-      setTimeout(() => {
-        this.$router.push("/admin");
-      }, 500);
+      this.$router.push("/admin");
     }
   },
   methods: {
-    renderBase: function() {
-      baseInfo()
-        .then(resp => {
-          this.title = resp.data.title;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
     login: function() {
       let form = {
         username: this.username,
@@ -74,6 +60,9 @@ export default {
       login(form).then(resp => {
         localStorage.setItem("token", resp.data.token);
         this.$router.push("/admin");
+        localStorage.setItem("username", this.username);
+        localStorage.setItem("password", this.password);
+
       });
     }
   }
