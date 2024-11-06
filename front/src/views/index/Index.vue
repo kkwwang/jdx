@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%;">
     <van-nav-bar :title="title">
       <template #left>
         <van-icon

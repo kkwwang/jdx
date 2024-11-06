@@ -1,56 +1,60 @@
 <template>
-  <div>
+  <div style="height: 100%;">
     <van-nav-bar title="收益统计">
       <template #left>
         <van-icon
-            color="#ee0a24"
-            name="arrow-left"
-            size="18"
-            @click="$router.push('/')"
+          color="#ee0a24"
+          name="arrow-left"
+          size="18"
+          @click="$router.push('/')"
         />
       </template>
     </van-nav-bar>
     <van-notice-bar
-        left-icon="volume-o"
-        text="统计信息仅供参考，以实际到账为准"
-        mode="closeable"
+      left-icon="volume-o"
+      text="统计信息仅供参考，以实际到账为准"
+      mode="closeable"
     />
     <van-cell-group inset>
       <van-field
-          ref="telRef"
-          maxlength="11"
-          v-model="mobile"
-          left-icon="phone-o"
-          name="mobile"
-          type="tel"
-          label="手机号"
-          placeholder="手机号"
+        ref="telRef"
+        maxlength="11"
+        v-model="mobile"
+        left-icon="phone-o"
+        name="mobile"
+        type="tel"
+        label="手机号"
+        placeholder="手机号"
       >
         <template #button>
           <van-button size="small" plain type="info" @click="getBean"
-          >查 询
+            >查 询
           </van-button>
         </template>
       </van-field>
     </van-cell-group>
     <van-divider contentPosition="center"
-    >{{ this.account.join() }}
+      >{{ this.account.join() }}
     </van-divider>
     <van-cell-group inset>
       <van-tabs v-model="activeTab" @change="tabChange">
-        <van-tab title="最新" name="最新"/>
-        <van-tab title="趋势图" name="趋势图"/>
+        <van-tab title="最新" name="最新" />
+        <van-tab title="趋势图" name="趋势图" />
       </van-tabs>
-      <van-empty v-if="!latest.mobile" description="暂无数据"/>
+      <van-empty v-if="!latest.mobile" description="暂无数据" />
       <template v-else>
         <template v-if="activeTab === '趋势图'">
           <van-cell-group class="echarts-main">
-            <van-tabs @change="legendTabChange" swipeable>
+            <van-tabs
+              @change="legendTabChange"
+              swipeable
+              v-model="activeLegend"
+            >
               <van-tab
-                  :key="item.title"
-                  v-for="item in legend"
-                  :title="item.title"
-                  :name="item.title"
+                :key="item.title"
+                v-for="item in legend"
+                :title="item.title"
+                :name="item.title"
               />
             </van-tabs>
             <van-cell ref="main"></van-cell>
@@ -58,15 +62,29 @@
         </template>
         <template v-if="activeTab === '最新'">
           <van-cell-group class="latest-cell">
-            <van-cell title="统计时间" :label="new Date() - new Date(latest.时间) > 12 * 60 * 60 * 1000 ?'若展示为非最新数据，请过十分钟后再试' : ''">
-              {{ latest.时间 ? dayjs(latest.时间).format("MM-DD A").replace("AM", "早上").replace("PM", "晚上") : "-" }}
+            <van-cell
+              title="统计时间"
+              :label="
+                new Date() - new Date(latest.时间) > 12 * 60 * 60 * 1000
+                  ? '若展示为非最新数据，请过十分钟后再试'
+                  : ''
+              "
+            >
+              {{
+                latest.时间
+                  ? dayjs(latest.时间)
+                      .format("MM-DD A")
+                      .replace("AM", "早上")
+                      .replace("PM", "晚上")
+                  : "-"
+              }}
             </van-cell>
             <van-cell
-                :key="item.title"
-                v-for="item in legend"
-                :title="item.title"
-                :label="getLatestTip(item)"
-            >{{ latest[item.title] || "-" }}
+              :key="item.title"
+              v-for="item in legend"
+              :title="item.title"
+              :label="getLatestTip(item)"
+              >{{ latest[item.title] || "-" }}
             </van-cell>
           </van-cell-group>
         </template>
@@ -76,7 +94,7 @@
 </template>
 
 <script>
-import {jdBean} from "@/api";
+import { jdBean } from "@/api";
 import * as echarts from "echarts";
 import "echarts/i18n/langZH";
 import legend from "../legend.json";
@@ -114,7 +132,7 @@ export default {
           },
           boundaryGap: ["20%", "20%"],
           min: 0,
-          max: function (value) {
+          max: function(value) {
             return Math.ceil(value.max * 1.1);
           },
           minInterval: 1,
@@ -172,16 +190,21 @@ export default {
     });
   },
   beforeDestroy() {
-    chart.dispose()
+    if (chart != null && chart.dispose) {
+      chart.dispose();
+    }
   },
   methods: {
     dayjs,
     init() {
+      if (chart != null && chart.dispose) {
+        chart.dispose();
+      }
       const chartDom = this.$refs.main;
       if (chartDom == null) {
         return;
       }
-      chart = echarts.init(chartDom, null, {locale: "ZH"});
+      chart = echarts.init(chartDom, null, { locale: "ZH" });
       this.option && chart.setOption(this.option);
     },
     tabChange() {
@@ -191,7 +214,6 @@ export default {
       if (this.activeTab === "趋势图") {
         this.$nextTick(() => {
           if (this.mobile) {
-            this.init();
             this.getBean();
           }
         });
@@ -204,10 +226,11 @@ export default {
     },
 
     legendTabChange(name) {
-      chart.dispatchAction({
-        type: "legendToggleSelect",
-        name: name
-      });
+      chart &&
+        chart.dispatchAction({
+          type: "legendToggleSelect",
+          name: name
+        });
     },
     getBean() {
       if (!this.mobile) {
@@ -227,7 +250,7 @@ export default {
                     name: key,
                     type: "line",
                     markLine: {
-                      data: [{yAxis: legendItem.difference, name: "提示线"}]
+                      data: [{ yAxis: legendItem.difference, name: "提示线" }]
                     },
                     data: []
                   };
@@ -238,16 +261,16 @@ export default {
                 ]);
               }
             }
-          })
+          });
 
           this.latest = item;
         });
 
-        this.account = Array.from(account);
-
-        chart &&
-        chart.setOption({
-          series: Object.values(seriesObj)
+        this.$nextTick(() => {
+          this.account = Array.from(account);
+          this.option.series = Object.values(seriesObj);
+          this.init();
+          this.legendTabChange(this.activeLegend);
         });
       });
     }
@@ -258,7 +281,7 @@ export default {
 <style scoped>
 .latest-cell,
 .echarts-main {
-  height: calc(100vh - 225px - 44px - 16px);
+  height: calc(100vh - 190px - 44px - 16px);
   overflow-y: auto;
 }
 
