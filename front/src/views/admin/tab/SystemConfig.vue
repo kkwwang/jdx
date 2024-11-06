@@ -1,5 +1,19 @@
 <template>
   <div>
+    <!-- 系统控制 -->
+    <van-divider
+        :style="{
+        color: '#1989fa',
+        borderColor: '#1989fa',
+        padding: '0 16px',
+        marginTop: '12px'
+      }"
+    >系统控制
+    </van-divider>
+    <van-cell-group>
+      <van-cell title="更新环境" is-link clickable @click="updateEnv"/>
+    </van-cell-group>
+
     <!-- 网站设置 -->
     <van-divider
         :style="{
@@ -149,8 +163,9 @@
 </template>
 
 <script>
-import {getSystemConfig, updateAccount, updateQywx, updateWebsiteConfig} from "@/api/admin";
+import {getSystemConfig, updateAccount, updateEnv, updateQywx, updateWebsiteConfig} from "@/api/admin";
 import CryptoJS from "crypto-js";
+import {Dialog} from "vant";
 
 export default {
   name: "SystemConfig",
@@ -222,6 +237,22 @@ export default {
     this.getSystemConfig();
   },
   methods: {
+    updateEnv(){
+      Dialog.confirm({
+        title: '提示',
+        message: '确认提交环境更新？',
+      })
+          .then(() => {
+            // on confirm
+            updateEnv().then(() => {
+              this.$toast.success("更新成功");
+            })
+          })
+          .catch(() => {
+            // on cancel
+          });
+
+    },
     getSystemConfig: function () {
       getSystemConfig().then(resp => {
         this.title = resp.data.title;

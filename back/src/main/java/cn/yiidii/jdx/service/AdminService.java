@@ -125,7 +125,9 @@ public class AdminService implements ITask {
 
     public JSONObject updateEnv(String mobile) {
         log.info("envs 修正开始");
-
+        if(!StringUtils.hasText(mobile)){
+            mobile = "";
+        }
         long start = System.currentTimeMillis();
 
         Map<String, Set<String>> qywxUserIdMap = new HashMap<>();

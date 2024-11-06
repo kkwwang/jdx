@@ -4,7 +4,7 @@ import { Toast, Dialog } from "vant";
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 50000
+  timeout: 600000
 });
 
 service.interceptors.request.use(

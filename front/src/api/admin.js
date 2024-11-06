@@ -95,3 +95,9 @@ export function getAllDate() {
     method: "get"
   });
 }
+export function updateEnv() {
+  return request({
+    url: "admin/updateEnv",
+    method: "get"
+  });
+}
