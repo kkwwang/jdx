@@ -301,7 +301,7 @@ export default {
 </script>
 
 <style scoped>
-.legend-tab.van-tabs >>> .van-tabs__content {
+.legend-tab.van-tabs :deep(.van-tabs__content) {
   display: none;
 }
 </style>

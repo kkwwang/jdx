@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "module": "ESNext",
+        "jsx": "preserve",
+        "baseUrl": ".",
+        "sourceMap": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "lib": ["DOM", "ES2015.Promise", "ES5", "ES6", "ES2016.Array.Include", "ESNext"],
+        "types": ["vue-cesium/global", "vue-cesium/Cesium", "vite/client"]
+    },
+    "include": ["src/**/*", "node_modules/vue-cesium/Cesium.d.ts", "node_modules/vue-cesium/global.d.ts"]
+}

@@ -1,0 +1,48 @@
+# http://editorconfig.org
+root = true
+
+[*]
+#字符集utf-8
+charset = utf-8
+#缩进风格：空格
+indent_style = space
+#缩进大小4
+indent_size = 4
+#换行符lf
+end_of_line = lf
+#是否在文件的最后插入一个空行
+insert_final_newline = false
+#是否删除行尾的空格
+trim_trailing_whitespace = true
+max_line_length = 999
+ij_html_do_not_indent_children_of_tags = html,body,thead,tbody,tfoot,script,style
+
+
+[*.md]
+trim_trailing_whitespace = true
+
+[Makefile]
+indent_style = tab
+
+[{*.ats,*.cts,*.mts,*.ts}]
+spaces_within_imports = true
+spaces_within_object_literal_braces = true
+
+[{*.cjs,*.js}]
+spaces_within_imports = true
+spaces_within_object_literal_braces = true
+blank_lines_after_imports = 1
+
+[*.vue]
+spaces_within_imports = true
+spaces_within_imports = true
+spaces_within_object_literal_braces = true
+spaces_within_object_literal_braces = true
+space_inside_empty_tag = true
+align_attributes = false
+blank_lines_after_imports = 1
+
+
+[{*.htm,*.html,*.ng,*.sht,*.shtm,*.shtml}]
+space_inside_empty_tag = true
+align_attributes = false

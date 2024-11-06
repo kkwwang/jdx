@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import QLManage from "@/views/admin/tab/QLManage";
-import SystemConfig from "@/views/admin/tab/SystemConfig";
+import QLManage from "@/views/admin/tab/QLManage.vue";
+import SystemConfig from "@/views/admin/tab/SystemConfig.vue";
 import BeanMange from "@/views/admin/tab/BeanManage.vue";
 
 export default {
