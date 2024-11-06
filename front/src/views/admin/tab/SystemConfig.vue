@@ -6,7 +6,7 @@
         color: '#1989fa',
         borderColor: '#1989fa',
         padding: '0 16px',
-        marginTop: '32px'
+        marginTop: '12px'
       }"
     >网站设置
     </van-divider>

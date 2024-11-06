@@ -37,7 +37,8 @@ import {
   List,
   Tag,
   Toast,
-  Dialog
+  Dialog,
+    Calendar
 } from "vant";
 import VueClipboard from "vue-clipboard2";
 
@@ -74,6 +75,7 @@ Vue.use(Steps);
 Vue.use(List);
 Vue.use(Tag);
 Vue.use(Dialog);
+Vue.use(Calendar);
 
 Vue.use(VueClipboard);
 

@@ -1,49 +1,38 @@
 <template>
   <div>
-    <div style="margin-bottom: 2em;">
-      <van-nav-bar :title="title">
-        <template #left>
-          <van-icon
-              color="#ee0a24"
-              name="setting-o"
-              size="18"
-              @click="$router.push('/login')"
-          />
-
-        </template>
-        <template #right>
-          <van-icon
-              color="#ee0a24"
-            name="balance-pay"
-            size="18"
-            @click="$router.push('/bean')"
-          />
-        </template>
-      </van-nav-bar>
+    <van-nav-bar :title="title">
+      <template #left>
+        <van-icon
+          color="#ee0a24"
+          name="setting-o"
+          size="18"
+          @click="$router.push('/login')"
+        />
+      </template>
+      <template #right>
+        <van-icon
+          color="#ee0a24"
+          name="balance-pay"
+          size="18"
+          @click="$router.push('/bean')"
+        />
+      </template>
+    </van-nav-bar>
+    <div
+      style="height: calc(100vh - 46px);  overflow-y: auto; overflow-x: hidden;"
+    >
       <van-notice-bar
         v-if="notice"
         left-icon="volume-o"
         :text="notice"
         mode="closeable"
       />
-
-      <!-- title -->
-      <!--      <div>-->
-      <!--        <div-->
-      <!--            v-if="title"-->
-      <!--            style="text-align: center; margin: 40px 0 20px 0; font-size: 32px"-->
-      <!--        >-->
-      <!--          {{ title }}-->
-      <!--        </div>-->
-      <!--      </div>-->
-
       <JD />
-
       <div style="text-align: center">
         <van-tag size="medium" type="primary">剩余车位：{{ remain }}</van-tag>
       </div>
-
       <div style="padding: 16px 8px " v-html="bottomNotice"></div>
+      <version></version>
     </div>
   </div>
 </template>
@@ -51,10 +40,11 @@
 <script>
 import JD from "./JD";
 import { baseInfo } from "@/api";
+import Version from "@/views/version.vue";
 
 export default {
   name: "Index",
-  components: { JD },
+  components: { Version, JD },
   data() {
     return {
       title: "",

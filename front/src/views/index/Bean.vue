@@ -113,9 +113,7 @@ export default {
             inside: true
           },
           boundaryGap: ["20%", "20%"],
-          min: function (value) {
-            return Math.floor(value.min * 0.9);
-          },
+          min: 0,
           max: function (value) {
             return Math.ceil(value.max * 1.1);
           },

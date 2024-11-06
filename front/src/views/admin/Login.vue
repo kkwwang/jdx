@@ -10,7 +10,7 @@
         />
       </template>
     </van-nav-bar>
-    <div>
+    <div style="height: calc(100% - 46px)">
       <van-cell-group>
         <van-field
           v-model="username"

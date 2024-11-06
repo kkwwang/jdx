@@ -1,12 +1,13 @@
 <template>
   <div>
-    <div style="margin: 16px 0 8px 20px">
+    <div style="margin-left: 20px">
       <van-popover
           v-model="qlOptPopover"
           placement="right-start"
           trigger="click">
         <div style="width: 96px;text-align: center">
-          <van-button style="border: none; margin: 4px 0" type="default" @click="showSaveQLConfig()">新增配置</van-button>
+          <van-button style="border: none; margin: 4px 0" type="default" @click="showSaveQLConfig()">新增配置
+          </van-button>
         </div>
         <template #reference>
           <van-button type="primary" icon="apps-o" size="small">操作</van-button>
@@ -125,14 +126,20 @@
         </div>
       </van-form>
     </van-action-sheet>
+
+    <other/>
+
   </div>
 </template>
 
 <script>
-import {getQLConfigList, delQLConfig, addQLConfig, updateQLConfig} from "@/api/admin";
+import {addQLConfig, delQLConfig, getQLConfigList, updateQLConfig} from "@/api/admin";
+import Other from "@/views/admin/other.vue";
+import Version from "@/views/version.vue";
 
 export default {
   name: "QLManage",
+  components: {Version, Other},
   data() {
     return {
       qlConfigList: [{displayName: "", clientId: "", clientSecret: "", url: "", max: 0, used: 0, disabled: 0}],

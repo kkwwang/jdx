@@ -3,16 +3,35 @@ package cn.yiidii.jdx.util;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 public class SQLiteUtils {
 
-    public static  JSONArray getLatestBean(){
-        String sql = "SELECT  * FROM  bean WHERE  时间= ( SELECT MAX( 时间 ) FROM bean ) group by mobile, 时间 order by 时间, 序号;";
-        return select(sql);
+    public static List getAllDate() {
+        String sql = "SELECT DISTINCT SUBSTR( 时间, 0, 11 )  FROM bean";
+        List result = new ArrayList();
+        for (Object o : Objects.requireNonNull(select(sql))) {
+            JSONObject item = (JSONObject) o;
+            result.addAll(item.values());
+        }
+
+        return result;
+    }
+    public static JSONArray getLatestBean(String time) {
+        if (!StringUtils.hasText(time)) {
+            time = "";
+        }
+        time += "%";
+        String sql = "SELECT  * FROM  bean WHERE  时间= ( SELECT MAX( 时间 ) FROM bean WHERE 时间 LIKE ?) group by mobile, 时间 order by 时间, 序号;";
+        return select(sql, time);
     }
 
 
@@ -35,6 +54,9 @@ public class SQLiteUtils {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
+
+
+
             ResultSet resultSet = ps.executeQuery();
             // 打印查询结果
             JSONArray result = new JSONArray();

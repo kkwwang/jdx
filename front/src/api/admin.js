@@ -76,15 +76,22 @@ export function updateAccount(data) {
 
 // 版本信息
 
-export function getLatestBean() {
+export function getLatestBean(time) {
   return request({
     url: "admin/getLatestBean",
-    method: "get"
+    method: "get",
+    params: { time }
   });
 }
 export function getAllEnv() {
   return request({
     url: "admin/getAllEnv",
+    method: "get"
+  });
+}
+export function getAllDate() {
+  return request({
+    url: "admin/getAllDate",
     method: "get"
   });
 }

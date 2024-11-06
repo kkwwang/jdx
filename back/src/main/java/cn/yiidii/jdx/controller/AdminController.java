@@ -117,8 +117,8 @@ public class AdminController {
     }
 
     @GetMapping(value = "getLatestBean")
-    public R<?> getLatestBean() {
-        return R.ok(SQLiteUtils.getLatestBean());
+    public R<?> getLatestBean(String time) {
+        return R.ok(SQLiteUtils.getLatestBean(time));
     }
 
     @GetMapping(value = "getAllEnv")
@@ -142,5 +142,10 @@ public class AdminController {
 
 
         return R.ok(temp);
+    }
+
+    @GetMapping(value = "getAllDate")
+    public R<?> getAllDate() {
+        return R.ok(SQLiteUtils.getAllDate());
     }
 }
