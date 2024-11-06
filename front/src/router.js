@@ -7,7 +7,6 @@ import Bean from "@/views/index/Bean.vue";
 
 export default createRouter({
     history: createWebHistory(),
-    // mode: "hash",
     base: import.meta.env.VITE_BASE_URL,
     routes: [
         {
