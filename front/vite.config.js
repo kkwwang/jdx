@@ -28,7 +28,6 @@ export default async ({mode}) => {
                     },
                 }
             },
-            minify: 'terser',
             terserOptions: {
                 compress: {
                     //生产环境时移除console.log()
