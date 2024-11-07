@@ -81,8 +81,9 @@ public class SystemConfigProperties implements InitializingBean, ITask {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AccountConfig {
-        private String username = "admin";
-        private String password = "123465";
+        private String username;
+        private String oldPassword;
+        private String password;
     }
 
     @Data

@@ -88,10 +88,18 @@ public class AdminController {
         if (StrUtil.isBlank(username)) {
             throw new BizException("用户名不能为空");
         }
-        if (StrUtil.isNotBlank(password)) {
-            systemConfigProperties.getAccountConfig().setPassword(password);
+        if (StrUtil.isBlank(password)) {
+            throw new BizException("密码不能为空");
         }
-        systemConfigProperties.getAccountConfig().setUsername(username);
+        if (StrUtil.isBlank(account.getOldPassword())) {
+            throw new BizException("旧密码不能为空");
+        }
+        if (StrUtil.isNotBlank(password) &&
+                StrUtil.equals(account.getOldPassword(), systemConfigProperties.getAccountConfig().getPassword())
+        ) {
+            systemConfigProperties.getAccountConfig().setPassword(password);
+            systemConfigProperties.getAccountConfig().setUsername(username);
+        }
         return R.ok(null, "修改成功");
     }
 

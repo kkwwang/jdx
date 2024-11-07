@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
     overflow-y: auto;
 }
 
-.van-cell {
+.van-cell.van-field {
     align-items: center;
 }
 
@@ -318,7 +318,8 @@ onBeforeUnmount(() => {
     background-color: #f5f5f5; /* 奇数行的背景色 */
 }
 
-.van-cell__label {
+:deep(.van-cell__label) {
+
     color: #ee0a24;
     float: left;
     width: 180%;

@@ -17,6 +17,11 @@
             placeholder="用户名"
         />
         <van-field
+            v-model="accountConfig.oldPassword"
+            label="旧密码"
+            placeholder="旧密码"
+        />
+        <van-field
             v-model="accountConfig.password"
             type="password"
             label="密码"
@@ -42,9 +47,11 @@
 import { onMounted, ref } from "vue";
 import { getAccount, updateAccount } from "@/api/admin/account";
 import { showDialog } from "vant";
+import CryptoJS from "crypto-js";
 
 const accountConfig = ref({
     username: "",
+    oldPassword: "",
     password: "",
     rePassword: ""
 })
@@ -56,15 +63,27 @@ const get = () => {
 };
 
 const save = () => {
-    updateAccount(accountConfig.value).then(() => {
-        showDialog({
-            message: "修改成功",
-            duration: 500
+    if (
+        accountConfig.value.username
+        && accountConfig.value.oldPassword
+        && accountConfig.value.password
+        && accountConfig.value.rePassword
+        && accountConfig.value.password === accountConfig.value.rePassword
+    ) {
+        updateAccount({
+            username: accountConfig.value.username,
+            oldPassword: CryptoJS.MD5(accountConfig.value.oldPassword).toString(),
+            password: CryptoJS.MD5(accountConfig.value.password).toString()
         }).then(() => {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-        })
-    });
+            showDialog({
+                message: "修改成功",
+                duration: 500
+            }).then(() => {
+                localStorage.removeItem("token");
+                window.location.href = "/login";
+            })
+        });
+    }
 };
 
 onMounted(() => {
