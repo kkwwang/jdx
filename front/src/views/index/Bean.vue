@@ -118,7 +118,13 @@ const option = computed(() => {
             trigger: "axis"
         },
         xAxis: {
-            type: "time"
+            type: "time",
+            min(value) {
+                return value.min - 24 * 60 * 60 * 1000;
+            },
+            max(value) {
+                return value.max + 24 * 60 * 60 * 1000;
+            },
         },
         yAxis: {
             axisLabel: {
@@ -178,55 +184,70 @@ const getBean = () => {
     jdBeanApi(mobile.value).then(res => {
         let account = new Set();
         const seriesObj = {};
-        res.data.forEach(item => {
-            account.add(item[accountName]);
-            legend.forEach(legendItem => {
+        legend.forEach(legendItem => {
+            if (!seriesObj[legendItem.title]) {
+                seriesObj[legendItem.title] = {
+                    name: legendItem.title,
+                    type: "line",
+                    markPoint: {
+                        data: [
+                            { type: "max", name: "Max" },
+                            { type: "min", name: "Min" },
+                            {
+                                coord: null,
+                                value: 0,
+                            }
+                        ]
+                    },
+                    markLine: {
+                        symbol: ["none", "none"],
+                        label: {
+                            position: "middle",
+                            formatter: "{b}:{c}"
+                        },
+                        data: [
+                            { yAxis: legendItem.difference, name: "提示线" },
+                            {
+                                type: "average",
+                                name: "平均值",
+                                lineStyle: { color: "#ff0000" }
+                            }
+                        ]
+                    },
+                    data: []
+                };
+            }
+            res.data.forEach((item, index) => {
+                account.add(item[accountName]);
                 for (let key of Object.keys(item)) {
                     if (legendItem.title === key) {
-                        if (!seriesObj[key]) {
-                            seriesObj[key] = {
-                                name: key,
-                                type: "line",
-                                markPoint: {
-                                    data: [
-                                        { type: "max", name: "Max" },
-                                        { type: "min", name: "Min" }
-                                    ]
-                                },
-                                markLine: {
-                                    symbol: ["none", "none"],
-                                    label: {
-                                        position: "middle",
-                                        formatter: "{b}:{c}"
-                                    },
-                                    data: [
-                                        { yAxis: legendItem.difference, name: "提示线" },
-                                        {
-                                            type: "average",
-                                            name: "平均值",
-                                            lineStyle: { color: "#ff0000" }
-                                        }]
-                                },
-                                data: []
-                            };
-                        }
-                        seriesObj[key].data.push([
+                        const itemValue = [
                             new Date(item[dataTime]),
-                            item[key]
-                        ]);
+                            parseFloat(item[key])
+                        ]
+                        seriesObj[key].data.push(itemValue);
+                        if (item[key]) {
+                            seriesObj[legendItem.title].markPoint.data[2].value = parseFloat(item[key])
+                            seriesObj[legendItem.title].markPoint.data[2].coord = itemValue
+                        }
                     }
                 }
+                latest.value = item;
             });
 
-            latest.value = item;
         });
 
+        console.log(seriesObj)
         nextTick(() => {
             account.value = Array.from(account);
             init({
                 ...option.value,
                 series: Object.values(seriesObj)
             });
+            console.log({
+                ...option.value,
+                series: Object.values(seriesObj)
+            })
             legendTabChange(activeLegend.value);
         });
     });
