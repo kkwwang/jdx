@@ -32,7 +32,7 @@ public class AdminNotifyEventListener implements ApplicationListener<AdminNotify
         Thread.currentThread().setName(String.format(Thread.currentThread().getName(), IdUtil.randomSnowflakeId(PREFIX) + "_"));
 
         QywxPushUtil.send(
-                systemConfigProperties.getQywxKey(),
+                systemConfigProperties.getQywxConfig().getQywxKey(),
                 event.getTitle(),
                 event.getContent(),
                 event.getMobileList(),

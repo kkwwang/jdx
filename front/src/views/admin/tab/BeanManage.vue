@@ -1,307 +1,295 @@
 <template>
-  <div style="height: 100%">
-    <van-cell-group inset>
-      <van-cell>
-        <van-tabs @change="legendTabChange" swipeable v-model="activeTab" class="legend-tab">
-          <van-tab title="登录统计" name="登录统计"/>
-          <van-tab
-              :disabled="!isBean && !item.data.length"
-              :key="item.name"
-              v-for="item in beanOption.series"
-              :title="item.name"
-              :name="item.name"
-          />
-        </van-tabs>
-      </van-cell>
-    </van-cell-group>
-    <van-cell-group inset>
-      <van-cell
-          title="日期"
-          :value="date"
-          @click="show = true"
-          v-if="activeTab !== '登录统计'"
-      />
-      <van-cell v-else title="在线情况">
-        {{ envs.length }}/{{ envs.filter(item => item.status === 0).length }}/{{
-          envs.filter(item => item.status !== 0).length
-        }}
-      </van-cell>
-      <van-calendar
-          :default-date="new Date(date)"
-          v-model="show"
-          @confirm="getLatestBean"
-          :show-confirm="false"
-          :max-date="new Date()"
-          :formatter="formatter"
-          :min-date="
+    <div style="height: 100%">
+        <van-cell-group inset>
+            <van-cell>
+                <van-tabs @change="legendTabChange" swipeable v-model="activeTab" class="legend-tab">
+                    <van-tab title="登录统计" name="登录统计" />
+                    <van-tab
+                        :disabled="!isBean && !item.data.length"
+                        :key="item.name"
+                        v-for="item in beanOption.series"
+                        :title="item.name"
+                        :name="item.name"
+                    />
+                </van-tabs>
+            </van-cell>
+        </van-cell-group>
+        <van-cell-group inset>
+            <van-cell
+                title="日期"
+                :value="date"
+                @click="show = true"
+                v-if="activeTab !== '登录统计'"
+            />
+            <van-cell v-else title="在线情况">
+                {{ envs.length }}/{{ envs.filter(item => item.status === 0).length }}/{{
+                    envs.filter(item => item.status !== 0).length
+                }}
+            </van-cell>
+            <van-calendar
+                :default-date="new Date(date)"
+                v-model:show="show"
+                @confirm="getLatestBeanFn"
+                :show-confirm="false"
+                :max-date="new Date()"
+                :formatter="formatter"
+                :min-date="
             new Date(new Date().getTime() - 12 * 30 * 24 * 60 * 60 * 1000)
           "
-      />
-    </van-cell-group>
-    <van-cell-group inset>
-      <van-cell>
-        <div style="height: calc(100vh - 192px)" ref="main"></div>
-      </van-cell>
-    </van-cell-group>
-  </div>
+            />
+        </van-cell-group>
+        <van-cell-group inset>
+            <van-cell style="height: calc(100vh - 192px)" ref="mainRef">
+            </van-cell>
+        </van-cell-group>
+    </div>
 </template>
-<script>
-import {getAllDate, getAllEnv, getLatestBean} from "@/api/admin";
-import legend from "../../legend.json";
-import * as echarts from "echarts";
+
+<script setup name="BeanManage">
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import dayjs from "dayjs";
+import * as echarts from "echarts";
+import { getAllDate, getAllEnv, getLatestBean } from "@/api/admin/bean";
+import legend from "../../legend.json"
 
 let chart;
-export default {
-  name: "BeanMange",
-  data() {
-    return {
-      date: dayjs().format("YYYY-MM-DD"),
-      show: false,
-      isBean: false,
-      activeTab: "登录统计",
-      data: [],
-      enableDate: [],
-      envs: [],
 
-      legend: legend,
-      yAxis: {
+const date = ref(dayjs().format("YYYY-MM-DD"))
+const show = ref(false)
+const isBean = ref(false)
+const activeTab = ref('登录统计')
+const data = ref([])
+const enableDate = ref([])
+const envs = ref([])
+const lastLoginData = ref([])
+const beanData = ref([])
+
+const mainRef = ref()
+
+const commonOptions = ref({
+    tooltip: {
+        trigger: "axis"
+    },
+    grid: {
+        top: "0",
+        left: "130",
+        right: "5",
+        bottom: "0"
+    },
+    yAxis: {
         type: "category",
-        // inverse: true,
         axisLabel: {
-          interval: 0
+            interval: 0
         },
         data: []
-      },
-      lastLoginTime: {
-        name: "最后登录时间",
-        type: "bar",
-        markLine: {
-          symbol: ["none", "none"],
-          label: {
-            position: "middle",
-            formatter: "{b}"
-          },
-          data: [
-            //{xAxis: item.difference, name: "提示线"},
-            {type: "average", name: "平均值", lineStyle: {color: "#ee0a24"}}
-          ]
-        },
-        data: []
-      }
-    };
-  },
-  computed: {
-    dayjs() {
-      return dayjs;
     },
-    lasLoginOption() {
-      return {
-        tooltip: {
-          trigger: "axis"
-        },
-        yAxis: this.yAxis,
-        xAxis: {
-          type: "time",
-          min: function (value) {
-            return Math.ceil(value.min - 6 * 60 * 60 * 1000);
-          }
-        },
-        grid: {
-          top: "0",
-          left: "130",
-          right: "5",
-          bottom: "0"
-        },
-        series: [this.lastLoginTime]
-      };
-    },
-    beanOption() {
-      return {
-        tooltip: {
-          trigger: "axis"
-        },
-        yAxis: this.yAxis,
-        xAxis: {
-          axisLabel: {
-            inside: false
-          },
-          boundaryGap: ["20%", "20%"],
-          min: 0,
-          max: function (value) {
-            return Math.ceil(value.max * 1.1);
-          },
-          minInterval: 1,
+})
 
-          type: "value"
+
+const lastLoginOption = computed(() => {
+    return {
+        ...commonOptions.value,
+        xAxis: {
+            type: "time",
+            min: function (value) {
+                return Math.ceil(value.min - 6 * 60 * 60 * 1000);
+            }
         },
-        grid: {
-          top: "0",
-          bottom: 0,
-          left: "130",
-          right: "5"
+        series: [
+            {
+                name: "最后登录时间",
+                type: "bar",
+                markLine: {
+                    symbol: ["none", "none"],
+                    label: {
+                        position: "middle",
+                        formatter: "{b}"
+                    },
+                    data: [
+                        { type: "average", name: "平均值", lineStyle: { color: "#ee0a24" } }
+                    ]
+                },
+                data: lastLoginData.value
+            }
+        ]
+    }
+})
+const beanOption = computed(() => {
+    return {
+        ...commonOptions.value,
+        xAxis: {
+            axisLabel: {
+                inside: false
+            },
+            boundaryGap: ["20%", "20%"],
+            min: 0,
+            max: function (value) {
+                return Math.ceil(value.max * 1.1);
+            },
+            minInterval: 1,
+
+            type: "value"
         },
         legend: {
-          show: false,
-          type: "scroll",
-          data: this.legend.map(item => item.title),
-          left: "center",
-          right: 0,
-          icon: "rect",
-          selectedMode: "single"
+            show: false,
+            type: "scroll",
+            data: legend.map(item => item.title),
+            left: "center",
+            right: 0,
+            icon: "rect",
+            selectedMode: "single"
         },
-        series: this.legend.map(item => {
-          return {
-            name: item.title,
-            type: "bar",
-            data: []
-          };
-        })
-      };
+        series: beanData.value
     }
-  },
-  beforeDestroy() {
-    chart = null;
-  },
-  mounted() {
-    this.getAllDate();
-    this.getAllEnv();
+})
 
-    window.addEventListener("resize", () => {
-      chart && chart.resize();
-    });
-  },
-  methods: {
-    reInit(option) {
-      if (chart) {
+const reInit = (option) => {
+    if (chart) {
         chart.dispose();
-      }
-      chart = echarts.init(this.$refs.main, null, {locale: "ZH"});
-      if (option) {
+    }
+    chart = echarts.init(mainRef.value?.$el, null, { locale: "ZH" });
+    if (option) {
         chart.setOption(option);
-      }
-    },
-    formatter(day) {
-      if (!this.enableDate.includes(dayjs(day.date).format("YYYY-MM-DD"))) {
-        day.type = "disabled";
-      }
-      return day;
-    },
-    getAllDate() {
-      getAllDate().then(res => {
-        this.enableDate = res.data;
-        this.date = this.enableDate[this.enableDate.length - 1];
-        if (this.envs.length) {
-          this.getLatestBean(this.date);
-        }
+    }
+}
 
-      });
-    },
-    getAllEnv() {
-      getAllEnv().then(res => {
-        this.envs = res.data;
-        this.yAxis.data = res.data.map(
+const formatter = (day) => {
+    if (!enableDate.value.includes(dayjs(day.date).format("YYYY-MM-DD"))) {
+        day.type = "disabled";
+    }
+    return day;
+}
+
+const getAllDateFn = () => {
+    getAllDate().then(res => {
+        enableDate.value = res.data;
+        date.value = enableDate.value[enableDate.value.length - 1];
+        if (envs.value.length) {
+            getLatestBeanFn(date.value);
+        }
+    });
+}
+
+const getAllEnvFn = () => {
+    getAllEnv().then(res => {
+        envs.value = res.data;
+        commonOptions.value.yAxis.data = res.data.map(
             item => item.wechat + (item.status === 1 ? " ❌" : " ✅")
         );
-        this.lastLoginTime.data = res.data.map(item => {
-          return item.status === 1
-              ? {
-                value: item.loginTime,
-                itemStyle: {
-                  color: "#ee0a24"
+        lastLoginData.value = res.data.map(item => {
+            return item.status === 1
+                ? {
+                    value: item.loginTime,
+                    itemStyle: {
+                        color: "#ee0a24"
+                    }
                 }
-              }
-              : item.loginTime;
+                : item.loginTime;
         });
-        this.reInit(this.lasLoginOption);
-        if (this.enableDate.length) {
-          if (this.envs.length) {
-            this.getLatestBean(this.date);
-          }
+        reInit(lastLoginOption.value);
+        if (enableDate.value.length) {
+            if (envs.value.length) {
+                getLatestBeanFn(date.value);
+            }
         }
-      });
-    },
-    getLatestBean(value) {
-      this.show = false;
-      value && (this.date = dayjs(value).format("YYYY-MM-DD"));
-      getLatestBean(this.date).then(res => {
+    });
+}
+
+const getLatestBeanFn = (value) => {
+    show.value = false;
+    value && (date.value = dayjs(value).format("YYYY-MM-DD"));
+    getLatestBean(date.value).then(res => {
         const temp = [];
 
-        this.envs.forEach(env => {
-          let dataTemp = {};
-          res.data.forEach(item => {
-            if (env.ptPin === item.账号) {
-              dataTemp = item;
-            }
-          });
-          temp.push({
-            ...env,
-            ...dataTemp
-          });
+        envs.value.forEach(env => {
+            let dataTemp = {};
+            res.data.forEach(item => {
+                if (env.ptPin === item.账号) {
+                    dataTemp = item;
+                }
+            });
+            temp.push({
+                ...env,
+                ...dataTemp
+            });
         });
 
         console.log(temp)
 
-        this.beanOption.series = this.legend.map(item => {
-          return {
-            name: item.title,
-            type: "bar",
-            markLine: {
-              symbol: ["none", "none"],
-              label: {
-                position: "middle",
-                formatter: "{b}:{c}"
-              },
-              data: [
-                {xAxis: item.difference, name: "提示线"},
-                {
-                  type: "average",
-                  name: "平均值",
-                  lineStyle: {color: "#ff0000"}
-                }
-              ]
-            },
-            markPoint: {
-              data: [
-                {type: "max", name: "Max"},
-                {type: "min", name: "Min"}
-              ]
-            },
-            data: temp.map(env => env[item.title]).filter(item => item)
-          };
+        beanData.value = legend.map(item => {
+            return {
+                name: item.title,
+                type: "bar",
+                markLine: {
+                    symbol: ["none", "none"],
+                    label: {
+                        position: "middle",
+                        formatter: "{b}:{c}"
+                    },
+                    data: [
+                        { xAxis: item.difference, name: "提示线" },
+                        {
+                            type: "average",
+                            name: "平均值",
+                            lineStyle: { color: "#ff0000" }
+                        }
+                    ]
+                },
+                markPoint: {
+                    data: [
+                        { type: "max", name: "Max" },
+                        { type: "min", name: "Min" }
+                    ]
+                },
+                data: temp.map(env => env[item.title]).filter(item => item)
+            };
         });
 
-        console.log(this.beanOption.series)
-        if (this.activeTab !== "登录统计") {
-          this.legendTabChange(this.activeTab);
+        console.log(beanOption.value)
+        if (activeTab.value !== "登录统计") {
+            legendTabChange(activeTab.value);
         }
-        this.isBean = true;
-      });
-    },
-    legendTabChange(name) {
-      this.activeTab = name;
-      this.$nextTick(() => {
+        isBean.value = true;
+    });
+}
+
+const legendTabChange = (name) => {
+    activeTab.value = name;
+    nextTick(() => {
         if (!chart) {
-          return;
+            return;
         }
         if (name === "登录统计") {
-          this.reInit(this.lasLoginOption);
+            reInit(lastLoginOption.value);
         } else {
-          console.log(this.beanOption)
-          this.reInit(this.beanOption);
-          chart.dispatchAction({
-            type: "legendToggleSelect",
-            name: name
-          });
+            reInit(beanOption.value);
+            chart.dispatchAction({
+                type: "legendToggleSelect",
+                name: name
+            });
         }
-      });
+    });
+}
+
+onBeforeUnmount(() => {
+    if (chart) {
+        chart.dispose();
+        chart = null;
     }
-  }
-};
+})
+
+onMounted(() => {
+    getAllDateFn();
+    getAllEnvFn();
+    window.addEventListener("resize", () => {
+        chart && chart.resize();
+    });
+})
 </script>
+
 
 <style scoped>
 .legend-tab.van-tabs :deep(.van-tabs__content) {
-  display: none;
+    display: none;
 }
 </style>

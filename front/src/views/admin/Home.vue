@@ -23,5 +23,7 @@ import BeanMange from "@/views/admin/tab/BeanManage.vue";
 <style scoped>
 :deep(.van-tabs__content) {
     padding: 10px 0;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
 }
 </style>

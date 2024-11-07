@@ -8,6 +8,7 @@ import cn.yiidii.jdx.support.ITask;
 import cn.yiidii.jdx.util.ScheduleTaskUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,23 +41,15 @@ public class SystemConfigProperties implements InitializingBean, ITask {
     @JSONField(serialize = false, deserialize = false)
     private final ScheduleTaskUtil scheduleTaskUtil;
 
-    private String username = "admin";
-    private String password = "123465";
 
-    private String title;
-    private String notice = "这是一条测试公告，只支持顶部";
-    private String indexBottomNotice = "这是底部说明，只支持html";
-    //    private String checkCookieCron = "0 0 12 * * ?";
     private List<QLConfig> qls;
 
-    private String qywxKey = null;
-    private String adminQywxId = null;
+    private WebsiteConfig websiteConfig = new WebsiteConfig();
 
-    private String corpid = "";
-    private String corpsecret = "";
-    private String domain = "";
-    private String contactsSecret = "";
-    private String agentid = "";
+    private AccountConfig accountConfig = new AccountConfig();
+
+    private QywxConfig qywxConfig = new QywxConfig();
+
 
     @PostConstruct
     public void init() {
@@ -64,7 +57,7 @@ public class SystemConfigProperties implements InitializingBean, ITask {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         // 根据config.json赋值
         update(true);
     }
@@ -82,6 +75,36 @@ public class SystemConfigProperties implements InitializingBean, ITask {
             log.error("更新配置文件[{}]发生异常, e: {}", SYSTEM_CONFIG_FILE_PAH, e.getMessage());
             return null;
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AccountConfig {
+        private String username = "admin";
+        private String password = "123465";
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class QywxConfig {
+        private String qywxKey = null;
+        private String adminQywxId = null;
+        private String corpid = "";
+        private String corpsecret = "";
+        private String domain = "";
+        private String contactsSecret = "";
+        private String agentid = "";
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class WebsiteConfig {
+        private String title;
+        private String notice;
+        private String indexBottomNotice;
     }
 
     @Data
@@ -120,7 +143,7 @@ public class SystemConfigProperties implements InitializingBean, ITask {
             return;
         }
         Thread.currentThread().setName(String.format(Thread.currentThread().getName(), "SYS_timerPersistSystemConfig"));
-        String prettyJa = JSONUtil.toJsonPrettyStr(JSONObject.toJSONString(this));
+        String prettyJa = JSONUtil.toJsonPrettyStr(JSONObject.toJSONString(this, SerializerFeature.WriteNullStringAsEmpty));
         FileUtil.writeString(prettyJa, SYSTEM_CONFIG_FILE_PAH, StandardCharsets.UTF_8);
     }
 }

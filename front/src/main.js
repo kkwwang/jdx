@@ -34,7 +34,8 @@ import {
     TabbarItem,
     Tabs,
     Tag,
-    Toast
+    Toast,
+    Switch
 } from "vant";
 import VueClipboard from "vue-clipboard2";
 import {createApp} from "vue";
@@ -80,6 +81,8 @@ app.use(List);
 app.use(Tag);
 app.use(Dialog);
 app.use(Calendar);
+app.use(    Switch
+);
 
 app.use(VueClipboard);
 app.use(router);

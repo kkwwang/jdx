@@ -37,7 +37,7 @@ public class QywxPushUtil {
                 QywxUtil qywxUtil = SpringUtil.getBean(QywxUtil.class);
                 String contactsToken = qywxUtil.getToken();
                 SystemConfigProperties systemConfigProperties = SpringUtil.getBean(SystemConfigProperties.class);
-                reqParamJo.put("agentid", systemConfigProperties.getAgentid());
+                reqParamJo.put("agentid", systemConfigProperties.getQywxConfig().getAgentid());
                 reqParamJo.put("touser", String.join("|", qywxUserIdList));
                 log.info(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
                 @Cleanup HttpResponse respYy = HttpRequest.post(YY_PUSH_URL.replace("ACCESS_TOKEN", contactsToken))

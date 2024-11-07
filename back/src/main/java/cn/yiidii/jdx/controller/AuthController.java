@@ -57,8 +57,8 @@ public class AuthController {
         Assert.isTrue(StrUtil.isNotBlank(password), () -> {
             throw new BizException("密码不能为空");
         });
-        if (!StrUtil.equals(systemConfigProperties.getUsername(), username)
-                || !StrUtil.equals(systemConfigProperties.getPassword(), password)) {
+        if (!StrUtil.equals(systemConfigProperties.getAccountConfig().getUsername(), username)
+                || !StrUtil.equals(systemConfigProperties.getAccountConfig().getPassword(), password)) {
             throw new BizException("用户名或密码不正确");
         }
         JSONObject info = new JSONObject();

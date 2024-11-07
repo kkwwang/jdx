@@ -68,7 +68,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if (!ignore) {
             String token = request.getHeader("token");
             try {
-                String replaceKey = key.replace("username", systemConfigProperties.getUsername()).replace("password", systemConfigProperties.getPassword());
+                String replaceKey = key.replace("username", systemConfigProperties.getAccountConfig().getUsername()).replace("password", systemConfigProperties.getAccountConfig().getPassword());
                 JWT jwt = JWTUtil.parseToken(token).setKey(replaceKey.getBytes(StandardCharsets.UTF_8));
                 JWTValidator.of(jwt).validateDate();
             } catch (Throwable e) {

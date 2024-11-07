@@ -25,6 +25,7 @@ public class SQLiteUtils {
 
         return result;
     }
+
     public static JSONArray getLatestBean(String time) {
         if (!StringUtils.hasText(time)) {
             time = "";
@@ -54,7 +55,6 @@ public class SQLiteUtils {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
-
 
 
             ResultSet resultSet = ps.executeQuery();

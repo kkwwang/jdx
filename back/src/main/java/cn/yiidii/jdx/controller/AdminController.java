@@ -8,7 +8,6 @@ import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.AdminService;
 import cn.yiidii.jdx.service.QLService;
 import cn.yiidii.jdx.util.SQLiteUtils;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,20 +36,13 @@ public class AdminController {
 
     @GetMapping("ql")
     public R<?> qlConfig() {
-        JSONArray qlConfig = adminService.getQLConfig();
-        return R.ok(qlConfig);
+        return R.ok(adminService.getQLConfig());
     }
 
     @PostMapping("ql")
     public R<?> addQLConfig(@RequestBody @Validated QLConfig qlConfig) {
-        List<QLConfig> qlConfigs = adminService.addQLConfig(qlConfig);
+        List<QLConfig> qlConfigs = adminService.saveQLConfig(qlConfig);
         return R.ok(qlConfigs, "添加成功");
-    }
-
-    @PutMapping("ql")
-    public R<?> updateQLConfig(@RequestBody @Validated QLConfig qlConfig) {
-        List<QLConfig> qlConfigs = adminService.updateQLConfig(qlConfig);
-        return R.ok(qlConfigs, "修改成功");
     }
 
     @DeleteMapping("ql")
@@ -59,55 +51,47 @@ public class AdminController {
         return R.ok(qlConfigs, "删除成功");
     }
 
-    @GetMapping("config")
-    public R<?> getConfig() {
-        JSONObject result = new JSONObject();
-        result.put("title", systemConfigProperties.getTitle());
-        result.put("notice", systemConfigProperties.getNotice());
-        result.put("bottomNotice", systemConfigProperties.getIndexBottomNotice());
-        result.put("username", systemConfigProperties.getUsername());
-        result.put("corpid", systemConfigProperties.getCorpid());
-        result.put("domain", systemConfigProperties.getDomain());
-        result.put("contactsSecret", systemConfigProperties.getContactsSecret());
-        result.put("corpsecret", systemConfigProperties.getCorpsecret());
-        result.put("agentid", systemConfigProperties.getAgentid());
-        result.put("qywxKey", systemConfigProperties.getQywxKey());
-        result.put("adminQywxId", systemConfigProperties.getAdminQywxId());
-        return R.ok(result);
+    @GetMapping("websiteConfig")
+    public R<SystemConfigProperties.WebsiteConfig> webbsiteConfig() {
+        return R.ok(systemConfigProperties.getWebsiteConfig());
     }
 
 
     @PutMapping("websiteConfig")
-    public R<?> updateWebsiteConfig(@RequestBody JSONObject paramJo) {
-        JSONObject websiteConfig = adminService.updateWebsiteConfig(paramJo);
-        return R.ok(websiteConfig, "修改成功");
+    public R<?> updateWebsiteConfig(@RequestBody SystemConfigProperties.WebsiteConfig websiteConfig) {
+        systemConfigProperties.setWebsiteConfig(websiteConfig);
+        return R.ok(null, "修改成功");
+    }
+
+    @GetMapping("qywx")
+    public R<SystemConfigProperties.QywxConfig> qywxConfig() {
+        return R.ok(systemConfigProperties.getQywxConfig());
     }
 
 
     @PutMapping("qywx")
-    public R<?> updateQywx(@RequestBody JSONObject paramJo) {
-        systemConfigProperties.setAgentid(paramJo.getString("agentid"));
-        systemConfigProperties.setContactsSecret(paramJo.getString("contactsSecret"));
-        systemConfigProperties.setCorpid(paramJo.getString("corpid"));
-        systemConfigProperties.setCorpsecret(paramJo.getString("corpsecret"));
-        systemConfigProperties.setDomain(paramJo.getString("domain"));
-        systemConfigProperties.setQywxKey(paramJo.getString("qywxKey"));
-        systemConfigProperties.setAdminQywxId(paramJo.getString("adminQywxId"));
-        return R.ok(paramJo, "修改成功");
+    public R<SystemConfigProperties.QywxConfig> updateQywx(@RequestBody SystemConfigProperties.QywxConfig qywxConfig) {
+        systemConfigProperties.setQywxConfig(qywxConfig);
+        return R.ok(null, "修改成功");
+    }
+
+    @GetMapping("account")
+    public R<String> account() {
+        return R.ok(systemConfigProperties.getAccountConfig().getUsername());
     }
 
 
     @PutMapping("updateAccount")
-    public R<?> updateAccount(@RequestBody JSONObject paramJo) {
-        String username = paramJo.getString("username");
-        String password = paramJo.getString("password");
+    public R<?> updateAccount(@RequestBody SystemConfigProperties.AccountConfig account) {
+        String username = account.getUsername();
+        String password = account.getPassword();
         if (StrUtil.isBlank(username)) {
             throw new BizException("用户名不能为空");
         }
         if (StrUtil.isNotBlank(password)) {
-            systemConfigProperties.setPassword(password);
+            systemConfigProperties.getAccountConfig().setPassword(password);
         }
-        systemConfigProperties.setUsername(username);
+        systemConfigProperties.getAccountConfig().setUsername(username);
         return R.ok(null, "修改成功");
     }
 

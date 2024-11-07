@@ -9,8 +9,10 @@
     <property name="maxHistory" value="30"/>
     <property name="maxFileSize" value="50MB"/>
 
-    <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t:%r] [%logger{200}.%M:%L] %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
-    <property name="log_pattern_console" value="%red(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%5p]) %clr([%t:%r]){orange} %clr([%logger{36}.%M:%L]){cyan} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="log_pattern"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t:%r] [%logger{200}.%M:%L] %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="log_pattern_console"
+              value="%red(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%5p]) %clr([%t:%r]){orange} %clr([%logger{36}.%M:%L]){cyan} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

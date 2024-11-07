@@ -99,10 +99,10 @@ public class IndexController {
     @GetMapping("info")
     public R<?> getBaseInfo() {
         JSONObject jo = new JSONObject();
-        jo.put("title", systemConfigProperties.getTitle());
-        jo.put("notice", systemConfigProperties.getNotice());
+        jo.put("title", systemConfigProperties.getWebsiteConfig().getTitle());
+        jo.put("notice", systemConfigProperties.getWebsiteConfig().getNotice());
         jo.put("version", SpringUtil.getProperty("spring.application.version"));
-        jo.put("bottomNotice", systemConfigProperties.getIndexBottomNotice());
+        jo.put("bottomNotice", systemConfigProperties.getWebsiteConfig().getIndexBottomNotice());
         jo.put("remain", systemConfigProperties.getQls().stream()
                 .filter(ql -> ql.getDisabled() == 0 && ql.getUsed() < ql.getMax())
                 .map(ql -> ql.getMax() - ql.getUsed())

@@ -36,7 +36,7 @@
 </template>
 
 <script setup name="login">
-import { login as loginApi } from "@/api/admin";
+import { login as loginApi } from "@/api/admin/login";
 import CryptoJS from "crypto-js";
 import { onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";

@@ -187,8 +187,25 @@ const getBean = () => {
                             seriesObj[key] = {
                                 name: key,
                                 type: "line",
+                                markPoint: {
+                                    data: [
+                                        { type: "max", name: "Max" },
+                                        { type: "min", name: "Min" }
+                                    ]
+                                },
                                 markLine: {
-                                    data: [{ yAxis: legendItem.difference, name: "提示线" }]
+                                    symbol: ["none", "none"],
+                                    label: {
+                                        position: "middle",
+                                        formatter: "{b}:{c}"
+                                    },
+                                    data: [
+                                        { yAxis: legendItem.difference, name: "提示线" },
+                                        {
+                                            type: "average",
+                                            name: "平均值",
+                                            lineStyle: { color: "#ff0000" }
+                                        }]
                                 },
                                 data: []
                             };

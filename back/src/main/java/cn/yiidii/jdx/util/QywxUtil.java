@@ -108,7 +108,7 @@ public class QywxUtil {
     }
 
     public String getContactsToken() {
-        String contactsSecret = systemConfigProperties.getContactsSecret();
+        String contactsSecret = systemConfigProperties.getQywxConfig().getContactsSecret();
         return getToken(contactsSecret);
 
     }
@@ -120,8 +120,8 @@ public class QywxUtil {
         }
 
 
-        String corpid = systemConfigProperties.getCorpid();
-        String corpsecret = contactsSecret != null ? contactsSecret : systemConfigProperties.getCorpsecret();
+        String corpid = systemConfigProperties.getQywxConfig().getCorpid();
+        String corpsecret = contactsSecret != null ? contactsSecret : systemConfigProperties.getQywxConfig().getCorpsecret();
 
         String getToken = SpringUtil.getProperty("qywx.getToken");
 
@@ -202,7 +202,7 @@ public class QywxUtil {
             reqParamJo.put("name", "请登录企业微信或关注微信插件修改—" + mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"));
             reqParamJo.put("mobile", mobile);
             reqParamJo.put("userid", mobile);
-            reqParamJo.put("biz_mail", mobile + "@" + systemConfigProperties.getDomain());
+            reqParamJo.put("biz_mail", mobile + "@" + systemConfigProperties.getQywxConfig().getDomain());
 //            reqParamJo.put("email", mobile + "@" + systemConfigProperties.getDomain());
             reqParamJo.put("position", String.join(",", ptPinSet));
 
