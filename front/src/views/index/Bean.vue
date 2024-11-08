@@ -237,17 +237,13 @@ const getBean = () => {
 
         });
 
-        console.log(seriesObj)
         nextTick(() => {
             account.value = Array.from(account);
             init({
                 ...option.value,
                 series: Object.values(seriesObj)
             });
-            console.log({
-                ...option.value,
-                series: Object.values(seriesObj)
-            })
+
             legendTabChange(activeLegend.value);
         });
     });

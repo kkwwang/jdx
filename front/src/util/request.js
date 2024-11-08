@@ -20,7 +20,6 @@ service.interceptors.request.use(
     },
     error => {
         closeToast()
-        console.error("interceptors request error: " + error);
         return Promise.reject(error);
     }
 );

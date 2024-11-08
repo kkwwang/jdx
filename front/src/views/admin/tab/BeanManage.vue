@@ -214,8 +214,6 @@ const getLatestBeanFn = (value) => {
             });
         });
 
-        console.log(temp)
-
         beanData.value = legend.map(item => {
             return {
                 name: item.title,
@@ -241,11 +239,10 @@ const getLatestBeanFn = (value) => {
                         { type: "min", name: "Min" }
                     ]
                 },
-                data: temp.map(env => env[item.title]).filter(item => item)
+                data: temp.map(env => env[item.title])
             };
         });
 
-        console.log(beanOption.value)
         if (activeTab.value !== "登录统计") {
             legendTabChange(activeTab.value);
         }
