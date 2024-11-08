@@ -73,7 +73,7 @@ const smsCode = () => {
 }
 
 const login = () => {
-    jdLogin(this.form).then(() => {
+    jdLogin(form.value).then(() => {
         // 计时器清零
         expireTime.value = 0;
         form.value.code = "";

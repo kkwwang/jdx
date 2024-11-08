@@ -13,7 +13,7 @@
     </van-cell-group>
 </template>
 <script setup name="sys-controller">
-import { showConfirmDialog } from "vant";
+import { showConfirmDialog, showToast } from "vant";
 import { updateEnv } from "@/api/admin/ql";
 
 const updateEnvFn = () => {
@@ -23,7 +23,10 @@ const updateEnvFn = () => {
         message: '确认提交环境更新？',
     }).then(() => {
         updateEnv().then(() => {
-            this.$toast.success("更新成功");
+            showToast({
+                message: '提交成功',
+                duration: 500
+            });
         })
     })
 }
