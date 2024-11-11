@@ -106,7 +106,8 @@ const lastLoginOption = computed(() => {
                         formatter: "{b}"
                     },
                     data: [
-                        { xAxis: new Date(dayjs(new Date().getTime() - 3 * 24 * 60 * 60 * 1000).format("YYYY-MM-DD 00:00:00")), name: "提示线" },
+                        { xAxis: new Date(dayjs(new Date().getTime() - 3 * 24 * 60 * 60 * 1000).format("YYYY-MM-DD 00:00:00")), name: "离线警示线", lineStyle: { color: "#ee0a24" } },
+                        { xAxis: new Date(dayjs(new Date().getTime() - 2 * 24 * 60 * 60 * 1000).format("YYYY-MM-DD 00:00:00")), name: "提示线", lineStyle: { color: "#ff976a" } },
                     ]
                 },
                 data: lastLoginData.value
@@ -229,7 +230,7 @@ const getLatestBeanFn = (value) => {
                         {
                             type: "average",
                             name: "平均值",
-                            lineStyle: { color: "#ff0000" }
+                            lineStyle: { color: "#ee0a24" }
                         }
                     ]
                 },

@@ -210,7 +210,7 @@ const getBean = () => {
                             {
                                 type: "average",
                                 name: "平均值",
-                                lineStyle: { color: "#ff0000" }
+                                lineStyle: { color: "#ee0a24" }
                             }
                         ]
                     },
