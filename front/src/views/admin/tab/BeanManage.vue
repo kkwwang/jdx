@@ -74,7 +74,7 @@ const commonOptions = ref({
         top: "0",
         left: "130",
         right: "5",
-        bottom: "0"
+        bottom: "20"
     },
     yAxis: {
         type: "category",
@@ -106,7 +106,7 @@ const lastLoginOption = computed(() => {
                         formatter: "{b}"
                     },
                     data: [
-                        { type: "average", name: "平均值", lineStyle: { color: "#ee0a24" } }
+                        { xAxis: new Date(dayjs(new Date().getTime() - 3 * 24 * 60 * 60 * 1000).format("YYYY-MM-DD 00:00:00")), name: "提示线" },
                     ]
                 },
                 data: lastLoginData.value
