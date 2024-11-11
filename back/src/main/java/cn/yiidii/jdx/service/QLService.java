@@ -155,7 +155,7 @@ public class QLService implements ITask {
         }
 
         String text = StrUtil.format(
-                "账号：{}\n手机号：{}\n上次登录时间：{}",
+                "账号：{}\n手机号：{}\n上次登录：{}",
                 StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(),
                 mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"),
                 preLoginTime

@@ -1,14 +1,14 @@
 <template>
     <div style="background-color: #f6f6f6;  height: 100%;">
         <van-tabs>
+            <van-tab title="资产统计">
+                <BeanMange />
+            </van-tab>
             <van-tab title="青龙管理">
                 <QLManage />
             </van-tab>
             <van-tab title="系统设置">
                 <SystemConfig />
-            </van-tab>
-            <van-tab title="资产统计">
-                <BeanMange />
             </van-tab>
         </van-tabs>
     </div>
