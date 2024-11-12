@@ -68,7 +68,11 @@ const mainRef = ref()
 
 const commonOptions = ref({
     tooltip: {
-        trigger: "axis"
+        trigger: "axis",
+        axisPointer: {
+            type: "cross",
+            snap: true
+        },
     },
     grid: {
         top: "0",
@@ -175,7 +179,7 @@ const getAllEnvFn = () => {
     getAllEnv().then(res => {
         envs.value = res.data;
         commonOptions.value.yAxis.data = res.data.map(
-            item => item.wechat + (item.status === 1 ? " ❌" : " ✅")
+            (item, index) => item.wechat + (item.status === 1 ? " ❌" : " ✅") + ((index + 1).toString().padStart(2, "0"))
         );
         lastLoginData.value = res.data.map(item => {
             return item.status === 1

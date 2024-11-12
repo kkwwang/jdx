@@ -64,19 +64,9 @@
                     <van-cell-group class="latest-cell">
                         <van-cell
                             title="统计时间"
-                            :label="
-                new Date() - new Date(latest.时间) > 12 * 60 * 60 * 1000
-                  ? '若展示为非最新数据，请过十分钟后再试'
-                  : ''
-              "
                         >
                             {{
-                                latest.时间
-                                    ? dayjs(latest.时间)
-                                        .format("MM-DD A")
-                                        .replace("AM", "早上")
-                                        .replace("PM", "晚上")
-                                    : "-"
+                                latest.时间 || '-'
                             }}
                         </van-cell>
                         <van-cell
@@ -98,7 +88,6 @@ import legend from "../legend.json";
 import { useRoute } from "vue-router";
 import { jdBean as jdBeanApi } from "@/api";
 import * as echarts from "echarts";
-import dayjs from "dayjs";
 
 let route = useRoute()
 
@@ -115,7 +104,11 @@ const mainRef = ref()
 const option = computed(() => {
     return {
         tooltip: {
-            trigger: "axis"
+            trigger: "axis",
+            axisPointer: {
+                type: "cross",
+                snap: true
+            },
         },
         xAxis: {
             type: "time",
@@ -125,6 +118,7 @@ const option = computed(() => {
             max(value) {
                 return value.max + 24 * 60 * 60 * 1000;
             },
+            // formatter: '{yyyy}-{MM}-{dd}'
         },
         yAxis: {
             axisLabel: {
@@ -182,7 +176,7 @@ const getBean = () => {
     }
 
     jdBeanApi(mobile.value).then(res => {
-        let account = new Set();
+        let accountSet = new Set();
         const seriesObj = {};
         legend.forEach(legendItem => {
             if (!seriesObj[legendItem.title]) {
@@ -218,13 +212,15 @@ const getBean = () => {
                 };
             }
             res.data.forEach((item, index) => {
-                account.add(item[accountName]);
+                accountSet.add(item[accountName]);
                 for (let key of Object.keys(item)) {
                     if (legendItem.title === key) {
                         const itemValue = [
-                            new Date(item[dataTime]),
+                            // new Date(item[dataTime]),
+                            item[dataTime],
                             parseFloat(item[key])
                         ]
+                        // debugger
                         seriesObj[key].data.push(itemValue);
                         if (item[key]) {
                             seriesObj[legendItem.title].markPoint.data[2].value = parseFloat(item[key])
@@ -238,7 +234,7 @@ const getBean = () => {
         });
 
         nextTick(() => {
-            account.value = Array.from(account);
+            account.value = Array.from(accountSet);
             init({
                 ...option.value,
                 series: Object.values(seriesObj)
