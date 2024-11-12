@@ -14,7 +14,7 @@
                     color="#ee0a24"
                     name="balance-pay"
                     size="18"
-                    @click="$router.push('/bean/' + mobile)"
+                    @click="$router.push('/bean/' + (mobile || ''))"
                 />
             </template>
         </van-nav-bar>

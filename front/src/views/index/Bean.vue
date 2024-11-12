@@ -6,7 +6,7 @@
                     color="#ee0a24"
                     name="arrow-left"
                     size="18"
-                    @click="$router.push({ path: '/' + searchMobile})"
+                    @click="$router.push({ path: '/' + (searchMobile || '')})"
                 />
             </template>
         </van-nav-bar>
