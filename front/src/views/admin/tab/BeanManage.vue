@@ -156,6 +156,10 @@ const reInit = (option) => {
     if (option) {
         chart.setOption(option);
     }
+
+    chart.on('dblclick', function(params) {
+        window.open('/bean/' + envs.value[params.dataIndex].mobile);
+    });
 }
 
 const formatter = (day) => {

@@ -17,7 +17,7 @@ let _props = defineProps({
     }
 });
 
-watch(_props.serverVersion, () => {
+watch(() => _props.serverVersion, () => {
     if (_props.serverVersion) {
         if (_props.serverVersion.split("-")[0] !== npmPackageVersion.value.split("-")[0]) {
             showDialog({

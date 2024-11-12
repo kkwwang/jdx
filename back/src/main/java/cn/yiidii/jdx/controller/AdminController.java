@@ -128,6 +128,7 @@ public class AdminController {
                 jp.put("ptPin", remarks.getString("ptPin"));
                 jp.put("loginTime", remarks.getString("loginTime"));
                 jp.put("wechat", remarks.getString("wechat"));
+                jp.put("mobile", remarks.getString("mobile"));
                 return jp;
             }).collect(Collectors.toList()));
         }

@@ -6,7 +6,7 @@
                     color="#ee0a24"
                     name="arrow-left"
                     size="18"
-                    @click="$router.push('/')"
+                    @click="$router.push({ path: '/' + searchMobile})"
                 />
             </template>
         </van-nav-bar>
@@ -19,7 +19,7 @@
             <van-field
                 ref="telRef"
                 maxlength="11"
-                v-model="mobile"
+                v-model="searchMobile"
                 left-icon="phone-o"
                 name="mobile"
                 type="tel"
@@ -85,15 +85,16 @@
 <script setup name="Bean">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import legend from "../legend.json";
-import { useRoute } from "vue-router";
 import { jdBean as jdBeanApi } from "@/api";
 import * as echarts from "echarts";
 
-let route = useRoute()
+const _props = defineProps({
+    mobile: String
+})
 
 const latest = ref({});
 const activeTab = ref("最新");
-const mobile = ref("");
+const searchMobile = ref("");
 const accountName = "账号"
 const dataTime = "时间"
 const account = ref([])
@@ -171,11 +172,11 @@ const option = computed(() => {
 
 const getBean = () => {
 
-    if (!mobile.value) {
+    if (!searchMobile.value) {
         return;
     }
 
-    jdBeanApi(mobile.value).then(res => {
+    jdBeanApi(searchMobile.value).then(res => {
         let accountSet = new Set();
         const seriesObj = {};
         legend.forEach(legendItem => {
@@ -260,15 +261,12 @@ const init = optionProp => {
 
 
 onMounted(() => {
-    const queryMobile = route.query.mobile
-    if (queryMobile) {
-        mobile.value = queryMobile.split(",")[0];
-    } else {
-        mobile.value = window.localStorage.getItem("mobile") || "";
+    if (_props.mobile && !searchMobile.value) {
+        searchMobile.value = _props.mobile;
     }
 
     activeLegend.value = legend[0].title;
-    if (mobile.value) {
+    if (searchMobile.value) {
         getBean();
     }
     window.addEventListener("resize", () => {
@@ -297,7 +295,7 @@ const tabChange = (name) => {
     }
     if (activeTab.value === "趋势图") {
         nextTick(() => {
-            if (mobile.value) {
+            if (searchMobile.value) {
                 getBean();
             }
         });

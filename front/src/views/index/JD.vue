@@ -1,58 +1,55 @@
 <template>
     <div>
-        <div>
-            <van-field
-                ref="telRef"
-                maxlength="11"
-                v-model="form.mobile"
-                left-icon="phone-o"
-                name="mobile"
-                type="tel"
-                label="手机号"
-                placeholder="手机号"
-            ></van-field>
-            <van-field
-                maxlength="6"
-                ref="codeRef"
-                v-model="form.code"
-                left-icon="shield-o"
-                name="code"
-                type="number"
-                label="验证码"
-                placeholder="验证码"
-            >
-                <template #button>
-                    <van-count-down
-                        v-if="Number(expireTime) > 0"
-                        ref="countDown"
-                        :time="expireTime"
-                        format="ss"
-                    />
-                    <van-button v-else size="small" plain type="info" @click="smsCode"
-                    >发送验证码
-                    </van-button>
-                </template>
-            </van-field>
-
-            <div style="margin: 16px; ">
-                <van-button
-                    round
-                    block
-                    :disabled="!form.code"
-                    type="primary"
-                    @click="login"
-                >
-                    登录
+        <van-field
+            ref="telRef"
+            maxlength="11"
+            v-model="form.mobile"
+            left-icon="phone-o"
+            name="mobile"
+            type="tel"
+            label="手机号"
+            placeholder="手机号"
+        ></van-field>
+        <van-field
+            maxlength="6"
+            ref="codeRef"
+            v-model="form.code"
+            left-icon="shield-o"
+            name="code"
+            type="number"
+            label="验证码"
+            placeholder="验证码"
+        >
+            <template #button>
+                <van-count-down
+                    v-if="Number(expireTime) > 0"
+                    ref="countDown"
+                    :time="expireTime"
+                    format="ss"
+                />
+                <van-button v-else size="small" plain type="info" @click="smsCode"
+                >发送验证码
                 </van-button>
-            </div>
+            </template>
+        </van-field>
+
+        <div style="margin: 16px; ">
+            <van-button
+                round
+                block
+                :disabled="!form.code"
+                type="primary"
+                @click="login"
+            >
+                登录
+            </van-button>
         </div>
     </div>
 </template>
 
 <script setup name="JD">
-import { onMounted, ref } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 import { jdLogin, jdSmsCode } from "@/api";
-import { useRoute } from "vue-router";
 
 const expireTime = ref(0)
 const form = ref({
@@ -61,8 +58,9 @@ const form = ref({
 })
 
 const codeRef = ref()
-let route = useRoute()
-
+const _props = defineProps({
+    mobile: String
+})
 const smsCode = () => {
     form.value.code = "";
     jdSmsCode(form.value.mobile).then(resp => {
@@ -81,13 +79,11 @@ const login = () => {
 }
 
 onMounted(() => {
-    const queryMobile = route.query.mobile
-    if (queryMobile) {
-        form.value.mobile = queryMobile.split(",")[0];
-    } else {
-        form.value.mobile = window.localStorage.getItem("mobile") || "";
+    if (_props.mobile && !form.value.mobile) {
+        form.value.mobile = _props.mobile;
     }
 })
+
 
 </script>
 

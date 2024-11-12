@@ -10,16 +10,20 @@ export default createRouter({
     base: import.meta.env.VITE_BASE_URL,
     routes: [
         {
-            path: "/",
+            path: "/:mobile",
+            alias: "/",
             name: "Index",
+            props: true,
             component: Index,
             meta: {
                 title: "JDX"
             }
         },
         {
-            path: "/bean",
+            path: "/bean/:mobile",
+            alias: "/bean",
             name: "Bean",
+            props: true,
             component: Bean,
             meta: {
                 title: "收益"

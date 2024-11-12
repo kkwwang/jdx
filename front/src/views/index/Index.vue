@@ -14,7 +14,7 @@
                     color="#ee0a24"
                     name="balance-pay"
                     size="18"
-                    @click="$router.push('/bean')"
+                    @click="$router.push('/bean/' + mobile)"
                 />
             </template>
         </van-nav-bar>
@@ -27,7 +27,7 @@
                 :text="info.notice"
                 mode="closeable"
             />
-            <JD />
+            <JD :mobile="mobile" />
             <div style="text-align: center">
                 <van-tag size="medium" type="primary">剩余车位：{{ info.remain }}</van-tag>
             </div>
@@ -41,10 +41,12 @@
 import JD from "./JD.vue";
 import { baseInfo } from "@/api";
 import Version from "@/views/version.vue";
-import { onMounted, ref } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 
 const info = ref({})
-
+const _props = defineProps({
+    mobile: String
+})
 onMounted(() => {
     baseInfo().then(resp => {
         info.value = resp.data;
