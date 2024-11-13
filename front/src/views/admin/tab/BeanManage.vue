@@ -52,6 +52,7 @@ import * as echarts from "echarts";
 import { getAllDate, getAllEnv, getLatestBean } from "@/api/admin/bean";
 import legend from "../../legend.json"
 import { useRouter } from "vue-router";
+
 const router = useRouter()
 let chart;
 
@@ -65,6 +66,8 @@ const lastLoginData = ref([])
 const beanData = ref([])
 
 const mainRef = ref()
+
+const chartClick = ref({})
 
 const commonOptions = ref({
     tooltip: {
@@ -165,8 +168,15 @@ const reInit = (option) => {
         chart.setOption(option);
     }
 
-    chart.on('dblclick', function (params) {
-        router.push('/bean/' + envs.value[params.dataIndex].mobile);
+    chart.on('click', (params) => {
+        if (chartClick.value[params.dataIndex + params.seriesName]) {
+            router.push('/bean/' + envs.value[params.dataIndex].mobile);
+        }
+
+        chartClick.value[params.dataIndex + params.seriesName] = true
+        setTimeout(() => {
+            chartClick.value[params.dataIndex + params.seriesName] = false
+        }, 1000)
     });
 }
 
