@@ -245,11 +245,11 @@ const getLatestBeanFn = (value) => {
             return {
                 name: item.title,
                 type: "bar",
-                label: {
-                    show: true,
-                    position: 'inside',
-                    fontSize: 10,
-                },
+                // label: {
+                //     show: true,
+                //     position: 'inside',
+                //     fontSize: 10,
+                // },
                 markLine: {
                     symbol: ["none", "none"],
                     label: {
