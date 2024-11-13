@@ -101,6 +101,14 @@ const lastLoginOption = computed(() => {
         },
         series: [
             {
+                label: {
+                    show: true,
+                    position: 'inside',
+                    fontSize: 10,
+                    formatter(value) {
+                        return '' + Math.floor((new Date() - new Date(value.value)) / 24 / 60 / 60 / 1000)
+                    }
+                },
                 name: "最后登录时间",
                 type: "bar",
                 markLine: {
@@ -157,7 +165,7 @@ const reInit = (option) => {
         chart.setOption(option);
     }
 
-    chart.on('dblclick', function(params) {
+    chart.on('dblclick', function (params) {
         router.push('/bean/' + envs.value[params.dataIndex].mobile);
     });
 }
@@ -227,6 +235,11 @@ const getLatestBeanFn = (value) => {
             return {
                 name: item.title,
                 type: "bar",
+                label: {
+                    show: true,
+                    position: 'inside',
+                    fontSize: 10,
+                },
                 markLine: {
                     symbol: ["none", "none"],
                     label: {
