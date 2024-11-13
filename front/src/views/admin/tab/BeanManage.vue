@@ -51,14 +51,14 @@ import dayjs from "dayjs";
 import * as echarts from "echarts";
 import { getAllDate, getAllEnv, getLatestBean } from "@/api/admin/bean";
 import legend from "../../legend.json"
-
+import { useRouter } from "vue-router";
+const router = useRouter()
 let chart;
 
 const date = ref(dayjs().format("YYYY-MM-DD"))
 const show = ref(false)
 const isBean = ref(false)
 const activeTab = ref('登录统计')
-const data = ref([])
 const enableDate = ref([])
 const envs = ref([])
 const lastLoginData = ref([])
@@ -158,7 +158,7 @@ const reInit = (option) => {
     }
 
     chart.on('dblclick', function(params) {
-        window.open('/bean/' + envs.value[params.dataIndex].mobile);
+        router.push('/bean/' + envs.value[params.dataIndex].mobile);
     });
 }
 
