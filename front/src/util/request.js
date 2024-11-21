@@ -49,18 +49,17 @@ service.interceptors.response.use(
         closeToast()
         const resp = error.response.data;
         let msg = resp.msg;
-        if (msg) {
-            showDialog({
-                title: "提示",
-                message: msg
-            });
-        }
         if (error.response.status === 401) {
             setTimeout(() => {
                 localStorage.removeItem("token");
                 localStorage.removeItem("thirdToken");
                 router.push("/login");
             }, 500);
+        } else {
+            showDialog({
+                title: "提示",
+                message: msg || "Error"
+            });
         }
         return Promise.reject(error);
     }

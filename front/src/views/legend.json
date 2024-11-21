@@ -103,5 +103,15 @@
         "title": "全平台通用过期",
         "difference": 2,
         "tip": "\uD83D\uDEA8即将过期金额较大，请尽快使用"
+    },
+    {
+        "title": "视频余额",
+        "difference": 10,
+        "tip": "\uD83D\uDEA8请保持连续在线"
+    },
+    {
+        "title": "视频到账",
+        "difference": 2,
+        "tip": "✅收益还不错"
     }
 ]
