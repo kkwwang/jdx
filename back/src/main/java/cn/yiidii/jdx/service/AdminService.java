@@ -108,7 +108,14 @@ public class AdminService {
                             RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
                             remarkInfo.setNotifyMobile(remarkInfo.getMobile());
                             Set<String> bindQywx = qywxUtil.checkBindQywx(remarkInfo.getMobile());
-                            remarkInfo.setQywxUserId(bindQywx);
+
+                            if (bindQywx.isEmpty()) {
+                                remarkInfo.setQywxUserId(new HashSet<>(Collections.singletonList(mobile)));
+                                qywxUtil.createUser(mobile, new HashSet<>(Collections.singletonList(remarkInfo.getPtPin())));
+                            } else {
+                                remarkInfo.setQywxUserId(bindQywx);
+                            }
+
                             if (!StringUtils.hasText(remarkInfo.getLoginTime())) {
                                 remarkInfo.setLoginTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                             }

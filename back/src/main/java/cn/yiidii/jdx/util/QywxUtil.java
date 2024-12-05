@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 public class QywxUtil {
 
     private final SystemConfigProperties systemConfigProperties;
-    // 微信access_token有效期7200秒，提前200秒刷新
-    TimedCache<String, String> timedCache = CacheUtil.newTimedCache(7000 * 1000);
+
 
     public Set<String> checkBindQywx(String mobile) {
+
         Set<String> result = new HashSet<>();
         // 获取token
         String token = getToken();
@@ -115,11 +115,6 @@ public class QywxUtil {
 
     public String getToken(String contactsSecret) {
 
-        if (timedCache.containsKey(contactsSecret)) {
-            return timedCache.get(contactsSecret);
-        }
-
-
         String corpid = systemConfigProperties.getQywxConfig().getCorpid();
         String corpsecret = contactsSecret != null ? contactsSecret : systemConfigProperties.getQywxConfig().getCorpsecret();
 
@@ -134,7 +129,6 @@ public class QywxUtil {
             JSONObject jsonObject = JSON.parseObject(body);
             if (jsonObject.getInteger("errcode") == 0) {
                 String accessToken = jsonObject.getString("access_token");
-                timedCache.put(contactsSecret, accessToken);
                 return accessToken;
             }
         }
