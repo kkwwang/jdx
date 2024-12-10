@@ -18,11 +18,9 @@
         <van-cell-group inset>
             <van-field
                 ref="telRef"
-                maxlength="11"
                 v-model="searchMobile"
                 left-icon="phone-o"
                 name="mobile"
-                type="tel"
                 label="手机号"
                 placeholder="手机号"
             >
@@ -33,230 +31,44 @@
                 </template>
             </van-field>
         </van-cell-group>
-        <van-divider contentPosition="center"
-        >{{ account.join() }}
-        </van-divider>
         <van-cell-group inset>
-            <van-tabs v-model="activeTab" @change="tabChange">
-                <van-tab title="最新" name="最新" />
-                <van-tab title="趋势图" name="趋势图" />
+            <van-tabs v-model:active="activeTab">
+                <van-tab title="最新" name="最新">
+                    <latest-data :data="data" v-if="activeTab === '最新'" />
+                </van-tab>
+                <van-tab title="趋势图" name="趋势图">
+                    <bean-chart :data="data" v-if="activeTab === '趋势图'" />
+                </van-tab>
+                <van-tab title="在线日历" name="在线日历">
+                    <online-tab :data="data" v-if="activeTab === '在线日历'" />
+                </van-tab>
             </van-tabs>
-            <van-empty v-if="!latest.mobile" description="暂无数据" />
-            <template v-else>
-                <template v-if="activeTab === '趋势图'">
-                    <van-cell-group class="echarts-main">
-                        <van-tabs
-                            @change="legendTabChange"
-                            swipeable
-                            v-model="activeLegend"
-                        >
-                            <van-tab
-                                :key="item.title"
-                                v-for="item in legend"
-                                :title="item.title"
-                                :name="item.title"
-                            />
-                        </van-tabs>
-                        <van-cell ref="mainRef"></van-cell>
-                    </van-cell-group>
-                </template>
-                <template v-if="activeTab === '最新'">
-                    <van-cell-group class="latest-cell">
-                        <van-cell
-                            title="统计时间"
-                        >
-                            {{
-                                latest.时间 || '-'
-                            }}
-                        </van-cell>
-                        <van-cell
-                            :key="item.title"
-                            v-for="item in legend"
-                            :title="item.title"
-                            :label="getLatestTip(item)"
-                        >{{ latest[item.title] || "-" }}
-                        </van-cell>
-                    </van-cell-group>
-                </template>
-            </template>
         </van-cell-group>
     </div>
 </template>
 <script setup name="Bean">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import legend from "../legend.json";
+import { onMounted, ref } from "vue";
 import { jdBean as jdBeanApi } from "@/api";
-import * as echarts from "echarts";
+import BeanChart from "@/views/index/bean-chart.vue";
+import LatestData from "@/views/index/latest-data.vue";
+import OnlineTab from "@/views/index/online-tab.vue";
 
 const _props = defineProps({
     mobile: String
 })
 
-const latest = ref({});
-const activeTab = ref("最新");
 const searchMobile = ref("");
-const accountName = "账号"
-const dataTime = "时间"
-const account = ref([])
-const activeLegend = ref("")
-let chart = null;
-const mainRef = ref()
-
-const option = computed(() => {
-    return {
-        tooltip: {
-            trigger: "axis",
-            axisPointer: {
-                type: "cross",
-                snap: true
-            },
-        },
-        xAxis: {
-            type: "time",
-            min(value) {
-                return value.min - 24 * 60 * 60 * 1000;
-            },
-            max(value) {
-                return value.max + 24 * 60 * 60 * 1000;
-            },
-            // formatter: '{yyyy}-{MM}-{dd}'
-        },
-        yAxis: {
-            axisLabel: {
-                showMaxLabel: false,
-                showMinLabel: false,
-                inside: true
-            },
-            boundaryGap: ["20%", "20%"],
-            min: 0,
-            max(value) {
-                return Math.ceil(value.max * 1.1);
-            },
-            minInterval: 1,
-            type: "value"
-        },
-        dataZoom: [
-            {
-                type: "inside",
-                start: 0,
-                end: 100
-            },
-            {
-                start: 0,
-                end: 100
-            }
-        ],
-        grid: {
-            top: "0",
-            left: "5",
-            right: "5"
-        },
-        legend: {
-            show: false,
-            type: "scroll",
-            data: legend.map(item => item.title),
-            left: "center",
-            right: 0,
-            icon: "rect",
-            selectedMode: "single"
-        },
-        series: legend.map(item => {
-            return {
-                name: item.title,
-                type: "line",
-                data: []
-            };
-        })
-    }
-})
+const data = ref([])
+const activeTab = ref()
 
 const getBean = () => {
-
     if (!searchMobile.value) {
         return;
     }
 
     jdBeanApi(searchMobile.value).then(res => {
-        let accountSet = new Set();
-        const seriesObj = {};
-        legend.forEach(legendItem => {
-            if (!seriesObj[legendItem.title]) {
-                seriesObj[legendItem.title] = {
-                    name: legendItem.title,
-                    type: "line",
-                    markPoint: {
-                        data: [
-                            { type: "max", name: "Max" },
-                            { type: "min", name: "Min" },
-                            {
-                                coord: null,
-                                value: 0,
-                            }
-                        ]
-                    },
-                    markLine: {
-                        symbol: ["none", "none"],
-                        label: {
-                            position: "middle",
-                            formatter: "{b}:{c}"
-                        },
-                        data: [
-                            { yAxis: legendItem.difference, name: "提示线" },
-                            {
-                                type: "average",
-                                name: "平均值",
-                                lineStyle: { color: "#ee0a24" }
-                            }
-                        ]
-                    },
-                    data: []
-                };
-            }
-            res.data.forEach((item, index) => {
-                accountSet.add(item[accountName]);
-                for (let key of Object.keys(item)) {
-                    if (legendItem.title === key) {
-                        const itemValue = [
-                            // new Date(item[dataTime]),
-                            item[dataTime],
-                            parseFloat(item[key])
-                        ]
-                        // debugger
-                        seriesObj[key].data.push(itemValue);
-                        if (item[key]) {
-                            seriesObj[legendItem.title].markPoint.data[2].value = parseFloat(item[key])
-                            seriesObj[legendItem.title].markPoint.data[2].coord = itemValue
-                        }
-                    }
-                }
-                latest.value = item;
-            });
-
-        });
-
-        nextTick(() => {
-            account.value = Array.from(accountSet);
-            init({
-                ...option.value,
-                series: Object.values(seriesObj)
-            });
-
-            legendTabChange(activeLegend.value);
-        });
+        data.value = res.data
     });
-}
-
-const init = optionProp => {
-    if (chart != null && chart.dispose) {
-        chart.dispose();
-    }
-
-    const chartDom = mainRef.value?.$el;
-    if (chartDom == null) {
-        return;
-    }
-    chart = echarts.init(chartDom, null, { locale: "ZH" })
-    optionProp && chart.setOption(optionProp);
 }
 
 
@@ -265,46 +77,8 @@ onMounted(() => {
         searchMobile.value = _props.mobile;
     }
 
-    activeLegend.value = legend[0].title;
     if (searchMobile.value) {
         getBean();
-    }
-    window.addEventListener("resize", () => {
-        chart && chart.resize();
-    });
-})
-
-const legendTabChange = (name) => {
-    chart &&
-    chart.dispatchAction({
-        type: "legendToggleSelect",
-        name: name
-    });
-}
-
-const getLatestTip = item => {
-    if (latest.value[item.title] - item.difference > 0) {
-        return item.tip;
-    }
-}
-
-const tabChange = (name) => {
-    activeTab.value = name;
-    if (chart != null && chart.dispose) {
-        chart.dispose();
-    }
-    if (activeTab.value === "趋势图") {
-        nextTick(() => {
-            if (searchMobile.value) {
-                getBean();
-            }
-        });
-    }
-}
-
-onBeforeUnmount(() => {
-    if (chart != null && chart.dispose) {
-        chart.dispose();
     }
 })
 </script>
@@ -313,8 +87,15 @@ onBeforeUnmount(() => {
 <style scoped>
 .latest-cell,
 .echarts-main {
-    height: calc(100vh - 190px - 44px - 16px);
     overflow-y: auto;
+}
+
+.latest-cell {
+    height: calc(100vh - 190px - 16px);
+}
+
+.echarts-main {
+    height: calc(100vh - 190px - 44px - 16px);
 }
 
 .van-cell.van-field {

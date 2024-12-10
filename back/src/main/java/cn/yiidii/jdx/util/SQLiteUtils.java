@@ -40,8 +40,19 @@ public class SQLiteUtils {
         if (!StringUtils.hasText(mobile)) {
             return null;
         }
-        String sql = "SELECT * FROM bean where mobile = ? group by mobile, 时间 order by 时间, 序号;";
-        return select(sql, mobile);
+        String[] split = mobile.split(",");
+
+        StringBuilder param = new StringBuilder();
+        for (int i = 0; i < split.length; i++) {
+            param.append("?");
+            if (i != split.length - 1) {
+                param.append(",");
+            }
+        }
+
+
+        String sql = "SELECT * FROM bean where mobile in (" + param + ") group by mobile, 时间 order by 时间, 序号;";
+        return select(sql, split);
     }
 
     private static JSONArray select(String sql, Serializable... params) {
