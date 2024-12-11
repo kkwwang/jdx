@@ -1,44 +1,7 @@
 import router from "./router";
-import {
-    ActionSheet,
-    Button,
-    Calendar,
-    Card,
-    Cell,
-    CellGroup,
-    CountDown,
-    Dialog,
-    Divider,
-    Empty,
-    Field,
-    Form,
-    Grid,
-    GridItem,
-    Icon,
-    Image as VanImage,
-    ImagePreview,
-    List,
-    Loading,
-    NavBar,
-    NoticeBar,
-    Picker,
-    Popover,
-    Popup,
-    Radio,
-    RadioGroup,
-    Step,
-    Steps,
-    SwipeCell,
-    Tab,
-    Tabbar,
-    TabbarItem,
-    Tabs,
-    Tag,
-    Toast,
-    Switch
-} from "vant";
+import { ActionSheet, Button, Calendar, Card, Cell, CellGroup, Checkbox, CheckboxGroup, CountDown, Dialog, Divider, Empty, Field, Form, Grid, GridItem, Icon, Image as VanImage, ImagePreview, List, Loading, NavBar, NoticeBar, Picker, Popover, Popup, Radio, RadioGroup, Step, Steps, SwipeCell, Switch, Tab, Tabbar, TabbarItem, Tabs, Tag, Toast } from "vant";
 import VueClipboard from "vue-clipboard2";
-import {createApp} from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import "vant/lib/index.css"
 
@@ -81,8 +44,9 @@ app.use(List);
 app.use(Tag);
 app.use(Dialog);
 app.use(Calendar);
-app.use(    Switch
-);
+app.use(Switch);
+app.use(Checkbox);
+app.use(CheckboxGroup);
 
 app.use(VueClipboard);
 app.use(router);

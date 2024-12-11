@@ -47,6 +47,14 @@ public class RemarkInfo {
         return this;
     }
 
+    public RemarkInfo setNotifyMobile(Set<String> notifyMobile, boolean clear) {
+        if (clear) {
+            this.notifyMobile.clear();
+        }
+        this.notifyMobile.addAll(notifyMobile.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+        return this;
+    }
+
     public RemarkInfo setNotifyMobile(String... notifyMobile) {
         this.notifyMobile.addAll(Arrays.stream(notifyMobile).filter(StringUtils::hasText).collect(Collectors.toList()));
         return this;

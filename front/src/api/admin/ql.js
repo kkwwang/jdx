@@ -32,3 +32,11 @@ export function updateEnv() {
         method: "get"
     });
 }
+
+export function acountLink(data) {
+    return request({
+        url: "admin/acountLink",
+        method: "post",
+        data: data
+    });
+}

@@ -7,6 +7,9 @@
             <van-tab title="青龙管理">
                 <QLManage />
             </van-tab>
+            <van-tab title="账号关联">
+                <AcountLinking />
+            </van-tab>
             <van-tab title="系统设置">
                 <SystemConfig />
             </van-tab>
@@ -18,6 +21,7 @@
 import QLManage from "@/views/admin/tab/QLManage.vue";
 import SystemConfig from "@/views/admin/tab/SystemConfig.vue";
 import BeanMange from "@/views/admin/tab/BeanManage.vue";
+import AcountLinking from "@/views/admin/tab/acount-linking.vue";
 </script>
 
 <style scoped>

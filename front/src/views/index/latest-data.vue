@@ -44,6 +44,7 @@ const getLatestTip = (item, value) => {
 
 const getLatestData = () => {
     const temp = {}
+    envDatas.value = []
     _props.data.forEach(item => {
 
         if (!temp[item.mobile]) {

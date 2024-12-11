@@ -29,6 +29,8 @@ const _props = defineProps({
 
 const getOnlineDates = () => {
     const temp = {}
+    envDatas.value = []
+
     _props.data.forEach(item => {
 
         if (!temp[item.mobile]) {

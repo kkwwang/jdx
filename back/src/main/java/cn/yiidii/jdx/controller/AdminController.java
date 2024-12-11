@@ -4,13 +4,17 @@ import cn.hutool.core.util.StrUtil;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties.QLConfig;
 import cn.yiidii.jdx.model.R;
+import cn.yiidii.jdx.model.dto.AcountLinkDto;
+import cn.yiidii.jdx.model.dto.RemarkInfo;
 import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.AdminService;
 import cn.yiidii.jdx.service.QLService;
 import cn.yiidii.jdx.util.SQLiteUtils;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -129,6 +133,7 @@ public class AdminController {
                 jp.put("loginTime", remarks.getString("loginTime"));
                 jp.put("wechat", remarks.getString("wechat"));
                 jp.put("mobile", remarks.getString("mobile"));
+                jp.put("notifyMobile", remarks.getJSONArray("notifyMobile"));
                 return jp;
             }).collect(Collectors.toList()));
         }
@@ -140,5 +145,26 @@ public class AdminController {
     @GetMapping(value = "getAllDate")
     public R<?> getAllDate() {
         return R.ok(SQLiteUtils.getAllDate());
+    }
+
+    @PostMapping(value = "acountLink")
+    public R<?> acountLink(@RequestBody AcountLinkDto dto) {
+        List<QLService.QLAllNodeSearchResult> jdCookie = qlService.searchEnvFromAllNode(dto.getMainAcount(), "JD_COOKIE");
+        for (QLService.QLAllNodeSearchResult nodeSearchResult : jdCookie) {
+            for (JSONObject env : nodeSearchResult.getEnvs()) {
+                String remark = env.getString("remarks");
+                RemarkInfo remarkInfo = JSONObject.parseObject(remark, RemarkInfo.class);
+                if(StringUtils.pathEquals(remarkInfo.getMobile(), dto.getMainAcount())){
+                    remarkInfo.setNotifyMobile(dto.getOtherAcount(), true);
+                    remarkInfo.getQywxUserId().clear();
+
+                    env.put("remarks", JSONObject.toJSONString(remarkInfo, SerializerFeature.WriteNullStringAsEmpty));
+                    qlService.updateEnv(nodeSearchResult.getQlConfig(), env);
+
+                    adminService.updateEnv(dto.getMainAcount());
+                }
+            }
+        }
+        return R.ok();
     }
 }
