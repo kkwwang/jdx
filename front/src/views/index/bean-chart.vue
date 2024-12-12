@@ -123,6 +123,7 @@ const getBeanFn = () => {
                 seriesObj.value[item.title][itemData.mobile] = {
                     name: itemData.mobile,
                     type: "line",
+                    symbol: 'none',
                     markLine: {
                         symbol: ["none", "none"],
                         label: {
