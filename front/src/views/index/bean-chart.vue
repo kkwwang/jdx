@@ -136,17 +136,27 @@ const getBeanFn = () => {
                     markPoint: {
                         data: [
                             { type: "max", name: "Max" },
-                            { type: "min", name: "Min" }
+                            { type: "min", name: "Min" },
+                            {
+                                coord: null,
+                                value: 0,
+                            }
                         ]
                     },
                     data: []
                 }
             }
 
-            seriesObj.value[item.title][itemData.mobile].data.push([
+            const itemValue = [
                 itemData[dataTime],
                 parseFloat(itemData[item.title])
-            ])
+            ]
+            if(itemData[item.title]){
+                seriesObj.value[item.title][itemData.mobile].markPoint.data[2].value = itemValue[1]
+                seriesObj.value[item.title][itemData.mobile].markPoint.data[2].coord = itemValue
+            }
+
+            seriesObj.value[item.title][itemData.mobile].data.push(itemValue)
         });
     });
 }

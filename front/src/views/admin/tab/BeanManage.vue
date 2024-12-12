@@ -231,7 +231,7 @@ const getLatestBeanFn = (value) => {
         envs.value.forEach(env => {
             let dataTemp = {};
             res.data.forEach(item => {
-                if (env.ptPin === item.账号) {
+                if (env.mobile === item.mobile) {
                     dataTemp = item;
                 }
             });
