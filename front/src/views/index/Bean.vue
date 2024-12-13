@@ -32,7 +32,7 @@
             </van-field>
         </van-cell-group>
         <van-cell-group inset>
-            <van-tabs v-model:active="activeTab">
+            <van-tabs v-model:active="activeTab" swipeable>
                 <van-tab title="最新" name="最新">
                     <latest-data :data="data" v-if="activeTab === '最新'" />
                 </van-tab>

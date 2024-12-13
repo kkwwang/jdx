@@ -7,6 +7,7 @@
         color="#07c160"
         :formatter="formatter"
         :max-date="new Date()"
+        :min-date="defaultDate[defaultDate.length - 1]"
         :poppable="false"
         readonly
         :show-confirm="false"
@@ -28,6 +29,7 @@ const _props = defineProps({
 })
 const formatter = (day) => {
     if (_props.dates.includes(dayjs(day.date).format("YYYY-MM-DD"))) {
+        day.bottomInfo = "在线";
         day.className = "online";
     } else if (day.date < new Date()) {
         day.bottomInfo = "离线";
@@ -37,3 +39,14 @@ const formatter = (day) => {
 }
 
 </script>
+<style scoped>
+::v-deep(.van-calendar__day.online) {
+    background: none !important;
+    color: var(--van-success-color) !important;
+}
+
+::v-deep(.van-calendar__day.offline) {
+    background: none !important;
+    color: var(--van-field-error-message-color) !important;
+}
+</style>
