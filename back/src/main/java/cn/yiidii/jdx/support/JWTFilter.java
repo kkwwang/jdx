@@ -1,5 +1,6 @@
 package cn.yiidii.jdx.support;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpStatus;
 import cn.hutool.jwt.JWT;
@@ -7,10 +8,9 @@ import cn.hutool.jwt.JWTUtil;
 import cn.hutool.jwt.JWTValidator;
 import cn.yiidii.jdx.config.prop.SystemConfigProperties;
 import cn.yiidii.jdx.model.R;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.stereotype.Component;
@@ -37,10 +37,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @ConditionalOnClass(Filter.class)
 public class JWTFilter extends OncePerRequestFilter {
-    @Value("${key:username}")
-    private String key;
-
-    private final SystemConfigProperties systemConfigProperties;
 
 
     private static final List<String> IGNORED_URL =
@@ -53,8 +49,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
-    private final ObjectMapper objectMapper;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
@@ -66,21 +60,31 @@ public class JWTFilter extends OncePerRequestFilter {
             }
         }
         if (!ignore) {
-            String token = request.getHeader("token");
             try {
-                String replaceKey = key.replace("username", systemConfigProperties.getAccountConfig().getUsername()).replace("password", systemConfigProperties.getAccountConfig().getPassword());
-                JWT jwt = JWTUtil.parseToken(token).setKey(replaceKey.getBytes(StandardCharsets.UTF_8));
-                JWTValidator.of(jwt).validateDate();
+                checkToken(request);
             } catch (Throwable e) {
                 R<?> fail = R.failed(1, "登录身份已失效，请重新登录");
                 response.setStatus(HttpStatus.HTTP_UNAUTHORIZED);
                 response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                 response.setContentType(ContentType.JSON.getValue());
-                response.getWriter().write(objectMapper.writeValueAsString(fail));
+                response.getWriter().write(JSONObject.toJSONString(fail));
                 return;
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    public static void checkToken(HttpServletRequest request) throws IOException {
+        try {
+            String token = request.getHeader("token");
+            String key = SpringUtil.getProperty("key");
+            SystemConfigProperties systemConfigProperties = SpringUtil.getBean(SystemConfigProperties.class);
+            String replaceKey = key.replace("username", systemConfigProperties.getAccountConfig().getUsername()).replace("password", systemConfigProperties.getAccountConfig().getPassword());
+            JWT jwt = JWTUtil.parseToken(token).setKey(replaceKey.getBytes(StandardCharsets.UTF_8));
+            JWTValidator.of(jwt).validateDate();
+        } catch (Throwable e) {
+            throw e;
+        }
     }
 
 }

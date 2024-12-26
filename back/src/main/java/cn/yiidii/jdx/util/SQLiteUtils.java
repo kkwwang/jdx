@@ -1,11 +1,16 @@
 package cn.yiidii.jdx.util;
 
 import cn.hutool.extra.spring.SpringUtil;
+import cn.yiidii.jdx.support.JWTFilter;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
@@ -37,22 +42,35 @@ public class SQLiteUtils {
 
 
     public static JSONArray getBeanByMobile(String mobile) {
-        if (!StringUtils.hasText(mobile)) {
-            return null;
-        }
-        String[] split = mobile.split(",");
+        if (StringUtils.pathEquals(mobile, "all")) {
+            // 验证权限
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        StringBuilder param = new StringBuilder();
-        for (int i = 0; i < split.length; i++) {
-            param.append("?");
-            if (i != split.length - 1) {
-                param.append(",");
+            try {
+                JWTFilter.checkToken(request);
+                String sql = "SELECT * FROM bean where mobile is not null group by mobile, 时间 order by 时间, 序号;";
+                return select(sql);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+        } else {
+            if (!StringUtils.hasText(mobile)) {
+                return null;
+            }
+            String[] split = mobile.split(",");
+
+            StringBuilder param = new StringBuilder();
+            for (int i = 0; i < split.length; i++) {
+                param.append("?");
+                if (i != split.length - 1) {
+                    param.append(",");
+                }
+            }
+
+
+            String sql = "SELECT * FROM bean where mobile in (" + param + ") group by mobile, 时间 order by 时间, 序号;";
+            return select(sql, split);
         }
-
-
-        String sql = "SELECT * FROM bean where mobile in (" + param + ") group by mobile, 时间 order by 时间, 序号;";
-        return select(sql, split);
     }
 
     private static JSONArray select(String sql, Serializable... params) {
