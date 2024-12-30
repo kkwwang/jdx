@@ -98,8 +98,8 @@ const lastLoginOption = computed(() => {
         ...commonOptions.value,
         xAxis: {
             type: "value",
-            min: 0,
-            max: 24 * 5
+            min: -2,
+            max: 15
         },
         series: [
             {
@@ -114,7 +114,7 @@ const lastLoginOption = computed(() => {
                         return value.value
                     }
                 },
-                name: "在线时长（小时）",
+                name: "在线时长（天）",
                 type: "bar",
                 markLine: {
                     symbol: ["none", "none"],
@@ -207,11 +207,11 @@ const getAllEnvFn = () => {
         );
         lastLoginData.value = res.data.map(item => {
 
-            const temp = parseInt((new Date() - new Date(item.loginTime)) / 1000 / 60 / 60);
+            const temp = parseFloat(((new Date() - new Date(item.loginTime)) / 1000 / 60 / 60 / 24).toFixed(2))
 
             return item.status === 1
                 ? {
-                    value: 0,
+                    value: parseFloat(((temp - 2) * -1).toFixed(2)),
                     itemStyle: {
                         color: "#ee0a24"
                     }
