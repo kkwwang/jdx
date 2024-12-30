@@ -98,8 +98,7 @@ const lastLoginOption = computed(() => {
         ...commonOptions.value,
         xAxis: {
             type: "value",
-            min: -2,
-            max: 15
+            min: -1,
         },
         series: [
             {
@@ -107,12 +106,6 @@ const lastLoginOption = computed(() => {
                     show: true,
                     position: 'inside',
                     fontSize: 10,
-                    formatter(value) {
-                        if (value.name.indexOf('❌') !== -1) {
-                            return '离线'
-                        }
-                        return value.value
-                    }
                 },
                 name: "在线时长（天）",
                 type: "bar",
@@ -211,7 +204,7 @@ const getAllEnvFn = () => {
 
             return item.status === 1
                 ? {
-                    value: parseFloat(((temp - 2) * -1).toFixed(2)),
+                    value: temp * -1,
                     itemStyle: {
                         color: "#ee0a24"
                     }
