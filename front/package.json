@@ -1,6 +1,6 @@
 {
     "name": "JDX",
-    "version": "1.2.1-25",
+    "version": "1.2.1-26",
     "private": true,
     "scripts": {
         "preview": "vite preview --host",

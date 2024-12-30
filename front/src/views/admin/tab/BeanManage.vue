@@ -97,10 +97,9 @@ const lastLoginOption = computed(() => {
     return {
         ...commonOptions.value,
         xAxis: {
-            type: "time",
-            min: function (value) {
-                return Math.ceil(value.min - 6 * 60 * 60 * 1000);
-            }
+            type: "value",
+            min: 0,
+            max: 24 * 5
         },
         series: [
             {
@@ -109,10 +108,13 @@ const lastLoginOption = computed(() => {
                     position: 'inside',
                     fontSize: 10,
                     formatter(value) {
-                        return '' + Math.floor((new Date() - new Date(value.value)) / 24 / 60 / 60 / 1000)
+                        if (value.name.indexOf('❌') !== -1) {
+                            return '离线'
+                        }
+                        return value.value
                     }
                 },
-                name: "最后登录时间",
+                name: "在线时长（小时）",
                 type: "bar",
                 markLine: {
                     symbol: ["none", "none"],
@@ -121,8 +123,8 @@ const lastLoginOption = computed(() => {
                         formatter: "{b}"
                     },
                     data: [
-                        { xAxis: new Date(dayjs(new Date().getTime() - 3 * 24 * 60 * 60 * 1000).format("YYYY-MM-DD 00:00:00")), name: "离线警示线", lineStyle: { color: "#ee0a24" } },
-                        { xAxis: new Date(dayjs(new Date().getTime() - 2 * 24 * 60 * 60 * 1000).format("YYYY-MM-DD 00:00:00")), name: "提示线", lineStyle: { color: "#ff976a" } },
+                        { xAxis: 48, name: "离线警示线", lineStyle: { color: "#ee0a24" } },
+                        { xAxis: 72, name: "提示线", lineStyle: { color: "#ff976a" } },
                     ]
                 },
                 data: lastLoginData.value
@@ -204,14 +206,17 @@ const getAllEnvFn = () => {
             (item, index) => item.wechat + (item.status === 1 ? " ❌" : " ✅") + ((index + 1).toString().padStart(2, "0"))
         );
         lastLoginData.value = res.data.map(item => {
+
+            const temp = parseInt((new Date() - new Date(item.loginTime)) / 1000 / 60 / 60);
+
             return item.status === 1
                 ? {
-                    value: item.loginTime,
+                    value: 0,
                     itemStyle: {
                         color: "#ee0a24"
                     }
                 }
-                : item.loginTime;
+                : temp;
         });
         reInit(lastLoginOption.value);
         if (enableDate.value.length) {
