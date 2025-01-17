@@ -1,15 +1,15 @@
 <template>
     <van-cell-group inset>
         <van-tabs
+            v-if="legendData.length"
             @change="reInit"
             swipeable
             v-model:active="activeTab"
             class="legend-tab">
             <van-tab
                 :key="item.title"
-                v-for="item in legend"
+                v-for="item in legendData"
                 :title="item.title"
-                :name="item.title"
             />
         </van-tabs>
     </van-cell-group>
@@ -28,8 +28,8 @@ let chart;
 const show = ref(false)
 const activeTab = ref(legend[0].title)
 const dataTime = "时间"
+const legendData = ref([])
 
-const seriesObj = ref({})
 
 const mainRef = ref()
 
@@ -94,7 +94,7 @@ const beanOption = computed(() => {
     }
 })
 
-const reInit = () => {
+const reInit = (index) => {
     if (chart) {
         chart.dispose();
     }
@@ -103,7 +103,7 @@ const reInit = () => {
         chart = echarts.init(mainRef.value?.$el, null, { locale: "ZH" });
         const option = ({
             ...beanOption.value,
-            series: Object.values(seriesObj.value[activeTab.value])
+            series: Object.values(legendData.value[index]?.data)
         })
         chart.setOption(option);
     })
@@ -113,14 +113,13 @@ const reInit = () => {
 
 const getBeanFn = () => {
     show.value = false;
-    seriesObj.value = {}
     legend.forEach(item => {
-        if (!seriesObj.value[item.title]) {
-            seriesObj.value[item.title] = {}
-        }
+        const temp = {}
+
+        let allNan = true
         _props.data.forEach(itemData => {
-            if (!seriesObj.value[item.title][itemData.mobile]) {
-                seriesObj.value[item.title][itemData.mobile] = {
+            if (!temp[itemData.mobile]) {
+                temp[itemData.mobile] = {
                     name: itemData.mobile,
                     type: "line",
                     smooth: true,
@@ -153,13 +152,24 @@ const getBeanFn = () => {
                 itemData[dataTime],
                 parseFloat(itemData[item.title])
             ]
-            if(itemData[item.title]){
-                seriesObj.value[item.title][itemData.mobile].markPoint.data[2].value = itemValue[1]
-                seriesObj.value[item.title][itemData.mobile].markPoint.data[2].coord = itemValue
+            if (!isNaN(parseFloat(itemData[item.title]))) {
+                allNan = false
+            }
+            if (itemData[item.title]) {
+                temp[itemData.mobile].markPoint.data[2].value = itemValue[1]
+                temp[itemData.mobile].markPoint.data[2].coord = itemValue
             }
 
-            seriesObj.value[item.title][itemData.mobile].data.push(itemValue)
+            temp[itemData.mobile].data.push(itemValue)
         });
+
+        if (!allNan) {
+            legendData.value.push({
+                ...item,
+                data: temp
+            })
+        }
+
     });
 }
 
@@ -178,7 +188,7 @@ onMounted(() => {
 
     watch(() => _props.data, () => {
         getBeanFn();
-        reInit();
+        reInit(0);
     }, {
         deep: true,
         immediate: true
