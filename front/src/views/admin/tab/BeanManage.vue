@@ -1,8 +1,8 @@
 <template>
     <div style="height: 100%">
         <van-cell-group inset>
-            <van-cell>
-                <van-tabs @change="legendTabChange" swipeable v-model="activeTab" class="legend-tab">
+            <van-cell v-if="beanOption.series.length">
+                <van-tabs swipeable v-model:active="activeTab" class="legend-tab" @change="legendTabChange">
                     <van-tab title="登录统计" name="登录统计" />
                     <van-tab
                         :disabled="!isBean && !item.data.length"
@@ -59,7 +59,7 @@ let chart;
 const date = ref(dayjs().format("YYYY-MM-DD"))
 const show = ref(false)
 const isBean = ref(false)
-const activeTab = ref('登录统计')
+const activeTab = ref(window.localStorage.getItem("beanManageActiveTab") || "登录统计")
 const enableDate = ref([])
 const envs = ref([])
 const lastLoginData = ref([])
@@ -281,7 +281,8 @@ const getLatestBeanFn = (value) => {
 }
 
 const legendTabChange = (name) => {
-    activeTab.value = name;
+    window.localStorage.setItem("beanManageActiveTab", name)
+
     nextTick(() => {
         if (!chart) {
             return;
@@ -312,6 +313,7 @@ onMounted(() => {
         chart && chart.resize();
     });
 })
+
 </script>
 
 

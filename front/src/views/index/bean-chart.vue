@@ -193,7 +193,7 @@ onMounted(() => {
     });
     watch(() => _props.data, () => {
         getBeanFn();
-        reInit(0);
+        reInit(activeTab.value);
     }, {
         deep: true,
         immediate: true
