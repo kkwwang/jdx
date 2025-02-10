@@ -1,6 +1,6 @@
 <template>
     <van-cell-group inset v-if="envDatas.length">
-        <van-tabs swipeable>
+        <van-tabs swipeable v-model:active="activeTab">
             <van-tab
                 v-for="envData in envDatas"
                 :title="envData.mobile"
@@ -18,7 +18,9 @@ import { onMounted, ref, watch } from "vue";
 import Online from "@/views/index/online.vue";
 
 
+const onlineActiveTabName = 'onlineActiveTabName'
 const envDatas = ref([])
+const activeTab = ref(window.localStorage.getItem(onlineActiveTabName))
 
 const _props = defineProps({
     data: {
@@ -53,6 +55,10 @@ onMounted(() => {
     }, {
         deep: true,
         immediate: true
+    })
+
+    watch(() => activeTab.value, () => {
+        window.localStorage.setItem(onlineActiveTabName, activeTab.value)
     })
 })
 </script>

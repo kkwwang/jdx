@@ -1,22 +1,27 @@
 <template>
     <van-cell-group inset v-if="envDatas.length">
-        <van-tabs swipeable>
+        <van-tabs v-model:active="activeTab" swipeable>
             <van-tab
                 v-for="envData in envDatas"
                 :title="envData.mobile"
                 :name="envData.mobile">
                 <van-cell-group>
-                    <van-cell
-                        title="统计时间"
-                    > {{ envData.时间 || '-' }}
-                    </van-cell>
-                    <van-cell
-                        :key="index"
+                    <template
                         v-for="(item, index) in legend"
-                        :title="item.title"
-                        :label="getLatestTip(item, envData[item.title])"
-                    >{{ envData[item.title] || '-' }}
-                    </van-cell>
+                        :key="index"
+                    >
+                        <template v-if="envData[item.title]">
+                            <van-cell
+                                title="统计时间"
+                            > {{ envData.时间 || '-' }}
+                            </van-cell>
+                            <van-cell
+                                :title="item.title"
+                                :label="getLatestTip(item, envData[item.title])"
+                            >{{ envData[item.title]}}
+                            </van-cell>
+                        </template>
+                    </template>
                 </van-cell-group>
             </van-tab>
         </van-tabs>
@@ -27,7 +32,9 @@ import legend from "../legend.json"
 
 import { onMounted, ref, watch } from "vue";
 
+const latestDataActiveTabName = 'latestDataActiveTabName'
 
+const activeTab = ref(window.localStorage.getItem(latestDataActiveTabName))
 const _props = defineProps({
     data: {
         type: Array
@@ -64,6 +71,10 @@ onMounted(() => {
     }, {
         deep: true,
         immediate: true
+    })
+
+    watch(() => activeTab.value, () => {
+        window.localStorage.setItem(latestDataActiveTabName, activeTab.value)
     })
 })
 

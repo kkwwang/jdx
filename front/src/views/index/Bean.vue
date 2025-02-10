@@ -47,19 +47,21 @@
     </div>
 </template>
 <script setup name="Bean">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { jdBean as jdBeanApi } from "@/api";
 import BeanChart from "@/views/index/bean-chart.vue";
 import LatestData from "@/views/index/latest-data.vue";
 import OnlineTab from "@/views/index/online-tab.vue";
 
 const _props = defineProps({
-    mobile: String
+    mobile: String,
 })
 
+const beanActiveTabName = 'beanActiveTabName';
 const searchMobile = ref("");
 const data = ref([])
-const activeTab = ref()
+const activeTab = ref(window.localStorage.getItem(beanActiveTabName) || '最新')
+
 
 const getBean = () => {
     if (!searchMobile.value) {
@@ -73,6 +75,8 @@ const getBean = () => {
 
 
 onMounted(() => {
+
+
     if (_props.mobile && !searchMobile.value) {
         searchMobile.value = _props.mobile;
     }
@@ -81,6 +85,11 @@ onMounted(() => {
         getBean();
     }
 })
+
+watch(() => activeTab.value, () => {
+    window.localStorage.setItem(beanActiveTabName, activeTab.value)
+})
+
 </script>
 
 

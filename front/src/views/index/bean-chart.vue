@@ -8,8 +8,9 @@
             class="legend-tab">
             <van-tab
                 :key="item.title"
-                v-for="item in legendData"
+                v-for="(item, index) in legendData"
                 :title="item.title"
+                :name="index"
             />
         </van-tabs>
     </van-cell-group>
@@ -24,9 +25,10 @@ import * as echarts from "echarts";
 import legend from "../legend.json"
 
 let chart;
+const beanChartActiveTabName = 'beanChartActiveTabName';
 
 const show = ref(false)
-const activeTab = ref(legend[0].title)
+const activeTab = ref(parseInt(window.localStorage.getItem(beanChartActiveTabName)) || 0)
 const dataTime = "时间"
 const legendData = ref([])
 
@@ -99,6 +101,11 @@ const reInit = (index) => {
         chart.dispose();
     }
 
+    const series = legendData.value[index]?.data
+    if (!series) {
+        return
+    }
+
     nextTick(() => {
         chart = echarts.init(mainRef.value?.$el, null, { locale: "ZH" });
         const option = ({
@@ -107,7 +114,6 @@ const reInit = (index) => {
         })
         chart.setOption(option);
     })
-
 }
 
 
@@ -185,7 +191,6 @@ onMounted(() => {
     window.addEventListener("resize", () => {
         chart && chart.resize();
     });
-
     watch(() => _props.data, () => {
         getBeanFn();
         reInit(0);
@@ -196,4 +201,7 @@ onMounted(() => {
 })
 
 
+watch(() => activeTab.value, () => {
+    window.localStorage.setItem(beanChartActiveTabName, activeTab.value)
+})
 </script>
