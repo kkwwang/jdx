@@ -6,6 +6,11 @@
     },
     {
         "title": "京豆余额",
+        "difference": 500,
+        "tip": "✅购物金额大于20元可用"
+    },
+    {
+        "title": "京豆余额元",
         "difference": 5,
         "tip": "✅购物金额大于20元可用"
     },
@@ -56,6 +61,46 @@
     },
     {
         "title": "红包过期",
+        "difference": 2,
+        "tip": "\uD83D\uDEA8即将过期金额较大，请尽快使用"
+    },
+    {
+        "title": "特价版APP",
+        "difference": 3,
+        "tip": "✅红包比较多，可以用了"
+    },
+    {
+        "title": "特价版APP过期",
+        "difference": 2,
+        "tip": "\uD83D\uDEA8即将过期金额较大，请尽快使用"
+    },
+    {
+        "title": "京东APP",
+        "difference": 2,
+        "tip": "✅红包比较多，可以用了"
+    },
+    {
+        "title": "京东APP过期",
+        "difference": 2,
+        "tip": "\uD83D\uDEA8即将过期金额较大，请尽快使用"
+    },
+    {
+        "title": "微信小程序",
+        "difference": 2,
+        "tip": "✅红包比较多，可以用了"
+    },
+    {
+        "title": "微信小程序过期",
+        "difference": 2,
+        "tip": "\uD83D\uDEA8即将过期金额较大，请尽快使用"
+    },
+    {
+        "title": "全平台通用",
+        "difference": 2,
+        "tip": "✅红包比较多，可以用了"
+    },
+    {
+        "title": "全平台通用过期",
         "difference": 2,
         "tip": "\uD83D\uDEA8即将过期金额较大，请尽快使用"
     },
