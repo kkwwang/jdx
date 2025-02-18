@@ -54,12 +54,12 @@ public class QywxPushUtil {
             reqParamJo.remove("agentid");
             reqParamJo.remove("touser");
 
-            if (null != mobileList && !mobileList.isEmpty()) {
-                text.put("mentioned_mobile_list", mobileList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
-            }
-            if (null != qywxUserIdList && !qywxUserIdList.isEmpty()) {
-                text.put("mentioned_list", qywxUserIdList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
-            }
+//            if (null != mobileList && !mobileList.isEmpty()) {
+//                text.put("mentioned_mobile_list", mobileList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+//            }
+//            if (null != qywxUserIdList && !qywxUserIdList.isEmpty()) {
+//                text.put("mentioned_list", qywxUserIdList.stream().filter(StringUtils::hasText).collect(Collectors.toList()));
+//            }
 
             @Cleanup HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
                     .body(reqParamJo.toJSONString())

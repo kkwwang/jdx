@@ -19,6 +19,7 @@
             type="number"
             label="验证码"
             placeholder="验证码"
+            @input="smsInput"
         >
             <template #button>
                 <van-count-down
@@ -68,6 +69,12 @@ const smsCode = () => {
         codeRef.value.focus();
         window.localStorage.setItem("mobile", form.value.mobile);
     });
+}
+
+const smsInput = () => {
+    if (form.value.code.length === 6) {
+        login();
+    }
 }
 
 const login = () => {
