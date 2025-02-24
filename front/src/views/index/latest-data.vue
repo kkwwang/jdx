@@ -6,19 +6,20 @@
                 :title="envData.mobile"
                 :name="envData.mobile">
                 <van-cell-group>
+                    <van-cell
+                        title="统计时间"
+                    > {{ envData.时间 || '-' }}
+                    </van-cell>
                     <template
                         v-for="(item, index) in legend"
                         :key="index"
                     >
                         <template v-if="envData[item.title]">
-                            <van-cell
-                                title="统计时间"
-                            > {{ envData.时间 || '-' }}
-                            </van-cell>
+
                             <van-cell
                                 :title="item.title"
                                 :label="getLatestTip(item, envData[item.title])"
-                            >{{ envData[item.title]}}
+                            >{{ envData[item.title] }}
                             </van-cell>
                         </template>
                     </template>

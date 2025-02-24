@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Index from "@/views/index/Index.vue";
 import AdminLogin from "@/views/admin/Login.vue";
 import AdminHome from "@/views/admin/Home.vue";
@@ -20,8 +20,8 @@ export default createRouter({
             }
         },
         {
-            path: "/bean/:mobile",
-            alias: "/bean",
+            path: "/bean/:mobile/:type",
+            alias: ["/bean", "/bean/:mobile"],
             name: "Bean",
             props: true,
             component: Bean,

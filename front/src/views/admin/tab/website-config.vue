@@ -12,6 +12,7 @@
 
     <van-cell-group inset>
         <van-field v-model="websiteConfig.title" label="网站标题" placeholder="网站标题" />
+        <van-field v-model="websiteConfig.host" label="网站地址" placeholder="网站地址" />
 
         <van-field
             v-model="websiteConfig.notice"

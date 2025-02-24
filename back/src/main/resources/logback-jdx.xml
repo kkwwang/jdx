@@ -6,7 +6,7 @@
     <!--    <logger name="com.xxx" level="debug"/>-->
 
     <springProperty scope="context" name="path" source="log.path" defaultValue="logs"/>
-    <property name="maxHistory" value="30"/>
+    <property name="maxHistory" value="360"/>
     <property name="maxFileSize" value="50MB"/>
 
     <property name="log_pattern"

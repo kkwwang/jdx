@@ -6,7 +6,7 @@
                 :title="envData.mobile"
                 :name="envData.mobile">
                 <van-cell-group inset>
-                    <online :dates="envData.dates"></online>
+                    <online :dates="envData.dates" :mobile="envData.mobile"></online>
                 </van-cell-group>
             </van-tab>
         </van-tabs>

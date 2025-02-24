@@ -155,10 +155,12 @@ public class QLService implements ITask {
         }
 
         String text = StrUtil.format(
-                "账号：{}\n手机号：{}\n上次登录：{}",
+                "账号：{}\n手机号：{}\n上次登录：{}\n\n在线日历：{}bean/{}/online",
                 StringUtils.hasText(remarkInfo.getWechat()) ? remarkInfo.getWechat() : remarkInfo.getNickname(),
                 mobile.replaceAll("([0-9]{3})[0-9]{4}([0-9]{4})", "$1****$2"),
-                preLoginTime
+                preLoginTime,
+                systemConfigProperties.getWebsiteConfig().getHost(),
+                mobile
         );
 
         SpringUtil.publishEvent(

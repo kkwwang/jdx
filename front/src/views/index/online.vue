@@ -1,5 +1,6 @@
 <template>
     <van-calendar
+        v-if="loginLog != null"
         :title="'累计在线天数：' + dates.length"
         type="multiple"
         :default-date="defaultDate"
@@ -16,7 +17,10 @@
 </template>
 <script setup>
 import dayjs from "dayjs";
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { getLoginLog } from "@/api";
+
+const loginLog = ref(null)
 
 const defaultDate = computed(() => {
     return _props.dates.map(item => new Date(item)).sort((a, b) => new Date(b) - new Date(a))
@@ -25,18 +29,40 @@ const defaultDate = computed(() => {
 const _props = defineProps({
     dates: {
         type: Array
+    },
+    mobile: {
+        type: String
     }
 })
 const formatter = (day) => {
-    if (_props.dates.includes(dayjs(day.date).format("YYYY-MM-DD"))) {
-        day.bottomInfo = "在线";
+    const dayStr = dayjs(day.date).format("YYYY-MM-DD")
+    if (_props.dates.includes(dayStr)) {
         day.className = "online";
     } else if (day.date < new Date()) {
-        day.bottomInfo = "离线";
         day.className = "offline";
     }
+
+    if (loginLog.value[dayStr]) {
+        day.className = "online";
+        day.bottomInfo = loginLog.value[dayStr][0];
+    }
+
+
     return day;
 }
+
+onMounted(() => {
+    getLoginLog(_props.mobile).then(res => {
+        const result = {}
+        res.data.forEach(item => {
+            if (!result[item.login_day]) {
+                result[item.login_day] = []
+            }
+            result[item.login_day].push(item.login_time)
+        })
+        loginLog.value = result
+    })
+})
 
 </script>
 <style scoped>

@@ -32,3 +32,11 @@ export function jdBean(mobile) {
     method: "get"
   });
 }
+
+// jd登录
+export function getLoginLog(mobile) {
+  return request({
+    url: "jd/getLoginLog?mobile=" + mobile,
+    method: "get"
+  });
+}

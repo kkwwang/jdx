@@ -32,15 +32,15 @@
             </van-field>
         </van-cell-group>
         <van-cell-group inset>
-            <van-tabs v-model:active="activeTab" swipeable>
+            <van-tabs v-model:active="activeTab">
                 <van-tab title="最新" name="最新">
                     <latest-data :data="data" v-if="activeTab === '最新'" />
                 </van-tab>
                 <van-tab title="趋势图" name="趋势图">
                     <bean-chart :data="data" v-if="activeTab === '趋势图'" />
                 </van-tab>
-                <van-tab title="在线日历" name="在线日历">
-                    <online-tab :data="data" v-if="activeTab === '在线日历'" />
+                <van-tab title="在线日历" name="online">
+                    <online-tab :data="data" v-if="activeTab === 'online'" />
                 </van-tab>
             </van-tabs>
         </van-cell-group>
@@ -55,6 +55,7 @@ import OnlineTab from "@/views/index/online-tab.vue";
 
 const _props = defineProps({
     mobile: String,
+    type: String
 })
 
 const beanActiveTabName = 'beanActiveTabName';
@@ -75,14 +76,16 @@ const getBean = () => {
 
 
 onMounted(() => {
-
-
     if (_props.mobile && !searchMobile.value) {
         searchMobile.value = _props.mobile;
     }
 
     if (searchMobile.value) {
         getBean();
+    }
+
+    if (_props.type) {
+        activeTab.value = _props.type
     }
 })
 

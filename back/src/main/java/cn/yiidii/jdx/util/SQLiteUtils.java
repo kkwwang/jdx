@@ -1,5 +1,6 @@
 package cn.yiidii.jdx.util;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.yiidii.jdx.support.JWTFilter;
 import com.alibaba.fastjson.JSONArray;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -112,5 +114,44 @@ public class SQLiteUtils {
             System.err.println(e.getMessage());
         }
         return null;
+    }
+
+    public static void createLoginLogTable() {
+        try {
+            String sql = "CREATE TABLE IF NOT EXISTS login_log (mobile TEXT, 账号 TEXT, login_day TEXT, login_time TEXT);";
+            String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
+            // 连接到SQLite数据库
+            Connection connection = DriverManager.getConnection(datasourceUrl);
+            // 查询数据
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void insertLoginLog(String mobile, String account, Date loginTime) {
+        try {
+            createLoginLogTable();
+            String sql = "INSERT INTO login_log (mobile, 账号, login_day, login_time) VALUES (?, ?, ?, ?);";
+            String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
+            // 连接到SQLite数据库
+            Connection connection = DriverManager.getConnection(datasourceUrl);
+            // 查询数据
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, mobile);
+            ps.setString(2, account);
+            ps.setString(3, DateUtil.format(loginTime, "yyyy-MM-dd"));
+            ps.setString(4, DateUtil.format(loginTime, "HH:mm"));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static JSONArray getLoginLog(String mobile) {
+        createLoginLogTable();
+        String sql = "SELECT * FROM login_log WHERE mobile = ?;";
+        return select(sql, mobile);
     }
 }

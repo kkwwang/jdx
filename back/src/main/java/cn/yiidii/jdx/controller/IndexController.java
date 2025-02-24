@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -92,6 +93,11 @@ public class IndexController {
         log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(jdInfo.getCookie())));
         // 异步联动修正数据
         adminService.updateEnv(mobile);
+
+        // 记录登录信息
+        SQLiteUtils.insertLoginLog(mobile, jdInfo.getPtPin(), new Date());
+
+
         return R.ok(result, "登录成功");
     }
 
@@ -115,4 +121,8 @@ public class IndexController {
         return R.ok(SQLiteUtils.getBeanByMobile(mobile));
     }
 
+    @GetMapping("/jd/getLoginLog")
+    public R<JSONArray> getLoginLog(String mobile) {
+        return R.ok(SQLiteUtils.getLoginLog(mobile));
+    }
 }

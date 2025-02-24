@@ -106,6 +106,7 @@ public class SystemConfigProperties implements InitializingBean, ITask {
         private String title;
         private String notice;
         private String indexBottomNotice;
+        private String host;
     }
 
     @Data
