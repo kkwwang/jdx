@@ -189,7 +189,6 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
-    getCurrentInstance().proxy.$setTitle ("收益趋势");
 
     window.addEventListener("resize", () => {
         chart && chart.resize();
@@ -203,8 +202,20 @@ onMounted(() => {
     })
 })
 
+const { proxy } = getCurrentInstance();
 
-watch(() => activeTab.value, () => {
-    window.localStorage.setItem(beanChartActiveTabName, activeTab.value)
+watch(() => {
+    return {
+        legendData: legendData.value,
+        activeTab: activeTab.value
+    }
+}, () => {
+    if (activeTab.value != null && legendData.value[activeTab.value]) {
+        proxy.$setTitle("收益趋势 - " + legendData.value[activeTab.value]?.title);
+        window.localStorage.setItem(beanChartActiveTabName, activeTab.value)
+    }
+}, {
+    immediate: true,
+    deep: true
 })
 </script>

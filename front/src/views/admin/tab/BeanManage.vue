@@ -46,7 +46,7 @@
 </template>
 
 <script setup name="BeanManage">
-import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import dayjs from "dayjs";
 import * as echarts from "echarts";
 import { getAllDate, getAllEnv, getLatestBean } from "@/api/admin/bean";
@@ -281,7 +281,6 @@ const getLatestBeanFn = (value) => {
 }
 
 const legendTabChange = (name) => {
-    window.localStorage.setItem("beanManageActiveTab", name)
 
     nextTick(() => {
         if (!chart) {
@@ -307,12 +306,21 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
-    getCurrentInstance().proxy.$setTitle ("资产统计");
     getAllDateFn();
     getAllEnvFn();
     window.addEventListener("resize", () => {
         chart && chart.resize();
     });
+})
+
+const { proxy } = getCurrentInstance();
+
+watch(() => activeTab.value, () => {
+    proxy.$setTitle('资产统计 - ' + activeTab.value);
+    window.localStorage.setItem("beanManageActiveTab", activeTab.value)
+
+}, {
+    immediate: true
 })
 
 </script>

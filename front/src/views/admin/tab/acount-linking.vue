@@ -60,7 +60,7 @@
 import { getAllEnv } from "@/api/admin/bean";
 
 import SysController from "@/views/admin/tab/sys-controller.vue";
-import { getCurrentInstance, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { showConfirmDialog, showToast } from "vant";
 import { acountLink } from "@/api/admin/ql";
 
@@ -124,7 +124,6 @@ const save = () => {
 }
 
 onMounted(() => {
-    getCurrentInstance().proxy.$setTitle ("账号关联");
     getAllEnvFn()
 })
 </script>
