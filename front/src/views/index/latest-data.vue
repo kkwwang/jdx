@@ -31,9 +31,10 @@
 <script setup>
 import legend from "../legend.json"
 
-import { onMounted, ref, watch } from "vue";
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 
 const latestDataActiveTabName = 'latestDataActiveTabName'
+const { proxy } = getCurrentInstance()
 
 const activeTab = ref(window.localStorage.getItem(latestDataActiveTabName))
 const _props = defineProps({
@@ -67,6 +68,7 @@ const getLatestData = () => {
 }
 
 onMounted(() => {
+
     watch(() => _props.data, () => {
         getLatestData()
     }, {
@@ -75,7 +77,11 @@ onMounted(() => {
     })
 
     watch(() => activeTab.value, () => {
+        proxy.$setTitle ("最近收益 - " + activeTab.value);
+
         window.localStorage.setItem(latestDataActiveTabName, activeTab.value)
+    },{
+        immediate: true
     })
 })
 

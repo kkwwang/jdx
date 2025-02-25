@@ -20,7 +20,7 @@
 </template>
 
 <script setup name="BeanManage">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as echarts from "echarts";
 import legend from "../legend.json"
 
@@ -118,6 +118,7 @@ const reInit = (index) => {
 
 
 const getBeanFn = () => {
+    legendData.value = []
     show.value = false;
     legend.forEach(item => {
         const temp = {}
@@ -188,6 +189,8 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("收益趋势");
+
     window.addEventListener("resize", () => {
         chart && chart.resize();
     });

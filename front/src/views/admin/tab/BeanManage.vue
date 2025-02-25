@@ -46,7 +46,7 @@
 </template>
 
 <script setup name="BeanManage">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import * as echarts from "echarts";
 import { getAllDate, getAllEnv, getLatestBean } from "@/api/admin/bean";
@@ -307,6 +307,7 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("资产统计");
     getAllDateFn();
     getAllEnvFn();
     window.addEventListener("resize", () => {

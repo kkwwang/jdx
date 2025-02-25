@@ -76,6 +76,8 @@ const getBean = () => {
 
 
 onMounted(() => {
+
+
     if (_props.mobile && !searchMobile.value) {
         searchMobile.value = _props.mobile;
     }

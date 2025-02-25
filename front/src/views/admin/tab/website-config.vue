@@ -42,7 +42,7 @@
 <script setup name="website-config">
 
 import { getWebsiteConfigApi, updateWebsiteConfigApi } from "@/api/admin/website";
-import { onMounted, ref } from "vue";
+import { getCurrentInstance, onMounted, ref } from "vue";
 import { showToast } from "vant";
 
 const websiteConfig = ref({
@@ -67,6 +67,7 @@ const save = () => {
 }
 
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("网站设置");
     get()
 })
 

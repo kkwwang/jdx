@@ -44,7 +44,7 @@
 </template>
 
 <script setup name="account-config">
-import { onMounted, ref } from "vue";
+import { getCurrentInstance, onMounted, ref } from "vue";
 import { getAccount, updateAccount } from "@/api/admin/account";
 import { showDialog } from "vant";
 import CryptoJS from "crypto-js";
@@ -87,6 +87,7 @@ const save = () => {
 };
 
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("账号设置");
     get()
 })
 </script>

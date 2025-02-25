@@ -41,13 +41,15 @@
 import JD from "./JD.vue";
 import { baseInfo } from "@/api";
 import Version from "@/views/version.vue";
-import { defineProps, onMounted, ref } from "vue";
+import { defineProps, getCurrentInstance, onMounted, ref } from "vue";
 
 const info = ref({})
 const _props = defineProps({
     mobile: String
 })
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("登录");
+
     baseInfo().then(resp => {
         info.value = resp.data;
     })

@@ -38,7 +38,7 @@
 <script setup name="login">
 import { login as loginApi } from "@/api/admin/login";
 import CryptoJS from "crypto-js";
-import { onBeforeMount, ref } from "vue";
+import { getCurrentInstance, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter()
@@ -62,6 +62,7 @@ const login = () => {
 
 
 onBeforeMount(() => {
+    getCurrentInstance().proxy.$setTitle ("管理端登录");
     if (localStorage.getItem("token")) {
         router.push("/admin");
     }

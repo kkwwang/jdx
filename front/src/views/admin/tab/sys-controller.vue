@@ -15,6 +15,7 @@
 <script setup name="sys-controller">
 import { showConfirmDialog, showToast } from "vant";
 import { updateEnv } from "@/api/admin/ql";
+import { getCurrentInstance, onMounted } from "vue";
 
 const updateEnvFn = () => {
 
@@ -30,4 +31,9 @@ const updateEnvFn = () => {
         })
     })
 }
+
+onMounted(()=>{
+    getCurrentInstance().proxy.$setTitle ("系统设置");
+
+})
 </script>

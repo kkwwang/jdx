@@ -17,7 +17,7 @@
 </template>
 <script setup>
 import dayjs from "dayjs";
-import { computed, onMounted, ref } from "vue";
+import { computed, getCurrentInstance, onMounted, ref } from "vue";
 import { getLoginLog } from "@/api";
 
 const loginLog = ref(null)
@@ -58,6 +58,8 @@ const formatter = (day) => {
 }
 
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("在线日历 - " + _props.mobile)
+
     getLoginLog(_props.mobile).then(res => {
         const loginResult = {}
         const logoutResult = {}

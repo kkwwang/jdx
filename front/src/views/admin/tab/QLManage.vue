@@ -11,7 +11,7 @@
 </template>
 <script setup name="QLManage">
 import QlItem from "@/views/admin/tab/ql-item.vue";
-import { onMounted, ref } from "vue";
+import { getCurrentInstance, onMounted, ref } from "vue";
 import Other from "@/views/admin/other.vue";
 import { getQLConfigList as getQLConfigListApi } from "@/api/admin/ql";
 
@@ -46,6 +46,7 @@ const qlItemChanged = (resData) => {
 }
 
 onMounted(() => {
+    getCurrentInstance().proxy.$setTitle ("青龙管理");
     getQLConfigList()
 })
 </script>

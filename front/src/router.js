@@ -5,7 +5,7 @@ import AdminHome from "@/views/admin/Home.vue";
 import Bean from "@/views/index/Bean.vue";
 
 
-export default createRouter({
+const router = createRouter({
     history: createWebHistory(),
     base: import.meta.env.VITE_BASE_URL,
     routes: [
@@ -47,3 +47,7 @@ export default createRouter({
         }
     ]
 });
+
+
+
+export default router
