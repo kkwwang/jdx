@@ -21,6 +21,7 @@ import { computed, onMounted, ref } from "vue";
 import { getLoginLog } from "@/api";
 
 const loginLog = ref(null)
+const logoutLog = ref(null)
 
 const defaultDate = computed(() => {
     return _props.dates.map(item => new Date(item)).sort((a, b) => new Date(b) - new Date(a))
@@ -44,7 +45,12 @@ const formatter = (day) => {
 
     if (loginLog.value[dayStr]) {
         day.className = "online";
-        day.bottomInfo = loginLog.value[dayStr][0];
+        day.bottomInfo = loginLog.value[dayStr][0] + "✅";
+    }
+
+    if (logoutLog.value[dayStr]) {
+        day.className = "online";
+        day.topInfo = logoutLog.value[dayStr][0] + "❌";
     }
 
 
@@ -53,14 +59,26 @@ const formatter = (day) => {
 
 onMounted(() => {
     getLoginLog(_props.mobile).then(res => {
-        const result = {}
+        const loginResult = {}
+        const logoutResult = {}
         res.data.forEach(item => {
-            if (!result[item.login_day]) {
-                result[item.login_day] = []
+            if (item.type === "1") {
+                if (!loginResult[item.login_day]) {
+                    loginResult[item.login_day] = []
+                }
+                loginResult[item.login_day].push(item.login_time)
             }
-            result[item.login_day].push(item.login_time)
+
+            if (item.type === "0") {
+                if (!logoutResult[item.login_day]) {
+                    logoutResult[item.login_day] = []
+                }
+                logoutResult[item.login_day].push(item.login_time)
+            }
+
         })
-        loginLog.value = result
+        loginLog.value = loginResult
+        logoutLog.value = logoutResult
     })
 })
 

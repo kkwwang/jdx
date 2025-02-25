@@ -118,7 +118,7 @@ public class SQLiteUtils {
 
     public static void createLoginLogTable() {
         try {
-            String sql = "CREATE TABLE IF NOT EXISTS login_log (mobile TEXT, 账号 TEXT, login_day TEXT, login_time TEXT);";
+            String sql = "CREATE TABLE IF NOT EXISTS \"login_log\" (  \"mobile\" TEXT,  \"login_day\" TEXT,  \"login_time\" TEXT,  \"type\" integer);";
             String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
             // 连接到SQLite数据库
             Connection connection = DriverManager.getConnection(datasourceUrl);
@@ -133,16 +133,16 @@ public class SQLiteUtils {
     public static void insertLoginLog(String mobile, String account, Date loginTime) {
         try {
             createLoginLogTable();
-            String sql = "INSERT INTO login_log (mobile, 账号, login_day, login_time) VALUES (?, ?, ?, ?);";
+            String sql = "INSERT INTO login_log (\"mobile\", \"login_day\", \"login_time\", \"type\") VALUES (?, ?, ?, ?);";
             String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
             // 连接到SQLite数据库
             Connection connection = DriverManager.getConnection(datasourceUrl);
             // 查询数据
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, mobile);
-            ps.setString(2, account);
-            ps.setString(3, DateUtil.format(loginTime, "yyyy-MM-dd"));
-            ps.setString(4, DateUtil.format(loginTime, "HH:mm"));
+            ps.setString(2, DateUtil.format(loginTime, "yyyy-MM-dd"));
+            ps.setString(3, DateUtil.format(loginTime, "HH:mm"));
+            ps.setInt(4, 1);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
