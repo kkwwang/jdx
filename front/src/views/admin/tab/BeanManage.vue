@@ -316,7 +316,7 @@ onMounted(() => {
 const { proxy } = getCurrentInstance();
 
 watch(() => activeTab.value, () => {
-    proxy.$setTitle('资产统计 - ' + activeTab.value);
+    proxy.$setTitle('资产统计 ' + activeTab.value);
     window.localStorage.setItem("beanManageActiveTab", activeTab.value)
 
 }, {

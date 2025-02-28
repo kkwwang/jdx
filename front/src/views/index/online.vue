@@ -58,7 +58,7 @@ const formatter = (day) => {
 }
 
 onMounted(() => {
-    getCurrentInstance().proxy.$setTitle ("在线日历 - " + _props.mobile)
+    getCurrentInstance().proxy.$setTitle("在线日历 " + _props.mobile )
 
     getLoginLog(_props.mobile).then(res => {
         const loginResult = {}

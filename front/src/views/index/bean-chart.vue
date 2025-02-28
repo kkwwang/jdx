@@ -211,7 +211,7 @@ watch(() => {
     }
 }, () => {
     if (activeTab.value != null && legendData.value[activeTab.value]) {
-        proxy.$setTitle("收益趋势 - " + legendData.value[activeTab.value]?.title);
+        proxy.$setTitle("收益趋势 " + legendData.value[activeTab.value]?.title);
         window.localStorage.setItem(beanChartActiveTabName, activeTab.value)
     }
 }, {

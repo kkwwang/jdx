@@ -77,10 +77,10 @@ onMounted(() => {
     })
 
     watch(() => activeTab.value, () => {
-        proxy.$setTitle ("最近收益 - " + activeTab.value);
+        proxy.$setTitle("最近收益 " + activeTab.value);
 
         window.localStorage.setItem(latestDataActiveTabName, activeTab.value)
-    },{
+    }, {
         immediate: true
     })
 })

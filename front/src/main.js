@@ -51,7 +51,7 @@ app.use(CheckboxGroup);
 app.use(VueClipboard);
 
 app.config.globalProperties.$setTitle = (title) => {
-    document.title = title + " [ 豆车 - jdx ]";
+    document.title = title;
 }
 
 
