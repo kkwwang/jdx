@@ -15,11 +15,12 @@
 
 ## 🐳 安装说明
 
-本项目已打包成`docker`镜像，拉取配置即可使用
-> docker安装方法不再赘述
+# <p style="color: red; font-size: 32px">警告：请勿使用下方镜像，下方镜像版本中有重大bug，请勿直接使用。</p>
+~~本项目已打包成`docker`镜像，拉取配置即可使用~~
 
-### 1. 拉取并运行docker
-# 警告：请勿使用下方镜像，下方镜像版本中有重大bug，请勿直接使用。
+> ~~docker安装方法不再赘述~~
+
+### ~~1. 拉取并运行docker~~
 ```dockerfile
 docker run -d \
     -v <config dir>:/jdx/config \
@@ -27,9 +28,9 @@ docker run -d \
     --restart=always \
     --name jdx registry.cn-hangzhou.aliyuncs.com/yiidii-hub/jdx:v0.2.2
 ```
-> 这里命令自行替换卷和端口映射
+> ~~这里命令自行替换卷和端口映射~~
 > 
-> 例如：
+> ~~例如：~~
 > ```dockerfile
 > docker run -d \
 >   -v  /data/jdx/config:/jdx/config \
@@ -38,8 +39,8 @@ docker run -d \
 >   --name jdx registry.cn-hangzhou.aliyuncs.com/yiidii-hub/jdx:v0.2.2
 > ```
 > 
-注意：
- - 记得放行端口
+~~注意：~~
+ - ~~记得放行端口~~
 
 ### 2. 前台访问
 这时候访问 `http://ip:port/` 就能访问了
@@ -88,6 +89,7 @@ docker run -d \
     这里建议看下[ccwav/QLScript2](https://github.com/ccwav/QLScript2) 的设置说明
     
     另外，青龙和ccwav都有说明：
+    
     > ql repo 会默认复制 deps 目录下的文件到仓库目录，所以你要固定你的 sendNotify 或者其他文件时，只需要把文件放到deps目录即可
 5. **青龙连接失败**
 
