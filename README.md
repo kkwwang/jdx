@@ -19,7 +19,7 @@
 > docker安装方法不再赘述
 
 ### 1. 拉取并运行docker
-
+# 警告：请勿使用下方镜像，下方镜像版本中有重大bug，请勿直接使用。
 ```dockerfile
 docker run -d \
     -v <config dir>:/jdx/config \
