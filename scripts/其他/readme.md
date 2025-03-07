@@ -7,13 +7,11 @@
 ### after命令：
 
 - task 6dylan6_jdpro_main/jd_bean_info.js
-```bash
-node ../其他/bean-log.js && node ../其他/after_bean_info.js
-```
-
+- task 6dylan6_jdpro_main/jd_video_view.js
+- task 6dylan6_jdpro_main/jd_video_task.js
 - task 6dylan6_jdpro_main/jd_bean_change.js
 ```bash
-node ../其他/bean-log.js &&  node ../其他/after-video.js
+bash ../其他/statistics.sh
 ```
 
 - task 6dylan6_jdpro_main/jd_CheckCK.js
@@ -21,19 +19,11 @@ node ../其他/bean-log.js &&  node ../其他/after-video.js
 node ../其他/after_check_ck.js
 ```
 
-- task 6dylan6_jdpro_main/jd_video_view.js
-- task 6dylan6_jdpro_main/jd_video_task.js
-```bash
-node ../其他/bean-log.js &&  node ../其他/after-video.js
-```
-
-
-- 手动执行
+- 单独任务
 ```txt
 名称：刷新统计
-命令/脚本：task 其他/bean-log.js
+命令/脚本：task 其他/statistics.sh
 定时规则：0 0 * * *
-执行后：node ../其他/after-video.js && node ../其他/after_bean_info.js
 ```
 
 ### patch文件
