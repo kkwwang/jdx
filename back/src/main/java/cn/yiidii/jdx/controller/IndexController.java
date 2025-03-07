@@ -74,6 +74,11 @@ public class IndexController {
         Assert.isTrue(PhoneUtil.isMobile(mobile), () -> {
             throw new BizException("手机号格式不正确");
         });
+
+        if (qywxUtil.envIsEnable(mobile)) {
+            return R.failed("cookie还在有效期，请勿重复登录");
+        }
+
         Assert.isTrue(StrUtil.isNotBlank(code), () -> {
             throw new BizException("验证码不能为空");
         });

@@ -98,7 +98,7 @@ const lastLoginOption = computed(() => {
         ...commonOptions.value,
         xAxis: {
             type: "value",
-            min: -1,
+            min: -0.1,
         },
         series: [
             {
@@ -116,8 +116,8 @@ const lastLoginOption = computed(() => {
                         formatter: "{b}"
                     },
                     data: [
-                        { xAxis: 48, name: "离线警示线", lineStyle: { color: "#ee0a24" } },
-                        { xAxis: 72, name: "提示线", lineStyle: { color: "#ff976a" } },
+                        // { xAxis: 48, name: "离线警示线", lineStyle: { color: "#ee0a24" } },
+                        { xAxis: 2, name: "提示线", lineStyle: { color: "#ee0a24" } },
                     ]
                 },
                 data: lastLoginData.value

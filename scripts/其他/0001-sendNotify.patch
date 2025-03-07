@@ -1,0 +1,413 @@
+From 0f03ae468c9d15cc2b133ad2e3dc5ac60be48acf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E7=8E=8B=E5=87=AF?= <wangkai-yanfa@allcorehatress.com>
+Date: Tue, 5 Nov 2024 10:22:24 +0800
+Subject: [PATCH] sendNotify
+
+---
+ sendNotify.js | 317 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 298 insertions(+), 19 deletions(-)
+
+diff --git a/sendNotify.js b/sendNotify.js
+index 3bea5f3..ea0d56a 100644
+--- a/sendNotify.js
++++ b/sendNotify.js
+@@ -20,7 +20,7 @@
+ const querystring = require('querystring');
+ const exec = require('child_process').exec;
+ const $ = new Env();
+-const timeout = 15000; //超时时间(单位毫秒)
++const timeout = 36000000; //超时时间(单位毫秒)
+ //console.log("加载sendNotify，当前版本: 20230712");
+ // =======================================go-cqhttp通知设置区域===========================================
+ //gobot_url 填写请求地址http://127.0.0.1/send_private_msg
+@@ -191,8 +191,14 @@ let isLogin = false;
+ if (process.env.NOTIFY_SHOWNAMETYPE) {
+     ShowRemarkType = process.env.NOTIFY_SHOWNAMETYPE;
+ }
+-async function sendNotify(text, desp, params = {}, author = "\n================================\n好物推荐：https://u.jd.com/WLEVYTM",strsummary="") {
++async function sendNotify(text, desp, params = {}, author = "",strsummary="") {
+     console.log(`开始发送通知...`); 
++
++ 
++    if (desp.indexOf('一个失效的都没有') !== -1) {
++        console.log(`一个失效的都没有，跳过通知...`); 
++        return
++    }
+ 	
+ 	//NOTIFY_FILTERBYFILE代码来自Ca11back.
+     if (process.env.NOTIFY_FILTERBYFILE) {
+@@ -367,22 +373,22 @@ async function sendNotify(text, desp, params = {}, author = "\n=================
+                                 if (userIndex4 == -1 && userIndex2 == -1 && userIndex3 == -1) {
+                                     text = "京东CK检测";
+                                 }
+-                                if (process.env.CHECKCK_ALLNOTIFY) {
+-                                    strAllNotify = process.env.CHECKCK_ALLNOTIFY;
+-                                    /* if (strTempNotify.length > 0) {
+-                                    for (var TempNotifyl in strTempNotify) {
+-                                    strAllNotify += strTempNotify[TempNotifyl] + '\n';
+-                                    }
+-                                    }*/
+-                                    console.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
+-                                    strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
+-                                    console.log(strAllNotify);
+-                                }
++                                // if (process.env.CHECKCK_ALLNOTIFY) {
++                                //     strAllNotify = process.env.CHECKCK_ALLNOTIFY;
++                                //     /* if (strTempNotify.length > 0) {
++                                //     for (var TempNotifyl in strTempNotify) {
++                                //     strAllNotify += strTempNotify[TempNotifyl] + '\n';
++                                //     }
++                                //     }*/
++                                //     console.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
++                                //     strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
++                                //     console.log(strAllNotify);
++                                // }
+ 
+                                 if (DisableCkBody.code == 200) {
+                                     console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
+ 
+-                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,已自动禁用!\n如果要继续挂机，请重新登录账号，账号有效期为30天.`;
++                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,已自动禁用!\n如果要继续挂机，请重新登录账号.`;
+                                     strNotifyOneTemp += "\n任务标题：" + strtext;
+                                     if (strAllNotify)
+                                         strNotifyOneTemp += `\n` + strAllNotify;
+@@ -393,7 +399,7 @@ async function sendNotify(text, desp, params = {}, author = "\n=================
+ 
+                                 } else {
+                                     console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
+-                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请重新登录账号，账号有效期为30天.`;
++                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请重新登录账号.`;
+                                     strNotifyOneTemp += "\n任务标题：" + strtext;
+                                     if (strAllNotify)
+                                         strNotifyOneTemp += `\n` + strAllNotify;
+@@ -875,13 +881,163 @@ async function sendNotify(text, desp, params = {}, author = "\n=================
+ 
+     }
+ 
++
++    function replaceRemark(jd_cookies_env, chunk) {
++        let mentioned_mobile_list = []
++        let mentioned_list = []
++        let wechat_list = []
++
++        jd_cookies_env.forEach(jce => {
++            if (jce.remarks) {
++                let regArray = [];
++                // 如果 remarks 是json字符串
++                if (typeof jce.remarks === 'string' && jce.remarks.startsWith('{')) {
++                    jce.remarksObj = JSON.parse(jce.remarks)
++                    jce.remarksObj.ptPin && regArray.push(jce.remarksObj.ptPin.replace(/\|/gms, "\\|").replace(/\*/gms, "\\*"))
++                    jce.remarksObj.nickname && regArray.push(jce.remarksObj.nickname.replace(/\|/gms, "\\|").replace(/\*/gms, "\\*"))
++                } else {
++                    jce.remarks = jce.remarks.replace(/\|/gms, "\\|").replace(/\*/gms, "\\*")
++                    regArray = jce.remarks.split(' ').filter(item => item)
++                }
++
++                if (jce.remarksObj.mobile) {
++                    const reg = new RegExp(decodeURI(regArray.join('|')), "gms")
++                    chunk = chunk.replace(reg, jce.remarksObj.mobile).replace(/\|/gms, "|").replace(/\*/gms, "*")
++                    if (new RegExp([jce.remarksObj.mobile].join('|'), "gms").test(chunk)) {
++                        mentioned_mobile_list = [
++                            ...mentioned_mobile_list,
++                            ...[
++                                jce.remarksObj.mobile,
++                                ...jce.remarksObj.notifyMobile
++                            ]
++                        ].filter(item => item)
++
++                        mentioned_list = [
++                            ...mentioned_list,
++                            ...jce.remarksObj.qywxUserId
++                        ].filter(item => item)
++
++
++                        wechat_list = [
++                            ...wechat_list,
++                            jce.remarksObj.wechat
++                        ].filter(item => item)
++                    }
++                }
++            }
++        })
++        const result = chunk.replaceAll(/(1[0-9]{2})[0-9]{4}([0-9]{4})/gism, '$1****$2')
++
++        return {
++            result,
++            mentioned_mobile_list: Array.from(new Set(mentioned_mobile_list)),
++            mentioned_list: Array.from(new Set(mentioned_list)),
++            wechat_list: Array.from(new Set(wechat_list)),
++        }
++    }
++
++    // 企业微信截断
++    //desp += author; //增加作者信息，防止被贩卖等
++    const jd_cookies_env = await getEnvs();
++
++    desp = desp.replace(/京豆详情统计】\n\n/gism, "京豆详情统计】\n")
++    // 离线通知
++
++    if (text.indexOf('CK检测') !== -1) {
++        let strAllNotify = ""
++        if (process.env.CHECKCK_ALLNOTIFY) {
++            strAllNotify = process.env.CHECKCK_ALLNOTIFY;
++            console.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
++            strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
++        }
++
++        const {
++            result,
++            mentioned_mobile_list,
++            mentioned_list,
++            wechat_list
++        } = replaceRemark(jd_cookies_env, desp)
++
++        for (const jce of jd_cookies_env) {
++            if (jce.remarks) {
++                // 如果 remarks 是json字符串
++                if (typeof jce.remarks === 'string' && jce.remarks.startsWith('{')) {
++                    jce.remarksObj = JSON.parse(jce.remarks)
++
++                    const offline = result.match(new RegExp(jce.remarksObj.mobile.replaceAll(/(1[0-9]{2})[0-9]{4}([0-9]{4})/gism, '$1\\*\\*\\*\\*$2')), "gms")
++                    if (offline) {
++                        const chunk = "京东CK检测：\n\n👇👇👇👇失效账号👇👇👇👇\n" + jce.remarksObj.mobile.replaceAll(/(1[0-9]{2})[0-9]{4}([0-9]{4})/gism, '$1****$2') + "\n\n" + strAllNotify + jce.remarksObj.mobile
++                        console.log(chunk)
++                        await sendToQywxYy(`${text}\n\n${chunk}`, jce.remarksObj.qywxUserId)
++                    }
++                }
++            }
++        }
++    }
++
++    if (desp.length > 1500) {
++        const temp = desp.split('\n\n')
++        temp.forEach(async (chunk, index) => {
++            if (chunk && chunk.trim().length && chunk.replaceAll(/-|\n|\r/gism, '').length) {
++
++                let {
++                    result,
++                    mentioned_mobile_list,
++                    mentioned_list,
++                    wechat_list
++                } = replaceRemark(jd_cookies_env, chunk)
++
++                let content = result
++                    .replaceAll(/\n\n\n/gism, "\n")
++                    .replaceAll(/------/gism, "")
++
++                if(text === '京东资产统计'){
++                    if (process.env.BEAN_ALLNOTIFY) {
++                        beanAllNotify = process.env.BEAN_ALLNOTIFY + mentioned_mobile_list[0] + '/bean';
++                        content += beanAllNotify
++                    }
++                }
++                if (text.indexOf('CK检测') === -1) {
++                   await sendToQywxYy(`${text}\n\n${content}`, mentioned_list)
++                }
++                // 每应用对同一个成员不可超过30次/分钟，1000次/小时，超过部分会被丢弃不下发
++                setTimeout(async() => {
++                    await sendToQywxAdminYy(`${text}\n\n${content}\n\n账号：${wechat_list.join("、")}`)
++                }, 60 * 1000 / 35 * index)
++            }
++        })
++    } else {
++        let {
++            result,
++            mentioned_mobile_list,
++            mentioned_list,
++            wechat_list
++        } = replaceRemark(jd_cookies_env, desp)
++
++
++        if(text === '京东资产统计'){
++            if (process.env.BEAN_ALLNOTIFY) {
++                beanAllNotify = process.env.BEAN_ALLNOTIFY + mentioned_mobile_list[0] + '/bean';
++                result += beanAllNotify
++            }
++        }
++
++        if (text.indexOf('CK检测') === -1) {
++            await sendToQywxYy(`${text}\n\n${result}`, mentioned_list)
++        }
++        await sendToQywxAdminYy(`${text}\n\n${result}\n\n账号：${wechat_list.join("、")}`)
++    }
++
++    desp = desp.replaceAll(/(1[0-9]{2})[0-9]{4}([0-9]{4})/gism, '$1****$2')
++
++
+     //由于上述两种微信通知需点击进去才能查看到详情，故text(标题内容)携带了账号序号以及昵称信息，方便不点击也可知道是哪个京东哪个活动
+     text = text.match(/.*?(?=\s?-)/g) ? text.match(/.*?(?=\s?-)/g)[0] : text;
+     await Promise.all([
+         BarkNotify(text, desp, params), //iOS Bark APP
+         tgBotNotify(text, desp), //telegram 机器人
+         ddBotNotify(text, desp), //钉钉机器人
+-        qywxBotNotify(text, desp), //企业微信机器人
++        // qywxBotNotify(text, desp), //企业微信机器人
+         qywxamNotify(text, desp, strsummary), //企业微信应用消息推送
+             fsBotNotify(text, desp),   //飞书机器人
+         iGotNotify(text, desp, params), //iGot
+@@ -983,7 +1139,7 @@ function getRemark(strRemark) {
+     }
+ }
+ 
+-async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n================================\n好物推荐：<a href="https://u.jd.com/WLEVYTM">https://u.jd.com/WLEVYTM</a>', strsummary = "") {
++async function sendNotifybyWxPucher(text, desp, PtPin, author = '', strsummary = "") {
+ 
+     try {
+         var Uid = "";
+@@ -1489,14 +1645,135 @@ function ddBotNotify(text, desp) {
+     });
+ }
+ 
+-function qywxBotNotify(text, desp) {
++function getQywxYyToken(qywxyy) {
++    return new Promise((resolve) => {
++        const GET_TOKEN_URL = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET";
++        const options = {
++            url: GET_TOKEN_URL.replace("ID", qywxyy[0]).replace("SECRET", qywxyy[2]),
++            timeout,
++        };
++        $.get(options, (err, resp, data) => {
++            try {
++                if (err) {
++                    console.log('获取企业微信应用token失败\n');
++                    console.log(err);
++                } else {
++                    data = JSON.parse(data);
++                    if (data.errcode === 0) {
++                        console.log('获取企业微信应用token成功\n');
++                    } else {
++                        console.log('获取企业微信应用token失败\n');
++                        console.log(`${data.errmsg}\n`);
++                    }
++                }
++            } catch (e) {
++                $.logErr(e, resp);
++            }
++            finally {
++                resolve(data);
++            }
++        });
++
++    })
++
++}
++
++function sendToQywxAdminYy(content) {
++    return sendToQywxYy(content, null, true) 
++}
++
++function sendToQywxYy(content, toUserId, isAdmin = false) {
++
++    return new Promise(async (resolve) => {
++        const fs = require('fs');
++
++        const YY_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=ACCESS_TOKEN";
++
++        let qywxyy
++
++        if(!isAdmin){
++            if (process.env.qywxyy) {
++                qywxyy = process.env.qywxyy.split(",");
++            }
++        } else {
++            if (process.env.qywxyy_admin) {
++                qywxyy = process.env.qywxyy_admin.split(",");
++            }
++            // 管理员通知时，toUserId 修改为配置的管理员id
++            toUserId = [process.env.QYWXYYY_ADMIN_USER.split(",")]
++        }
++
++
++        //console.log("准备发送企业微信应用消息，toUserId=",toUserId)
++        let access_token = ""
++        const ACCESS_TOKEN_FILE = `./ACCESS_TOKEN_${qywxyy[1]}.json`
++        let ACCESS_TOKEN_CACHE = null
++        if (fs.existsSync(ACCESS_TOKEN_FILE)) {
++            ACCESS_TOKEN_CACHE = JSON.parse(fs.readFileSync(ACCESS_TOKEN_FILE, 'utf-8'))
++        }
++
++        if (ACCESS_TOKEN_CACHE && new Date() < new Date(ACCESS_TOKEN_CACHE.expires_time)) {
++            console.log("access_token缓存读取成功")
++            access_token = ACCESS_TOKEN_CACHE.access_token
++        } else {
++            const result = await getQywxYyToken(qywxyy)
++            result.expires_time = new Date().getTime() + (result.expires_in - 200) * 1000
++            fs.writeFileSync(ACCESS_TOKEN_FILE, JSON.stringify(result))
++            access_token = result.access_token
++        }
++
++        const options = {
++            url: YY_PUSH_URL.replace("ACCESS_TOKEN", access_token),
++            json: {
++                    "touser": toUserId.join("|"),
++                    "agentid": qywxyy[1],
++
++                    "msgtype": "text",
++                    "text": {
++                        "content": content
++                    }
++                },
++            headers: {
++                'Content-Type': 'application/json',
++            },
++            timeout,
++        };
++        $.post(options, (err, resp, data) => {
++            try {
++                if (err) {
++                    console.log('企业微信应用发送通知消息失败！！\n');
++                    console.log(err);
++                } else {
++                    data = JSON.parse(data);
++                    if (data.errcode === 0) {
++                        console.log('企业微信应用发送通知消息成功🎉。\n');
++                    } else {
++                        console.log('企业微信发送通知消息失败！！\n');
++                        console.log(`${data.errmsg}\n`);
++                    }
++                }
++            } catch (e) {
++                $.logErr(e, resp);
++            }
++            finally {
++                resolve(data);
++            }
++        });
++    })
++}
++
++
++function qywxBotNotify(text, desp, mentioned_mobile_list = [], mentioned_list = [], wechat_list = []) {
++
+     return new Promise((resolve) => {
+         const options = {
+             url: `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${QYWX_KEY}`,
+             json: {
+                 msgtype: 'text',
+                 text: {
+-                    content: ` ${text}\n\n${desp}`,
++                    content: `${text}\n\n${desp}\n\n账号：${wechat_list.join("、")}`,
++                    //mentioned_list: mentioned_list,
++                    //mentioned_mobile_list: mentioned_mobile_list
+                 },
+             },
+             headers: {
+@@ -1515,6 +1792,7 @@ function qywxBotNotify(text, desp) {
+                         if (data.errcode === 0) {
+                             console.log('企业微信发送通知消息成功🎉。\n');
+                         } else {
++                            console.log('企业微信发送通知消息失败！！\n');
+                             console.log(`${data.errmsg}\n`);
+                         }
+                     }
+@@ -2329,6 +2607,7 @@ module.exports = {
+     sendNotify,
+     sendNotifybyWxPucher,
+     BARK_PUSH,
++    sendToQywxYy
+ };
+ 
+ // prettier-ignore
+-- 
+2.46.0.windows.1
+
