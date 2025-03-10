@@ -48,6 +48,12 @@ const router = createRouter({
     ]
 });
 
+router.beforeEach((to, from, next) => {
+    if (typeof _hmt !== 'undefined' && to.path) {
+        _hmt.push(['_trackPageview', to.fullPath]);
+    }
 
+    next();
+});
 
 export default router
