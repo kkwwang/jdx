@@ -1,4 +1,4 @@
-From 0f03ae468c9d15cc2b133ad2e3dc5ac60be48acf Mon Sep 17 00:00:00 2001
+From 42a7d27869427458bc008b9edc54f5b955ab7cc8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?=E7=8E=8B=E5=87=AF?= <wangkai-yanfa@allcorehatress.com>
 Date: Tue, 5 Nov 2024 10:22:24 +0800
 Subject: [PATCH] sendNotify
@@ -8,7 +8,7 @@ Subject: [PATCH] sendNotify
  1 file changed, 298 insertions(+), 19 deletions(-)
 
 diff --git a/sendNotify.js b/sendNotify.js
-index 3bea5f3..ea0d56a 100644
+index d4c6074..12e209b 100644
 --- a/sendNotify.js
 +++ b/sendNotify.js
 @@ -20,7 +20,7 @@
@@ -26,14 +26,14 @@ index 3bea5f3..ea0d56a 100644
  }
 -async function sendNotify(text, desp, params = {}, author = "\n================================\n好物推荐：https://u.jd.com/WLEVYTM",strsummary="") {
 +async function sendNotify(text, desp, params = {}, author = "",strsummary="") {
-     console.log(`开始发送通知...`); 
+     console.log(`开始发送通知...`);
 +
-+ 
++
 +    if (desp.indexOf('一个失效的都没有') !== -1) {
-+        console.log(`一个失效的都没有，跳过通知...`); 
++        console.log(`一个失效的都没有，跳过通知...`);
 +        return
 +    }
- 	
+
  	//NOTIFY_FILTERBYFILE代码来自Ca11back.
      if (process.env.NOTIFY_FILTERBYFILE) {
 @@ -367,22 +373,22 @@ async function sendNotify(text, desp, params = {}, author = "\n=================
@@ -62,17 +62,17 @@ index 3bea5f3..ea0d56a 100644
 +                                //     strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
 +                                //     console.log(strAllNotify);
 +                                // }
- 
+
                                  if (DisableCkBody.code == 200) {
                                      console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
- 
+
 -                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,已自动禁用!\n如果要继续挂机，请重新登录账号，账号有效期为30天.`;
 +                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,已自动禁用!\n如果要继续挂机，请重新登录账号.`;
                                      strNotifyOneTemp += "\n任务标题：" + strtext;
                                      if (strAllNotify)
                                          strNotifyOneTemp += `\n` + strAllNotify;
 @@ -393,7 +399,7 @@ async function sendNotify(text, desp, params = {}, author = "\n=================
- 
+
                                  } else {
                                      console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
 -                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请重新登录账号，账号有效期为30天.`;
@@ -81,9 +81,9 @@ index 3bea5f3..ea0d56a 100644
                                      if (strAllNotify)
                                          strNotifyOneTemp += `\n` + strAllNotify;
 @@ -875,13 +881,163 @@ async function sendNotify(text, desp, params = {}, author = "\n=================
- 
+
      }
- 
+
 +
 +    function replaceRemark(jd_cookies_env, chunk) {
 +        let mentioned_mobile_list = []
@@ -248,16 +248,16 @@ index 3bea5f3..ea0d56a 100644
 @@ -983,7 +1139,7 @@ function getRemark(strRemark) {
      }
  }
- 
+
 -async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n================================\n好物推荐：<a href="https://u.jd.com/WLEVYTM">https://u.jd.com/WLEVYTM</a>', strsummary = "") {
 +async function sendNotifybyWxPucher(text, desp, PtPin, author = '', strsummary = "") {
- 
+
      try {
          var Uid = "";
 @@ -1489,14 +1645,135 @@ function ddBotNotify(text, desp) {
      });
  }
- 
+
 -function qywxBotNotify(text, desp) {
 +function getQywxYyToken(qywxyy) {
 +    return new Promise((resolve) => {
@@ -293,7 +293,7 @@ index 3bea5f3..ea0d56a 100644
 +}
 +
 +function sendToQywxAdminYy(content) {
-+    return sendToQywxYy(content, null, true) 
++    return sendToQywxYy(content, null, true)
 +}
 +
 +function sendToQywxYy(content, toUserId, isAdmin = false) {
@@ -400,14 +400,14 @@ index 3bea5f3..ea0d56a 100644
                              console.log(`${data.errmsg}\n`);
                          }
                      }
-@@ -2329,6 +2607,7 @@ module.exports = {
+@@ -2336,6 +2614,7 @@ module.exports = {
      sendNotify,
      sendNotifybyWxPucher,
      BARK_PUSH,
 +    sendToQywxYy
  };
- 
+
  // prettier-ignore
--- 
+--
 2.46.0.windows.1
 
