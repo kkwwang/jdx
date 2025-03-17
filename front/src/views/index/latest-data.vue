@@ -1,37 +1,21 @@
 <template>
-    <van-cell-group inset v-if="envDatas.length">
+    <van-cell-group inset v-if="Object.keys(envDatas).length">
         <van-tabs v-model:active="activeTab" swipeable>
             <van-tab
-                v-for="envData in envDatas"
-                :title="envData.mobile"
-                :name="envData.mobile">
-                <van-cell-group>
-                    <van-cell
-                        title="统计时间"
-                    > {{ envData.时间 || '-' }}
-                    </van-cell>
-                    <template
-                        v-for="(item, index) in legend"
-                        :key="index"
-                    >
-                        <template v-if="envData[item.title]">
-
-                            <van-cell
-                                :title="item.title"
-                                :label="getLatestTip(item, envData[item.title])"
-                            >{{ envData[item.title] }}
-                            </van-cell>
-                        </template>
-                    </template>
-                </van-cell-group>
+                v-for="(envData, mobile) in envDatas"
+                :title="mobile"
+                :name="mobile">
+                <latest-data-item :envData="envDatas[activeTab]" />
             </van-tab>
         </van-tabs>
+
     </van-cell-group>
 </template>
 <script setup>
-import legend from "../legend.json"
 
 import { getCurrentInstance, onMounted, ref, watch } from "vue";
+import LatestDataItem from "@/views/index/latest-data-item.vue";
+
 
 const latestDataActiveTabName = 'latestDataActiveTabName'
 const { proxy } = getCurrentInstance()
@@ -45,26 +29,18 @@ const _props = defineProps({
 
 const envDatas = ref([])
 
-const getLatestTip = (item, value) => {
-    if (value - item.difference > 0) {
-        return item.tip;
-    }
-}
 
 const getLatestData = () => {
     const temp = {}
     envDatas.value = []
-    _props.data.forEach(item => {
+    _props.data?.forEach(item => {
 
         if (!temp[item.mobile]) {
             temp[item.mobile] = []
         }
         temp[item.mobile].push(item)
     })
-
-    for (let tempKey in temp) {
-        envDatas.value.push(temp[tempKey][temp[tempKey].length - 1])
-    }
+    envDatas.value = temp
 }
 
 onMounted(() => {
