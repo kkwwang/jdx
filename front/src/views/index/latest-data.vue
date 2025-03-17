@@ -5,10 +5,9 @@
                 v-for="(envData, mobile) in envDatas"
                 :title="mobile"
                 :name="mobile">
-                <latest-data-item :envData="envDatas[activeTab]" />
             </van-tab>
         </van-tabs>
-
+        <latest-data-item :envData="envDatas[activeTab]" />
     </van-cell-group>
 </template>
 <script setup>
