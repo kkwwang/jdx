@@ -31,7 +31,7 @@ const loginLog = ref(null)
 const logoutLog = ref(null)
 
 const allDatas = ref([])
-const selectDate = ref(null)
+const selectDate = ref( dayjs().format("YYYY-MM-DD"))
 
 const defaultDate = computed(() => {
     return _props.dates.map(item => new Date(item)).sort((a, b) => new Date(b) - new Date(a))
