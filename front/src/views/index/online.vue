@@ -2,7 +2,7 @@
     <van-calendar
         v-if="loginLog != null"
         :title="'累计在线天数：' + dates.length"
-        type="multiple"
+        type="single"
         :default-date="defaultDate"
         switch-mode="year-month"
         color="#07c160"
@@ -10,10 +10,17 @@
         :max-date="new Date()"
         :min-date="defaultDate[defaultDate.length - 1]"
         :poppable="false"
-        readonly
         :show-confirm="false"
-        :style="{ height: '500px' }"
+        @select="calendarSelect"
     />
+
+        <van-list
+            finished-text="没有更多了"
+        >
+            <van-cell v-for="item in allDatas.filter(a => a.login_day === selectDate)" :key="item" :title="item.type === '1' ? '在线' : '离线'" :class="item.type === '1' ? 'online' : 'offline'">
+                {{ item.login_day }} {{ item.login_time }}
+            </van-cell>
+        </van-list>
 </template>
 <script setup>
 import dayjs from "dayjs";
@@ -22,6 +29,9 @@ import { getLoginLog } from "@/api";
 
 const loginLog = ref(null)
 const logoutLog = ref(null)
+
+const allDatas = ref([])
+const selectDate = ref(null)
 
 const defaultDate = computed(() => {
     return _props.dates.map(item => new Date(item)).sort((a, b) => new Date(b) - new Date(a))
@@ -57,12 +67,20 @@ const formatter = (day) => {
     return day;
 }
 
+const calendarSelect = (data) => {
+    const dayStr = dayjs(data).format("YYYY-MM-DD")
+    selectDate.value = dayStr
+    console.log(logoutLog.value[dayStr])
+    console.log(loginLog.value[dayStr])
+}
+
 onMounted(() => {
-    getCurrentInstance().proxy.$setTitle("在线日历 " + _props.mobile )
+    getCurrentInstance().proxy.$setTitle("在线日历 " + _props.mobile)
 
     getLoginLog(_props.mobile).then(res => {
         const loginResult = {}
         const logoutResult = {}
+        allDatas.value = res.data
         res.data.forEach(item => {
             if (item.type === "1") {
                 if (!loginResult[item.login_day]) {
@@ -87,12 +105,18 @@ onMounted(() => {
 </script>
 <style scoped>
 ::v-deep(.van-calendar__day.online) {
-    background: none !important;
     color: var(--van-success-color) !important;
 }
 
 ::v-deep(.van-calendar__day.offline) {
-    background: none !important;
+    color: var(--van-field-error-message-color) !important;
+}
+
+::v-deep(.online .van-cell__title){
+    color: var(--van-success-color) !important;
+}
+
+::v-deep(.offline .van-cell__title){
     color: var(--van-field-error-message-color) !important;
 }
 </style>

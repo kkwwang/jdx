@@ -151,7 +151,7 @@ public class SQLiteUtils {
 
     public static JSONArray getLoginLog(String mobile) {
         createLoginLogTable();
-        String sql = "SELECT * FROM login_log WHERE mobile = ?;";
+        String sql = "SELECT * FROM login_log WHERE mobile = ? ORDER BY login_day DESC, login_time DESC;";
         return select(sql, mobile);
     }
 }
