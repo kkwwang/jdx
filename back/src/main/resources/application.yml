@@ -5,7 +5,8 @@ spring:
   application:
     version: @project.version@
   datasource:
-    url: jdbc:sqlite:/bean-log.db
+    beanLog: jdbc:sqlite:/bean-log.db
+    loginLog: jdbc:sqlite:/login-log.db
 
 logging:
   config: classpath:logback-jdx.xml

@@ -22,10 +22,13 @@ import java.util.Objects;
 @Slf4j
 public class SQLiteUtils {
 
+    private static final String BEAN_LOG_DB_NAME = "beanLog";
+    private static final String LOGIN_LOG_DB_NAME = "loginLog";
+
     public static List getAllDate() {
         String sql = "SELECT DISTINCT SUBSTR( 时间, 0, 11 )  FROM bean";
         List result = new ArrayList();
-        for (Object o : Objects.requireNonNull(select(sql))) {
+        for (Object o : Objects.requireNonNull(select(BEAN_LOG_DB_NAME, sql))) {
             JSONObject item = (JSONObject) o;
             result.addAll(item.values());
         }
@@ -39,7 +42,7 @@ public class SQLiteUtils {
         }
         time += "%";
         String sql = "SELECT  * FROM  bean WHERE  时间= ( SELECT MAX( 时间 ) FROM bean WHERE 时间 LIKE ?) group by mobile, 时间 order by 时间, 序号;";
-        return select(sql, time);
+        return select(BEAN_LOG_DB_NAME, sql, time);
     }
 
 
@@ -51,7 +54,7 @@ public class SQLiteUtils {
             try {
                 JWTFilter.checkToken(request);
                 String sql = "SELECT * FROM bean where mobile is not null group by mobile, 时间 order by 时间, 序号;";
-                return select(sql);
+                return select(BEAN_LOG_DB_NAME, sql);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -71,13 +74,13 @@ public class SQLiteUtils {
 
 
             String sql = "SELECT * FROM bean where mobile in (" + param + ") group by mobile, 时间 order by 时间, 序号;";
-            return select(sql, split);
+            return select(BEAN_LOG_DB_NAME, sql, split);
         }
     }
 
-    private static JSONArray select(String sql, Serializable... params) {
+    private static JSONArray select(String dbName, String sql, Serializable... params) {
         try {
-            String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
+            String datasourceUrl = SpringUtil.getProperty("spring.datasource." + dbName);
             // 连接到SQLite数据库
             Connection connection = DriverManager.getConnection(datasourceUrl);
 
@@ -119,7 +122,7 @@ public class SQLiteUtils {
     public static void createLoginLogTable() {
         try {
             String sql = "CREATE TABLE IF NOT EXISTS \"login_log\" (  \"mobile\" TEXT,  \"login_day\" TEXT,  \"login_time\" TEXT,  \"type\" integer);";
-            String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
+            String datasourceUrl = SpringUtil.getProperty("spring.datasource." + LOGIN_LOG_DB_NAME);
             // 连接到SQLite数据库
             Connection connection = DriverManager.getConnection(datasourceUrl);
             // 查询数据
@@ -134,7 +137,7 @@ public class SQLiteUtils {
         try {
             createLoginLogTable();
             String sql = "INSERT INTO login_log (\"mobile\", \"login_day\", \"login_time\", \"type\") VALUES (?, ?, ?, ?);";
-            String datasourceUrl = SpringUtil.getProperty("spring.datasource.url");
+            String datasourceUrl = SpringUtil.getProperty("spring.datasource." + LOGIN_LOG_DB_NAME);
             // 连接到SQLite数据库
             Connection connection = DriverManager.getConnection(datasourceUrl);
             // 查询数据
@@ -152,6 +155,6 @@ public class SQLiteUtils {
     public static JSONArray getLoginLog(String mobile) {
         createLoginLogTable();
         String sql = "SELECT * FROM login_log WHERE mobile = ? ORDER BY login_day DESC, login_time DESC;";
-        return select(sql, mobile);
+        return select(LOGIN_LOG_DB_NAME, sql, mobile);
     }
 }
