@@ -1,6 +1,7 @@
 package cn.yiidii.jdx.util;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.yiidii.jdx.support.JWTFilter;
 import com.alibaba.fastjson.JSONArray;
@@ -128,6 +129,9 @@ public class SQLiteUtils {
             // 查询数据
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.executeUpdate();
+
+            ps.close();
+            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -146,7 +150,13 @@ public class SQLiteUtils {
             ps.setString(2, DateUtil.format(loginTime, "yyyy-MM-dd"));
             ps.setString(3, DateUtil.format(loginTime, "HH:mm"));
             ps.setInt(4, 1);
+
+            log.info(StrUtil.format("登录成功，手机号：{}，账号：{}", mobile, account));
+
             ps.executeUpdate();
+
+            ps.close();
+            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
