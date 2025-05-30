@@ -27,7 +27,7 @@
         <file>${path}/debug.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 每天一归档 -->
-            <fileNamePattern>${path}/debug_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${path}/debug.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>${maxFileSize}</maxFileSize>
@@ -47,7 +47,7 @@
         <file>${path}/info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 每天一归档 -->
-            <fileNamePattern>${path}/info_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${path}/info.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -68,7 +68,7 @@
         <file>${path}/warn.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 每天一归档 -->
-            <fileNamePattern>${path}/warn_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${path}/warn.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -90,7 +90,7 @@
         <file>${path}/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 每天一归档 -->
-            <fileNamePattern>${path}/error_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${path}/error.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
