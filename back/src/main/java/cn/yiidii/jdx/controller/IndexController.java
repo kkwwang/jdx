@@ -11,6 +11,7 @@ import cn.yiidii.jdx.model.ex.BizException;
 import cn.yiidii.jdx.service.AdminService;
 import cn.yiidii.jdx.service.JdService;
 import cn.yiidii.jdx.service.QLService;
+import cn.yiidii.jdx.util.HttpContextUtils;
 import cn.yiidii.jdx.util.JDXUtil;
 import cn.yiidii.jdx.util.QywxUtil;
 import cn.yiidii.jdx.util.SQLiteUtils;
@@ -95,7 +96,7 @@ public class IndexController {
         }
 
         JSONObject result = qlService.submitCk(jdInfo.getCookie(), mobile);
-        log.info(StrUtil.format("ptPin: {}提交Cookie", JDXUtil.getPtPinFromCK(jdInfo.getCookie())));
+        log.info(StrUtil.format("ptPin: {}提交Cookie，提交IP：{}", JDXUtil.getPtPinFromCK(jdInfo.getCookie()), HttpContextUtils.getRequestIpAddr()));
         // 异步联动修正数据
         adminService.updateEnv(mobile);
 

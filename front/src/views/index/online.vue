@@ -14,13 +14,23 @@
         @select="calendarSelect"
     />
 
-        <van-list
-            finished-text="没有更多了"
+    <van-list
+        finished-text="没有更多了"
+    >
+        <van-cell
+            v-for="item in allDatas.filter(a => a.login_day === selectDate)"
+            :key="item" :title="item.type === '1' ? '在线' : '离线'"
+            :class="item.type === '1' ? 'online' : 'offline'"
+
         >
-            <van-cell v-for="item in allDatas.filter(a => a.login_day === selectDate)" :key="item" :title="item.type === '1' ? '在线' : '离线'" :class="item.type === '1' ? 'online' : 'offline'">
-                {{ item.login_day }} {{ item.login_time }}
-            </van-cell>
-        </van-list>
+            <div>
+                <div>{{ item.ip_addr }}</div>
+                <div>{{ item.login_day }} {{ item.login_time }}</div>
+            </div>
+
+
+        </van-cell>
+    </van-list>
 </template>
 <script setup>
 import dayjs from "dayjs";
@@ -31,7 +41,7 @@ const loginLog = ref(null)
 const logoutLog = ref(null)
 
 const allDatas = ref([])
-const selectDate = ref( dayjs().format("YYYY-MM-DD"))
+const selectDate = ref(dayjs().format("YYYY-MM-DD"))
 
 const defaultDate = computed(() => {
     return _props.dates.map(item => new Date(item)).sort((a, b) => new Date(b) - new Date(a))
@@ -112,11 +122,11 @@ onMounted(() => {
     color: var(--van-field-error-message-color) !important;
 }
 
-::v-deep(.online .van-cell__title){
+::v-deep(.online .van-cell__title) {
     color: var(--van-success-color) !important;
 }
 
-::v-deep(.offline .van-cell__title){
+::v-deep(.offline .van-cell__title) {
     color: var(--van-field-error-message-color) !important;
 }
 </style>

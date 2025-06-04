@@ -1,0 +1,19 @@
+# 仅供参考，请根据服务器实际情况修改
+version: '3.3'
+services:
+  jdx:
+    container_name: jdx
+    build:
+      context: /docker/qinglong/jdx
+      dockerfile: Dockerfile
+    image: "jdx"
+    restart: always
+    environment:
+      TZ: 'Asia/Shanghai'
+    volumes:
+      - /docker/qinglong/jdx/config:/jdx/config
+      - /docker/qinglong/jdx/logs:/jdx/logs
+      - /docker/qinglong/qinglong/data/db/bean-log.db:/bean-log.db
+      - /docker/qinglong/qinglong/data/db/login-log.db:/login-log.db
+      - /docker/qinglong/jdx/dist:/html
+    privileged: true

@@ -7,7 +7,7 @@
                 :name="mobile">
             </van-tab>
         </van-tabs>
-        <latest-data-item :envData="envDatas[activeTab]" />
+        <latest-data-item v-if="activeTab" :envData="envDatas[activeTab]" />
     </van-cell-group>
 </template>
 <script setup>

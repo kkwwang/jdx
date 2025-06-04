@@ -34,7 +34,7 @@
 
 <script setup name="latestDataItem">
 import legend from "../legend.json"
-import { onMounted, ref, watch } from "vue";
+import { defineProps, onMounted, ref, watch } from "vue";
 import dayjs from "dayjs";
 
 const activeData = ref({})
@@ -56,8 +56,14 @@ const openCanlendar = () => {
 
 const getLatestBeanFn = (value) => {
     show.value = false;
-    date.value = dayjs(value).format("YYYY-MM-DD")
-    activeData.value = _props.envData.filter(item => item.时间 === dayjs(value).format("YYYY-MM-DD"))?.[0]
+    if (!value) {
+        activeData.value = _props.envData[_props.envData.length - 1] || {}
+        date.value = activeData.value.时间
+    } else {
+        date.value = dayjs(value).format("YYYY-MM-DD")
+        activeData.value = _props.envData.filter(item => item.时间 === dayjs(value).format("YYYY-MM-DD"))?.[0] || {}
+    }
+
 }
 const formatter = (day) => {
     if (!enableDate.value.includes(dayjs(day.date).format("YYYY-MM-DD"))) {
@@ -72,11 +78,15 @@ const getLatestTip = (item, value) => {
 }
 
 onMounted(() => {
-    getLatestBeanFn(date.value)
+    if (_props.envData) {
+        getLatestBeanFn()
+    }
 })
 
 watch(() => _props.envData, () => {
-    getLatestBeanFn(date.value)
+    if (_props.envData) {
+        getLatestBeanFn()
+    }
 })
 
 </script>
