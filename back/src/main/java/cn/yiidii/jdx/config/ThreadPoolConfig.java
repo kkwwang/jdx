@@ -89,7 +89,7 @@ public class ThreadPoolConfig {
     @Bean("asyncExecutor")
     public ThreadPoolTaskExecutor asyncExecutor() {
         ThreadPoolTaskExecutor executor = constructor(ASYNC_EXECUTOR_NAME_PREFIX);
-        log.info(StrUtil.format("初始化通用线程池: {}", JSONObject.toJSONString(executor)));
+        log.debug(StrUtil.format("初始化通用线程池: {}", JSONObject.toJSONString(executor)));
         return executor;
     }
 

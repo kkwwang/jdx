@@ -125,7 +125,7 @@ public class QywxUtil {
                 .execute();
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
-            log.info("获取token结果: {}", body);
+            log.debug("获取token结果: {}", body);
             JSONObject jsonObject = JSON.parseObject(body);
             if (jsonObject.getInteger("errcode") == 0) {
                 String accessToken = jsonObject.getString("access_token");
@@ -146,7 +146,7 @@ public class QywxUtil {
 
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
-            log.info("获取用户id，参数：{}，结果: {}", reqParamJo.toJSONString(), body);
+            log.debug("获取用户id，参数：{}，结果: {}", reqParamJo.toJSONString(), body);
             JSONObject jsonObject = JSON.parseObject(body);
             return jsonObject.getString("userid");
         }
@@ -161,7 +161,7 @@ public class QywxUtil {
 
         if (response.getStatus() == HttpStatus.HTTP_OK) {
             String body = response.body();
-            log.info("获取用户信息结果: {}", body);
+            log.debug("获取用户信息结果: {}", body);
             JSONObject jsonObject = JSON.parseObject(body);
             if (jsonObject.getInteger("errcode") == 0) {
                 return jsonObject.getString("userid");
@@ -182,7 +182,7 @@ public class QywxUtil {
             @Cleanup HttpResponse response = HttpRequest.post(updateUrl.replace("ACCESS_TOKEN", token))
                     .body(reqParamJo.toJSONString())
                     .execute();
-            log.info("更新企业微信岗位信息为京东pt_pin完成，参数：{}，结果：{}", reqParamJo.toJSONString(), response.body());
+            log.debug("更新企业微信岗位信息为京东pt_pin完成，参数：{}，结果：{}", reqParamJo.toJSONString(), response.body());
         }
 
     }
@@ -203,7 +203,7 @@ public class QywxUtil {
             @Cleanup HttpResponse response = HttpRequest.post(create.replace("ACCESS_TOKEN", token))
                     .body(reqParamJo.toJSONString())
                     .execute();
-            log.info(response.body());
+            log.debug(response.body());
         }
 
     }

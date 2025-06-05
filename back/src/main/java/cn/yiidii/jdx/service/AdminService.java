@@ -77,7 +77,7 @@ public class AdminService {
 
 
     public JSONObject updateEnv(String mobile) {
-        log.info("envs 修正开始");
+        log.debug("envs 修正开始");
         if (!StringUtils.hasText(mobile)) {
             mobile = "";
         }
@@ -150,7 +150,7 @@ public class AdminService {
 
         qywxUserIdMap.forEach(qywxUtil::updateQywxUserPosition);
 
-        log.info("envs 修正更新成功，耗时：{} s", (System.currentTimeMillis() - start) / 1000);
+        log.debug("envs 修正更新成功，耗时：{} s", (System.currentTimeMillis() - start) / 1000);
         return new JSONObject();
     }
 

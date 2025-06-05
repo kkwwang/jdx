@@ -69,7 +69,7 @@ public class AuthController {
         info.put(NOT_BEFORE, now);
         info.put("token", JWTUtil.createToken(info, key.replace("username", username).replace("password", password).getBytes(StandardCharsets.UTF_8)));
 
-        log.info(StrUtil.format("登录结果: {}", info.toJSONString()));
+        log.debug(StrUtil.format("登录结果: {}", info.toJSONString()));
         return R.ok(info.getString("token"), "登陆成功");
     }
 

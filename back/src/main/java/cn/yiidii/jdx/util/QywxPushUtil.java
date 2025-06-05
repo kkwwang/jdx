@@ -39,11 +39,11 @@ public class QywxPushUtil {
                 SystemConfigProperties systemConfigProperties = SpringUtil.getBean(SystemConfigProperties.class);
                 reqParamJo.put("agentid", systemConfigProperties.getQywxConfig().getAgentid());
                 reqParamJo.put("touser", String.join("|", qywxUserIdList));
-                log.info(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
+                log.debug(StrUtil.format("企业微信发送消息, 参数: {}", reqParamJo.toJSONString()));
                 @Cleanup HttpResponse respYy = HttpRequest.post(YY_PUSH_URL.replace("ACCESS_TOKEN", contactsToken))
                         .body(reqParamJo.toJSONString())
                         .execute();
-                log.info(StrUtil.format("企业微信应用发送消息, 响应: {}", respYy.body()));
+                log.debug(StrUtil.format("企业微信应用发送消息, 响应: {}", respYy.body()));
             }
         } catch (Exception e) {
             log.warn("企业微信应用推送异常, 异常信息: {}", e.getMessage());
@@ -64,7 +64,7 @@ public class QywxPushUtil {
             @Cleanup HttpResponse resp = HttpRequest.post(PUSH_URL.replace("${QYWX_KEY}", qywxKey))
                     .body(reqParamJo.toJSONString())
                     .execute();
-            log.info(StrUtil.format("企业微信群发送消息, 响应: {}", resp.body()));
+            log.debug(StrUtil.format("企业微信群发送消息, 响应: {}", resp.body()));
         } catch (Exception e) {
             log.warn("企业微信群推送异常, 异常信息: {}", e.getMessage());
         }

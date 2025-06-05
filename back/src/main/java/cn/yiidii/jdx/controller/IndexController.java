@@ -96,7 +96,7 @@ public class IndexController {
         }
 
         JSONObject result = qlService.submitCk(jdInfo.getCookie(), mobile);
-        log.info(StrUtil.format("ptPin: {}提交Cookie，提交IP：{}", JDXUtil.getPtPinFromCK(jdInfo.getCookie()), HttpContextUtils.getRequestIpAddr()));
+        log.debug(StrUtil.format("ptPin: {}提交Cookie，提交IP：{}", JDXUtil.getPtPinFromCK(jdInfo.getCookie()), HttpContextUtils.getRequestIpAddr()));
         // 异步联动修正数据
         adminService.updateEnv(mobile);
 

@@ -52,6 +52,7 @@ public class GlobalExceptionHandler {
     public R<?> bizException(BizException ex) {
         log.debug("BizException", ex);
         log.warn("BizException: {}", ex.getMessage());
+        log.info("BizException: {}", ex.getMessage());
         return R.failed(ex.getCode(), ex.getMessage());
     }
 

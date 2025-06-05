@@ -47,7 +47,7 @@ public class ScheduleTaskUtil {
         ScheduledFuture<?> future = defaultTaskScheduler.schedule(task, new CronTrigger(cron));
         futureGroup.put(name, future);
         taskGroup.put(name, task);
-        log.info(StrUtil.format("定时任务[{}({})]启动成功", name, cron));
+        log.debug(StrUtil.format("定时任务[{}({})]启动成功", name, cron));
     }
 
 
@@ -60,7 +60,7 @@ public class ScheduleTaskUtil {
         ScheduledFuture<?> future = futureGroup.get(name);
         if (future != null) {
             future.cancel(true);
-            log.info(StrUtil.format("定时任务[{}]停止成功", name));
+            log.debug(StrUtil.format("定时任务[{}]停止成功", name));
         }
     }
 
@@ -80,6 +80,6 @@ public class ScheduleTaskUtil {
         stopCron(name);
         ScheduledFuture<?> future = defaultTaskScheduler.schedule(taskGroup.get(name), new CronTrigger(cron));
         futureGroup.put(name, future);
-        log.info(StrUtil.format("定时任务[{}({})]变更成功", name, cron));
+        log.debug(StrUtil.format("定时任务[{}({})]变更成功", name, cron));
     }
 }

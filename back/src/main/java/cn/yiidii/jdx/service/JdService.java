@@ -51,8 +51,8 @@ public class JdService {
         if (Objects.isNull(responseJo)) {
             throw new BizException("京东服务器抽风中, 再试一次吧~");
         }
-        log.info(StrUtil.format("京东发送验证码, 获取一堆什么参数, 京东响应: {}", responseJo.toJSONString()));
-        this.checkErr(responseJo);
+        log.debug(StrUtil.format("京东发送验证码, 获取一堆什么参数, 京东响应: {}", responseJo.toJSONString()));
+        this.checkErr(responseJo, mobile);
         JSONObject data = responseJo.getJSONObject("data");
         String gsalt = data.getString("gsalt");
         String guid = data.getString("guid");
@@ -83,8 +83,8 @@ public class JdService {
         if (Objects.isNull(responseJo)) {
             throw new BizException("京东服务器抽风中, 再试一次吧~");
         }
-        log.info(StrUtil.format("京东发送验证码, 第二步, 京东响应: {}", responseJo.toJSONString()));
-        this.checkErr(responseJo);
+        log.debug(StrUtil.format("京东发送验证码, 第二步, 京东响应: {}", responseJo.toJSONString()));
+        this.checkErr(responseJo, mobile);
         timedCache.put(mobile, jdInfo);
         jdInfo.setExpireTime(responseJo.getJSONObject("data").getLong("expire_time"));
         return jdInfo;
@@ -105,9 +105,9 @@ public class JdService {
                 .cookie(jdInfo.getPreCookie())
                 .execute();
         JSONObject responseJo = JSONObject.parseObject(response.body());
-        this.checkErr(responseJo);
+        this.checkErr(responseJo, mobile);
         JSONObject data = responseJo.getJSONObject("data");
-        log.info(StrUtil.format("[京东 - {}] 获取到数据 {}", mobile, data));
+        log.debug(StrUtil.format("[京东 - {}] 获取到数据 {}", mobile, data));
 
         String ptKey = data.getString("pt_key");
         String ptPin = data.getString("pt_pin");
@@ -121,10 +121,10 @@ public class JdService {
     }
 
 
-    private void checkErr(JSONObject responseJo) {
+    private void checkErr(JSONObject responseJo, String mobile) {
         Integer errCode = responseJo.getInteger("err_code");
         if (errCode != 0) {
-            throw new BizException(responseJo.getString("err_msg"));
+            throw new BizException(mobile + ": " + responseJo.getString("err_msg"));
         }
     }
 }
