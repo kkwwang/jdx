@@ -13,7 +13,6 @@ services:
     volumes:
       - /docker/qinglong/jdx/config:/jdx/config
       - /docker/qinglong/jdx/logs:/jdx/logs
-      - /docker/qinglong/qinglong/data/db/bean-log.db:/bean-log.db
-      - /docker/qinglong/qinglong/data/db/login-log.db:/login-log.db
+      - /volume1/docker/qinglong/qinglong/data/db:/qinglong/data/db
       - /docker/qinglong/jdx/dist:/html
     privileged: true

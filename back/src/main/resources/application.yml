@@ -5,8 +5,8 @@ spring:
   application:
     version: @project.version@
   datasource:
-    beanLog: jdbc:sqlite:/bean-log.db
-    loginLog: jdbc:sqlite:/login-log.db
+    beanLog: jdbc:sqlite:/qinglong/data/db/bean-log.db
+    loginLog: jdbc:sqlite:/qinglong/data/db/login-log.db
 
 logging:
   config: classpath:logback-jdx.xml
