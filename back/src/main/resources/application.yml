@@ -11,6 +11,12 @@ spring:
 logging:
   config: classpath:logback-jdx.xml
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
 qywx:
   getToken: https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET
   # 文档：https://work.weixin.qq.com/api/doc#10167

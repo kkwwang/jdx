@@ -51,6 +51,7 @@ export default async ({mode}) => {
 
         server: {
             port: 43000,
+            allowedHosts: true,
             proxy: {
                 '^/api/*': {
                     target: `http://127.0.0.1:8090`,

@@ -44,7 +44,8 @@ public class JWTFilter extends OncePerRequestFilter {
                     "/info",
                     "/oauth/**",
                     "/auth/**",
-                    "/third/**"
+                    "/third/**",
+                    "/actuator/**"
             );
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
