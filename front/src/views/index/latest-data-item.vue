@@ -10,11 +10,19 @@
             v-for="(item, index) in legend"
             :key="index"
         >
-            <template v-if="activeData[item.title]">
+            <template v-if="activeData?.[item.title]">
                 <van-cell
                     :title="item.title"
                     :label="getLatestTip(item, activeData[item.title])"
-                >{{ activeData[item.title] }}
+                >{{ activeData?.[item.title] || '-'}}
+                </van-cell>
+            </template>
+            <template v-else>
+                <van-cell
+                    :title="item.title"
+                    :label="getLatestTip(item, item.difference)"
+                >
+                    -
                 </van-cell>
             </template>
         </template>
