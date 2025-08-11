@@ -76,6 +76,12 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.34.0</version> <!-- Use the latest version -->
         </dependency>
+        <!-- p6spy 依赖 -->
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+            <version>3.9.1</version>
+        </dependency>
 
 <!--        Actuator -->
         <dependency>

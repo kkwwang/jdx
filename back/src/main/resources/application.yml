@@ -5,8 +5,9 @@ spring:
   application:
     version: @project.version@
   datasource:
-    beanLog: jdbc:sqlite:/qinglong/data/db/bean-log.db
-    loginLog: jdbc:sqlite:/qinglong/data/db/login-log.db
+    beanLog: jdbc:p6spy:sqlite:/qinglong/data/db/bean-log.db
+    loginLog: jdbc:p6spy:sqlite:/qinglong/data/db/login-log.db
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
 
 logging:
   config: classpath:logback-jdx.xml

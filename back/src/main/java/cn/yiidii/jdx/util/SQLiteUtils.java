@@ -15,10 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 public class SQLiteUtils {
@@ -47,7 +45,15 @@ public class SQLiteUtils {
     }
 
 
-    public static JSONArray getBeanByMobile(String mobile) {
+    public static JSONArray getBeanByMobile(String mobile, String startDate, String endDate) {
+        if(null == startDate){
+            // 7天前
+            startDate = DateUtil.format(DateUtil.offsetDay(new Date(), -7), "yyyy-MM-dd");
+        }
+        if(null == endDate){
+            endDate = DateUtil.format(new Date(), "yyyy-MM-dd");
+        }
+
         if (StringUtils.pathEquals(mobile, "all")) {
             // 验证权限
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -73,9 +79,13 @@ public class SQLiteUtils {
                 }
             }
 
+            ArrayList<String> list = new ArrayList<>(Arrays.asList(split));
+            list.add(startDate);
+            list.add(endDate);
 
-            String sql = "SELECT * FROM bean where mobile in (" + param + ") group by mobile, 时间 order by 时间, 序号;";
-            return select(BEAN_LOG_DB_NAME, sql, split);
+
+            String sql = "SELECT * FROM bean where mobile in (" + param + ") AND 时间 BETWEEN ? AND ? group by mobile, 时间 order by 时间, 序号;";
+            return select(BEAN_LOG_DB_NAME, sql, list.toArray(new String[0]));
         }
     }
 

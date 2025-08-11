@@ -123,8 +123,8 @@ public class IndexController {
     }
 
     @GetMapping("/jd/getBean")
-    public R<JSONArray> getBean(String mobile) {
-        return R.ok(SQLiteUtils.getBeanByMobile(mobile));
+    public R<JSONArray> getBean(String mobile, String startDate, String endDate) {
+        return R.ok(SQLiteUtils.getBeanByMobile(mobile, startDate, endDate));
     }
 
     @GetMapping("/jd/getLoginLog")
