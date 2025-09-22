@@ -48,7 +48,7 @@ public class SQLiteUtils {
     public static JSONArray getBeanByMobile(String mobile, String startDate, String endDate) {
         if(null == startDate){
             // 7天前
-            startDate = DateUtil.format(DateUtil.offsetDay(new Date(), -7), "yyyy-MM-dd");
+            startDate = DateUtil.format(DateUtil.offsetDay(new Date(), -90), "yyyy-MM-dd");
         }
         if(null == endDate){
             endDate = DateUtil.format(new Date(), "yyyy-MM-dd");

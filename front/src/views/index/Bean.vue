@@ -12,7 +12,7 @@
         </van-nav-bar>
         <van-notice-bar
             left-icon="volume-o"
-            text="统计信息仅供参考，以实际到账为准"
+            text="统计信息仅供参考（仅展示最近90天数据）"
             mode="closeable"
         />
         <van-cell-group inset>

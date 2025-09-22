@@ -72,11 +72,11 @@ const beanOption = computed(() => {
         dataZoom: [
             {
                 type: "inside",
-                start: 0,
+                start: 85,
                 end: 100
             },
             {
-                start: 0,
+                start: 75,
                 end: 100
             }
         ],
